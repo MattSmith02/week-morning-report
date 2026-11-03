@@ -282,11 +282,7 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
   const rest = part !== "hook";
   const framed = part !== "rest";
   const altered = alteredCoverFor(story);
-  const frameBg = altered
-    ? altered.tone === "pink"
-      ? "bg-[var(--report-section-pink)]"
-      : "bg-[var(--report-section-sky)]"
-    : "bg-[#F4F0EA]";
+  const frameBg = altered ? alteredPlateClass(altered.tone) : "bg-[#F4F0EA]";
 
   return (
     <div className={framed ? `relative py-16 xl:py-20 ${frameBg}` : ""}>
@@ -662,75 +658,90 @@ function CoverLock() {
   );
 }
 
-type AlteredCover = { tone: "pink" | "sky"; graphic: string; inset: string };
+type AlteredTone = "pink" | "sky" | "mint";
+type AlteredCover = { tone: AlteredTone; motif: "sun" | "lens" | "paper" };
 
-/** Shared collage art — not story-specific, reusable for any piece in these sections. */
-const ALTERED_BY_SECTION: Record<"pink" | "sky", AlteredCover> = {
-  pink: {
-    tone: "pink",
-    graphic: "/the-week/ice-collage.png",
-    inset: "/the-week/film/frame-02.jpg",
-  },
-  sky: {
-    tone: "sky",
-    graphic: "/the-week/gambling-collage.png",
-    inset: "/the-week/film/frame-04.jpg",
-  },
-};
-
+/** Bright plates + generic artled motifs — reusable for any story in these sections. */
 function alteredCoverFor(story: WeekStory): AlteredCover | null {
   const key = `${story.chip} ${story.kicker}`.toLowerCase();
-  if (key.includes("not all bad")) return ALTERED_BY_SECTION.pink;
-  if (key.includes("on this day") || key.includes("tall tale")) return ALTERED_BY_SECTION.sky;
+  if (key.includes("not all bad")) return { tone: "pink", motif: "sun" };
+  if (key.includes("on this day")) return { tone: "sky", motif: "lens" };
+  if (key.includes("tall tale")) return { tone: "mint", motif: "paper" };
   return null;
 }
 
-function ScribbleMark({ className = "" }: { className?: string }) {
+function alteredPlateClass(tone: AlteredTone) {
+  if (tone === "pink") return "bg-[var(--report-section-pink)]";
+  if (tone === "mint") return "bg-[var(--report-section-mint)]";
+  return "bg-[var(--report-section-sky)]";
+}
+
+/** Oval artled graphic: flat shapes + arrows (edition-card language). */
+function ArtledMotif({ motif }: { motif: AlteredCover["motif"] }) {
+  if (motif === "sun") {
+    return (
+      <svg viewBox="0 0 320 180" className="h-full w-full" aria-hidden>
+        <ellipse cx="160" cy="96" rx="54" ry="52" fill="#F5C542" />
+        {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg) => {
+          const rad = (deg * Math.PI) / 180;
+          const x2 = 160 + Math.cos(rad) * 118;
+          const y2 = 96 + Math.sin(rad) * 78;
+          return (
+            <path
+              key={deg}
+              d={`M160 96 L${x2} ${y2}`}
+              stroke={deg % 60 === 0 ? "#E85D04" : "#2F9E6B"}
+              strokeWidth={deg % 60 === 0 ? 14 : 10}
+              strokeLinecap="round"
+              opacity="0.92"
+            />
+          );
+        })}
+      </svg>
+    );
+  }
+  if (motif === "lens") {
+    return (
+      <svg viewBox="0 0 320 180" className="h-full w-full" aria-hidden>
+        <rect x="36" y="28" width="248" height="124" rx="8" fill="#E8E4DC" />
+        {[0, 1, 2, 3, 4].map((row) =>
+          [0, 1, 2, 3, 4, 5].map((col) => (
+            <path
+              key={`${row}-${col}`}
+              d={`M${58 + col * 36} ${44 + row * 22} l8 14 -16 0 z`}
+              fill="#F67B9A"
+              opacity="0.85"
+            />
+          )),
+        )}
+        <circle cx="168" cy="92" r="46" fill="none" stroke="#1B1B1B" strokeWidth="10" />
+        <circle cx="168" cy="92" r="28" fill="none" stroke="#1B1B1B" strokeWidth="6" />
+        <path d="M198 122 L248 156" stroke="#1B1B1B" strokeWidth="12" strokeLinecap="round" />
+      </svg>
+    );
+  }
   return (
-    <svg className={className} viewBox="0 0 160 40" fill="none" aria-hidden>
-      <path
-        d="M4 28c18-16 34-18 52-10 14 6 22 4 34-4 12-8 28-12 46-6 8 3 16 8 22 14"
-        stroke="#0A0A0A"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-      <path
-        d="M18 34c22-8 40-6 58 2 16 7 30 2 42-6"
-        stroke="#0A0A0A"
-        strokeWidth="1.1"
-        strokeLinecap="round"
-        opacity="0.55"
-      />
+    <svg viewBox="0 0 320 180" className="h-full w-full" aria-hidden>
+      <rect x="96" y="34" width="88" height="112" rx="4" fill="#D9D4CC" transform="rotate(-18 140 90)" />
+      <rect x="118" y="40" width="88" height="112" rx="4" fill="#EFEBE3" transform="rotate(12 162 96)" />
+      <rect x="128" y="48" width="72" height="10" fill="#C4BDB2" transform="rotate(12 164 53)" />
+      <rect x="128" y="66" width="56" height="6" fill="#C4BDB2" transform="rotate(12 156 69)" />
+      <path d="M70 40 L250 140" stroke="#DF0A14" strokeWidth="18" strokeLinecap="round" opacity="0.85" />
+      <path d="M250 40 L70 140" stroke="#DF0A14" strokeWidth="18" strokeLinecap="round" opacity="0.85" />
     </svg>
   );
 }
 
-/** Pastel plate + grayscale collage cutouts — “It’s not all bad” / On this day / Tall tale. */
-function AlteredCoverDecor({
-  tone,
-  graphic,
-  inset,
-}: {
-  tone: "pink" | "sky";
-  graphic: string;
-  inset?: string;
-}) {
-  const plate = tone === "pink" ? "bg-[var(--report-section-pink)]" : "bg-[var(--report-section-sky)]";
+/** Bright plate + cream oval artled motif — matches edition-card covers. */
+function AlteredCoverDecor({ tone, motif }: AlteredCover) {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-      <div className={`absolute inset-0 ${plate}`} />
-      <div className="absolute top-[6%] right-[-6%] h-[56%] w-[68%] max-w-[720px] rotate-[-2.5deg] sm:right-[4%] sm:w-[54%]">
-        <div className="relative h-full w-full overflow-hidden border-[5px] border-white shadow-[0_22px_48px_rgba(10,10,10,0.18)] sm:border-[7px]">
-          <Image src={graphic} alt="" fill unoptimized sizes="70vw" className="object-cover grayscale contrast-125" />
-          <div className="absolute inset-0 bg-[#011535]/12 mix-blend-multiply" />
+      <div className={`absolute inset-0 ${alteredPlateClass(tone)}`} />
+      <div className="absolute top-[12%] left-1/2 h-[42%] w-[min(88%,560px)] -translate-x-1/2 sm:top-[14%] sm:h-[46%]">
+        <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-[999px] bg-[var(--report-section-oval)] px-8 shadow-[0_12px_32px_rgba(10,10,10,0.12)]">
+          <ArtledMotif motif={motif} />
         </div>
       </div>
-      {inset ? (
-        <div className="absolute bottom-[30%] left-[4%] h-[26%] w-[30%] max-w-[240px] rotate-[3deg] overflow-hidden border-[4px] border-white shadow-[0_14px_28px_rgba(10,10,10,0.16)] sm:left-[8%]">
-          <Image src={inset} alt="" fill unoptimized sizes="240px" className="object-cover grayscale contrast-110" />
-        </div>
-      ) : null}
-      <ScribbleMark className="absolute bottom-[26%] left-[6%] w-36 opacity-45 sm:left-[10%] sm:w-44" />
     </div>
   );
 }
@@ -758,9 +769,7 @@ function StoryCover({ story, index, edition, locked = false }: { story: WeekStor
   const textOnly = !hasMedia && !altered && story.format !== "puzzle";
   const lightPlate = Boolean(altered) || textOnly;
   const plateBg = altered
-    ? altered.tone === "pink"
-      ? "bg-[var(--report-section-pink)]"
-      : "bg-[var(--report-section-sky)]"
+    ? alteredPlateClass(altered.tone)
     : textOnly
       ? "bg-[var(--report-beige)]"
       : story.format === "puzzle"
@@ -774,7 +783,7 @@ function StoryCover({ story, index, edition, locked = false }: { story: WeekStor
       className={`relative flex h-[calc(100svh-48px)] min-h-[520px] scroll-mt-12 items-end overflow-clip ${plateBg}`}
     >
       {altered ? (
-        <AlteredCoverDecor tone={altered.tone} graphic={altered.graphic} inset={altered.inset} />
+        <AlteredCoverDecor tone={altered.tone} motif={altered.motif} />
       ) : story.imageSrc ? (
         <Image
           src={story.imageSrc}
@@ -793,9 +802,12 @@ function StoryCover({ story, index, edition, locked = false }: { story: WeekStor
       {hasMedia || story.format === "puzzle" ? (
         <div className={`absolute inset-0 ${story.format === "puzzle" ? "bg-gradient-to-t from-black/75 via-black/10 to-transparent" : coverScrim}`} />
       ) : null}
-      {hasMedia && !edition ? (
+      {/* Story index watermark — includes 01 on the first / edition cover */}
+      {hasMedia || altered ? (
         <span
-          className="pointer-events-none absolute inset-x-0 bottom-[22%] z-[5] text-center text-[min(28vw,220px)] leading-none font-normal text-white/25 select-none"
+          className={`pointer-events-none absolute inset-x-0 z-[5] text-center text-[min(28vw,220px)] leading-none font-normal select-none ${
+            lightPlate ? "bottom-[38%] text-black/12" : "bottom-[22%] text-white/25"
+          }`}
           style={roman}
           aria-hidden
         >
@@ -827,23 +839,14 @@ function StoryCover({ story, index, edition, locked = false }: { story: WeekStor
             </span>
           </div>
         ) : null}
-        <p
-          className={`text-[12px] font-bold tracking-[0.16em] uppercase ${
-            lightPlate || altered ? "text-[#DF0A14]" : "text-[#DF0A14]"
-          }`}
-          style={uiBold}
-        >
-          {edition ? story.chip : (
-            <>
-              {number(index)}
-              <span className={lightPlate ? "text-black/50" : "text-white/80"}> · {story.chip}</span>
-            </>
-          )}
+        <p className="text-[12px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
+          {number(index)}
+          <span className={lightPlate ? "text-black/55" : "text-white/80"}> · {story.chip}</span>
         </p>
         {lightPlate ? <div className="mt-4 h-[3px] w-16 bg-[#DF0A14]" aria-hidden /> : null}
         <h2
           className={`mt-4 max-w-[14ch] text-[56px] leading-[0.95] sm:text-[72px] lg:max-w-none lg:whitespace-nowrap ${
-            lightPlate ? (altered?.tone === "pink" ? "text-[#DF0A14]" : "text-black") : "text-white"
+            lightPlate ? "text-black" : "text-white"
           }`}
           style={roman}
         >
@@ -1528,16 +1531,14 @@ export function ReportBriefing({
                   const textOnly = !hasMedia && !altered && story.format !== "puzzle";
                   const lightPlate = Boolean(altered) || textOnly;
                   const plateBg = altered
-                    ? altered.tone === "pink"
-                      ? "bg-[var(--report-section-pink)]"
-                      : "bg-[var(--report-section-sky)]"
+                    ? alteredPlateClass(altered.tone)
                     : textOnly
                       ? "bg-[var(--report-beige)]"
                       : "bg-[#111]";
                   return (
                 <div className={`relative h-full snap-start overflow-clip ${plateBg}`}>
                   {altered ? (
-                    <AlteredCoverDecor tone={altered.tone} graphic={altered.graphic} inset={altered.inset} />
+                    <AlteredCoverDecor tone={altered.tone} motif={altered.motif} />
                   ) : story.format === "video" && story.videoSrc ? (
                     <video src={story.videoSrc} autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover" />
                   ) : story.imageSrc ? (
@@ -1554,9 +1555,11 @@ export function ReportBriefing({
                     <TextOnlyDecor tone="beige" />
                   ) : null}
                   {hasMedia ? <div className={`absolute inset-0 ${coverScrim}`} /> : null}
-                  {hasMedia ? (
+                  {hasMedia || altered ? (
                     <span
-                      className="pointer-events-none absolute inset-x-0 bottom-[26%] z-[5] text-center text-[32vw] leading-none text-white/25 select-none"
+                      className={`pointer-events-none absolute inset-x-0 z-[5] text-center text-[32vw] leading-none select-none ${
+                        lightPlate ? "bottom-[40%] text-black/12" : "bottom-[26%] text-white/25"
+                      }`}
                       style={roman}
                       aria-hidden
                     >
@@ -1567,15 +1570,10 @@ export function ReportBriefing({
                   <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center px-12 pb-24 text-center">
                     <p className="text-[12px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
                       {number(storyIndex)}
-                      <span className={lightPlate ? "text-black/50" : "text-white/80"}> · {story.chip}</span>
+                      <span className={lightPlate ? "text-black/55" : "text-white/80"}> · {story.chip}</span>
                     </p>
                     {lightPlate ? <div className="mt-4 h-[3px] w-16 bg-[#DF0A14]" aria-hidden /> : null}
-                    <h2
-                      className={`mt-4 max-w-[12ch] text-[2.625rem] leading-none ${
-                        lightPlate ? (altered?.tone === "pink" ? "text-[#DF0A14]" : "text-black") : "text-white"
-                      }`}
-                      style={roman}
-                    >
+                    <h2 className={`mt-4 max-w-[12ch] text-[2.625rem] leading-none ${lightPlate ? "text-black" : "text-white"}`} style={roman}>
                       {story.displayTitle}
                     </h2>
                     <p className={`mt-3 line-clamp-2 max-w-[32ch] text-[16px] leading-6 ${lightPlate ? "text-black/75" : "text-white/90"}`} style={roman}>
