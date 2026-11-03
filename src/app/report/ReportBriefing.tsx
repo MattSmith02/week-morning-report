@@ -28,10 +28,31 @@ const heading = "text-[2rem] leading-10 text-black";
 const subInfo = "text-[11px] font-bold tracking-[0.12em] text-[#6B7280] uppercase";
 const readColumn = "w-full max-w-[65ch]";
 const bodyCopy = "mt-6 text-base leading-6";
-const softPanel = "bg-[#EEEAE4]";
-const hairline = "border-black/12";
-/** Shared cover/thumbnail scrim — same on mobile and desktop. */
+const softPanel = "bg-[#F8E8E6]";
+const hairline = "border-[#DF0A14]/20";
+/** Shared photo cover/thumbnail scrim — same on mobile and desktop. */
 const coverScrim = "bg-gradient-to-t from-black/75 via-black/15 to-black/25";
+const OUTLET_DOMAIN: Record<string, string> = {
+  "The New York Times": "nytimes.com",
+  "The Associated Press": "apnews.com",
+  "The Wall Street Journal": "wsj.com",
+  "The Washington Post": "washingtonpost.com",
+  "The Guardian": "theguardian.com",
+  "Al Jazeera": "aljazeera.com",
+  "USA Today": "usatoday.com",
+  "The Philadelphia Inquirer": "inquirer.com",
+  "Houston Chronicle": "houstonchronicle.com",
+  "The Minnesota Star Tribune": "startribune.com",
+  "The Dallas Morning News": "dallasnews.com",
+  Politico: "politico.com",
+  "The New Yorker": "newyorker.com",
+  "New York Magazine": "nymag.com",
+};
+
+function outletLogo(name: string) {
+  const domain = OUTLET_DOMAIN[name];
+  return domain ? `https://logo.clearbit.com/${domain}` : null;
+}
 
 const PAPER_COVERS = [
   {
@@ -192,7 +213,7 @@ function SideAd({ align }: { align: "left" | "right" }) {
     <aside aria-label="Advertisement" className={`absolute inset-y-0 hidden w-[300px] min-[1400px]:block ${edge}`}>
       <div className="sticky top-16">
         <div
-          className="flex h-[600px] items-center justify-center bg-[#EEEEEE] px-4 text-center text-[12px] tracking-[0.14em] text-[#737373] uppercase"
+          className={`flex h-[600px] items-center justify-center ${softPanel} px-4 text-center text-[12px] tracking-[0.14em] text-[#DF0A14] uppercase`}
           style={ui}
         >
           Advertisement
@@ -205,7 +226,7 @@ function SideAd({ align }: { align: "left" | "right" }) {
 function InArticleAd({ wideHide = false }: { wideHide?: boolean }) {
   return (
     <aside aria-label="Advertisement" className={wideHide ? "min-[1400px]:hidden" : ""}>
-      <div className="flex h-[280px] w-full items-center justify-center bg-[#EEEEEE] text-[12px] tracking-[0.14em] text-[#737373] uppercase" style={ui}>
+      <div className={`flex h-[280px] w-full items-center justify-center ${softPanel} text-[12px] tracking-[0.14em] text-[#DF0A14] uppercase`} style={ui}>
         Advertisement
       </div>
     </aside>
@@ -216,9 +237,9 @@ function FullBleedAd({ tall }: { tall: "screen" | "column" }) {
   return (
     <aside
       aria-label="Advertisement"
-      className={`flex w-full items-center justify-center bg-[#EEEEEE] ${tall === "column" ? "h-full" : "h-[calc(100svh-48px)] min-h-[520px]"}`}
+      className={`flex w-full items-center justify-center ${softPanel} ${tall === "column" ? "h-full" : "h-[calc(100svh-48px)] min-h-[520px]"}`}
     >
-      <p className="text-[12px] tracking-[0.14em] text-[#737373] uppercase" style={ui}>
+      <p className="text-[12px] tracking-[0.14em] text-[#DF0A14] uppercase" style={ui}>
         Advertisement
       </p>
     </aside>
@@ -247,6 +268,14 @@ function CaptureGate({ children }: { children: ReactNode }) {
   );
 }
 
+function FullBleedBrand({ children }: { children: ReactNode }) {
+  return (
+    <div className={`relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2 ${softPanel}`}>
+      <div className={`mx-auto px-4 py-10 sm:px-8 xl:py-12 ${readColumn}`}>{children}</div>
+    </div>
+  );
+}
+
 function StoryReading({ story, part = "all", place = "none" }: { story: WeekStory; part?: "all" | "hook" | "rest"; place?: "none" | "sides" | "inline" }) {
   const happenedLabel = story.format === "tale" ? "The tale" : story.format === "quote" ? "" : "What happened";
   const hook = part !== "rest";
@@ -254,8 +283,8 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
   const framed = part !== "rest";
 
   return (
-    <div className={framed ? "relative flex justify-center bg-[#F4F0EA] px-4 py-16 xl:py-20" : ""}>
-      <div className={framed ? `flex flex-col gap-16 xl:gap-24 ${readColumn}` : "flex flex-col gap-6"}>
+    <div className={framed ? "relative bg-[#F4F0EA] py-16 xl:py-20" : ""}>
+      <div className={framed ? `relative mx-auto flex flex-col gap-16 px-4 xl:gap-24 ${readColumn}` : "flex flex-col gap-6"}>
         {hook && story.format !== "quote" && story.whatHappened ? (
           <section>
             <SectionHeading>{happenedLabel}</SectionHeading>
@@ -283,19 +312,21 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
           </ul>
         ) : null}
         {rest && story.quote ? (
-          <figure className={`max-w-[635px] ${softPanel} px-5 py-6`}>
-            <div className="flex items-start gap-4">
-              <QuoteMark />
-              <div>
-                <blockquote className="text-[1.75rem] italic leading-9" style={roman}>
-                  {story.quote}
-                </blockquote>
-                <p className={`mt-3 ${subInfo}`} style={ui}>
-                  Quote{story.quoteAttribution ? ` · ${story.quoteAttribution}` : ""}
-                </p>
+          <FullBleedBrand>
+            <figure>
+              <div className="flex items-start gap-4">
+                <QuoteMark />
+                <div>
+                  <blockquote className="text-[1.75rem] italic leading-9" style={roman}>
+                    {story.quote}
+                  </blockquote>
+                  <p className={`mt-3 ${subInfo}`} style={ui}>
+                    Quote{story.quoteAttribution ? ` · ${story.quoteAttribution}` : ""}
+                  </p>
+                </div>
               </div>
-            </div>
-          </figure>
+            </figure>
+          </FullBleedBrand>
         ) : null}
         {rest ? <div className="contents">
           {story.format === "quote" && story.whatHappened ? (
@@ -311,26 +342,28 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
             </section>
           ) : null}
           {story.stats.length > 0 ? (
-            <section className={`${softPanel} px-5 py-8 sm:px-6`}>
-              {story.statsHeading ? <SectionHeading rule={false}>{story.statsHeading}</SectionHeading> : null}
-              <div className={`grid gap-x-8 gap-y-6 sm:grid-cols-2 ${story.statsHeading ? "mt-8" : ""}`}>
-                {story.stats.map((stat) => (
-                  <div key={stat.label} className={`border-t border-[#DF0A14]/60 pt-4`}>
-                    <p className="text-[2.75rem] leading-none tracking-tight text-black sm:text-[3.25rem]" style={roman}>
-                      {stat.value}
-                    </p>
-                    <p className={`mt-3 ${subInfo}`} style={ui}>
-                      {stat.label}
-                    </p>
-                  </div>
-                ))}
-              </div>
-              {story.statsNote ? (
-                <p className={`mt-8 max-w-[58ch] border-t ${hairline} pt-4 text-sm leading-5 text-[#6B7280]`} style={ui}>
-                  {story.statsNote}
-                </p>
-              ) : null}
-            </section>
+            <FullBleedBrand>
+              <section>
+                {story.statsHeading ? <SectionHeading rule={false}>{story.statsHeading}</SectionHeading> : null}
+                <div className={`grid gap-x-8 gap-y-6 sm:grid-cols-2 ${story.statsHeading ? "mt-8" : ""}`}>
+                  {story.stats.map((stat) => (
+                    <div key={stat.label} className="border-t border-[#DF0A14] pt-4">
+                      <p className="text-[2.75rem] leading-none tracking-tight text-black sm:text-[3.25rem]" style={roman}>
+                        {stat.value}
+                      </p>
+                      <p className={`mt-3 ${subInfo}`} style={ui}>
+                        {stat.label}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                {story.statsNote ? (
+                  <p className={`mt-8 max-w-[58ch] border-t ${hairline} pt-4 text-sm leading-5 text-[#6B7280]`} style={ui}>
+                    {story.statsNote}
+                  </p>
+                ) : null}
+              </section>
+            </FullBleedBrand>
           ) : null}
           {story.whatsNext ? (
             <section className={`border-t ${hairline} pt-10`}>
@@ -622,9 +655,33 @@ function CoverLock() {
   );
 }
 
-function StoryCover({ story, index, edition, locked = false }: { story: WeekStory; index: number; edition?: boolean; locked?: boolean }) {
+function TextOnlyDecor() {
   return (
-    <section id={story.id} data-story className={`relative flex h-[calc(100svh-48px)] min-h-[520px] scroll-mt-12 items-end overflow-clip ${story.format === "puzzle" ? "bg-[#F4F0EA]" : "bg-[#111]"}`}>
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+      <div className="absolute inset-0 bg-[#F4F0EA]" />
+      <div className="absolute -top-24 -right-16 h-[70vmin] w-[70vmin] rounded-full bg-[#DF0A14]/12" />
+      <div className="absolute -bottom-32 -left-20 h-[55vmin] w-[55vmin] rounded-full bg-[#DF0A14]/08" />
+      <div className="absolute inset-y-0 left-0 w-2 bg-[#DF0A14] sm:w-3" />
+      <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#DF0A14]/18 to-transparent" />
+      <div className="absolute top-10 right-8 hidden text-[18vw] leading-none font-bold text-[#DF0A14]/[0.07] select-none lg:block" style={roman}>
+        W
+      </div>
+    </div>
+  );
+}
+
+function StoryCover({ story, index, edition, locked = false }: { story: WeekStory; index: number; edition?: boolean; locked?: boolean }) {
+  const hasMedia = Boolean(story.imageSrc) || (story.format === "video" && Boolean(story.videoSrc));
+  const textOnly = !hasMedia && story.format !== "puzzle";
+
+  return (
+    <section
+      id={story.id}
+      data-story
+      className={`relative flex h-[calc(100svh-48px)] min-h-[520px] scroll-mt-12 items-end overflow-clip ${
+        story.format === "puzzle" || textOnly ? "bg-[#F4F0EA]" : "bg-[#111]"
+      }`}
+    >
       {story.imageSrc ? (
         <Image
           src={story.imageSrc}
@@ -637,10 +694,12 @@ function StoryCover({ story, index, edition, locked = false }: { story: WeekStor
         />
       ) : story.format === "video" && story.videoSrc ? (
         <video src={story.videoSrc} muted playsInline preload="metadata" className="absolute inset-0 h-full w-full object-cover" />
-      ) : (
-        <div className="absolute inset-0" style={{ background: story.imageGradient }} aria-hidden />
-      )}
-      <div className={`absolute inset-0 ${story.format === "puzzle" ? "bg-gradient-to-t from-black/75 via-black/10 to-transparent" : coverScrim}`} />
+      ) : textOnly ? (
+        <TextOnlyDecor />
+      ) : null}
+      {hasMedia || story.format === "puzzle" ? (
+        <div className={`absolute inset-0 ${story.format === "puzzle" ? "bg-gradient-to-t from-black/75 via-black/10 to-transparent" : coverScrim}`} />
+      ) : null}
       {locked ? <CoverLock /> : null}
       {story.format === "video" ? (
         <button
@@ -659,29 +718,33 @@ function StoryCover({ story, index, edition, locked = false }: { story: WeekStor
       ) : null}
       <div className={`relative z-10 flex w-full flex-col items-center pb-12 text-center sm:pb-16 ${pagePad}`}>
         {edition ? (
-          <div className="mb-8 flex items-center justify-center gap-3 text-white">
+          <div className={`mb-8 flex items-center justify-center gap-3 ${textOnly ? "text-black" : "text-white"}`}>
             <WeekMark />
             <span className="text-[14px] font-bold tracking-[0.28em]" style={romanBold}>
               THE WEEK
             </span>
           </div>
         ) : null}
-        <p className="text-[12px] font-bold tracking-[0.16em] text-white uppercase" style={uiBold}>
+        <p className={`text-[12px] font-bold tracking-[0.16em] uppercase ${textOnly ? "text-[#DF0A14]" : "text-white"}`} style={uiBold}>
           {edition ? story.chip : (
             <>
               {number(index)}
-              <span className="text-white/70"> · {story.chip}</span>
+              <span className={textOnly ? "text-black/45" : "text-white/70"}> · {story.chip}</span>
             </>
           )}
         </p>
-        <h2 className="mt-4 max-w-[12ch] text-[56px] leading-[0.95] text-white sm:text-[72px] lg:max-w-none lg:whitespace-nowrap" style={roman}>
+        {textOnly ? <div className="mt-4 h-[3px] w-16 bg-[#DF0A14]" aria-hidden /> : null}
+        <h2
+          className={`mt-4 max-w-[14ch] text-[56px] leading-[0.95] sm:text-[72px] lg:max-w-none lg:whitespace-nowrap ${textOnly ? "text-black" : "text-white"}`}
+          style={roman}
+        >
           {story.displayTitle}
         </h2>
-        <p className="mt-4 max-w-[36ch] text-[20px] leading-7 text-white/90" style={roman}>
+        <p className={`mt-4 max-w-[36ch] text-[20px] leading-7 ${textOnly ? "text-black/75" : "text-white/90"}`} style={roman}>
           {story.dek}
         </p>
         {story.imageCaption ? (
-          <p className="mt-4 text-sm leading-5 text-white/70">
+          <p className={`mt-4 text-sm leading-5 ${textOnly ? "text-black/50" : "text-white/70"}`}>
             {story.imageCaption}
           </p>
         ) : null}
@@ -804,7 +867,7 @@ function Recirculation() {
                       {card.headline}
                     </span>
                   </span>
-                  <span className="block h-px bg-[#9CA3AF]" />
+                  <span className="block h-px bg-[#DF0A14]/25" />
                   <span>
                     <span className="block text-[16px] leading-6 text-black" style={roman}>
                       + {card.more} more inside
@@ -840,14 +903,33 @@ function outletMark(name: string) {
   return `${a}${b}`.toUpperCase();
 }
 
-function SourceMark({ name }: { name: string }) {
+function SourceMark({ name, size = 44 }: { name: string; size?: number }) {
+  const [failed, setFailed] = useState(false);
+  const src = outletLogo(name);
+
+  if (!src || failed) {
+    return (
+      <span
+        className="inline-flex shrink-0 items-center justify-center bg-[#DF0A14] text-[13px] font-bold tracking-wide text-white"
+        style={{ ...uiBold, width: size, height: size }}
+        aria-hidden
+      >
+        {outletMark(name)}
+      </span>
+    );
+  }
+
   return (
-    <span
-      className="inline-flex h-11 w-11 shrink-0 items-center justify-center bg-[#1B1B1B] text-[13px] font-bold tracking-wide text-white"
-      style={uiBold}
-      aria-hidden
-    >
-      {outletMark(name)}
+    <span className="relative inline-flex shrink-0 items-center justify-center overflow-hidden bg-white" style={{ width: size, height: size }}>
+      <Image
+        src={src}
+        alt=""
+        width={size}
+        height={size}
+        unoptimized
+        className="object-contain p-1.5"
+        onError={() => setFailed(true)}
+      />
     </span>
   );
 }
@@ -857,13 +939,13 @@ function BriefingSources({ periods }: { periods: SourcePeriod[] }) {
   if (!period) return null;
 
   return (
-    <section aria-label="Sources behind this briefing" className="flex justify-center bg-[#F4F0EA] px-4 py-16">
-      <div className="w-full max-w-[720px]">
+    <section aria-label="Sources behind this briefing" className={`w-full ${softPanel} py-16`}>
+      <div className={`mx-auto px-4 ${readColumn}`}>
         <h2 className={heading} style={roman}>
           Sources behind this briefing
         </h2>
-        <p className="mt-4 max-w-[68ch] text-base leading-6 text-[#6B7280]" style={ui}>
-          Outlets cited across this week’s editions — names and how often they appear.
+        <p className="mt-4 max-w-[68ch] text-base leading-6 text-black/70" style={ui}>
+          Built to be trustworthy and transparent: every story shows the outlets we drew from, so you can judge the reporting for yourself.
         </p>
         <a href="/report?sources=1" target="_blank" rel="noopener noreferrer" className={`mt-6 ${weekCta}`}>
           View sources
@@ -873,24 +955,27 @@ function BriefingSources({ periods }: { periods: SourcePeriod[] }) {
           <p className={`shrink-0 ${subInfo}`} style={ui}>
             Cited this week
           </p>
-          <div className="h-px min-w-8 flex-1 bg-black/12" />
+          <div className="h-px min-w-8 flex-1 bg-[#DF0A14]/25" />
         </div>
-        <ul className="mt-4 grid gap-px bg-black/10 sm:grid-cols-2">
-          {period.uses.map((source) => (
-            <li key={source.name} className={`flex items-center gap-3 ${softPanel} px-4 py-4`}>
-              <SourceMark name={source.name} />
-              <span className="min-w-0 flex-1">
-                <span className="block text-base leading-6 text-black" style={romanBold}>
-                  {source.name}
-                </span>
-                <span className={`mt-1 block ${subInfo}`} style={ui}>
-                  {source.count} {source.count === 1 ? "citation" : "citations"}
-                </span>
-              </span>
-            </li>
-          ))}
-        </ul>
       </div>
+      <ul className="report-cards mt-4 flex gap-3 overflow-x-auto px-4 pb-1 sm:px-8">
+        {period.uses.map((source) => (
+          <li
+            key={source.name}
+            className="flex w-[210px] shrink-0 flex-col items-start gap-4 border border-[#DF0A14]/15 bg-white px-4 py-4"
+          >
+            <SourceMark name={source.name} size={52} />
+            <span>
+              <span className="block text-base leading-6 text-black" style={romanBold}>
+                {source.name}
+              </span>
+              <span className={`mt-1 block ${subInfo}`} style={ui}>
+                {source.count} {source.count === 1 ? "citation" : "citations"}
+              </span>
+            </span>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
@@ -925,8 +1010,8 @@ function SourcesChart({ periods }: { periods: SourcePeriod[] }) {
         <h2 className={`mt-4 ${heading}`} style={roman}>
           Behind this briefing
         </h2>
-        <p className="mt-4 text-base leading-6 text-[#6B7280]" style={ui}>
-          {period.detail} {period.citations} citations from {period.uses.length} outlets.
+        <p className="mt-4 text-base leading-6 text-black/70" style={ui}>
+          Trustworthy because the citations are open. Transparent because you can see every outlet we used — {period.citations} citations from {period.uses.length} outlets. {period.detail}
         </p>
         <div className="mt-6 flex flex-wrap gap-2">
           {periods.map((item) => (
@@ -940,16 +1025,16 @@ function SourcesChart({ periods }: { periods: SourcePeriod[] }) {
             />
           ))}
         </div>
-        <ul className={`mt-10 divide-y divide-black/10 border-y ${hairline}`}>
+        <ul className={`mt-10 divide-y divide-[#DF0A14]/15 border-y ${hairline}`}>
           {period.uses.map((source) => (
             <li key={source.name} className="flex items-center gap-4 py-5">
-              <SourceMark name={source.name} />
+              <SourceMark name={source.name} size={48} />
               <span className="min-w-0 flex-1">
                 <span className="flex items-baseline justify-between gap-3 text-base leading-6" style={roman}>
                   <span className="min-w-0">{source.name}</span>
-                  <span className="shrink-0 text-[#6B7280]" style={ui}>{source.count}</span>
+                  <span className="shrink-0 text-[#DF0A14]" style={uiBold}>{source.count}</span>
                 </span>
-                <span className="mt-2 block h-1.5 overflow-hidden bg-black/10">
+                <span className="mt-2 block h-1.5 overflow-hidden bg-[#F8E8E6]">
                   <span className="block h-full bg-[#DF0A14]" style={{ width: `${Math.max(8, (source.count / topUse) * 100)}%` }} />
                 </span>
               </span>
@@ -1316,7 +1401,11 @@ export function ReportBriefing({
             return (
               <Fragment key={story.id}>
               <section id={`feed-${story.id}`} data-slide data-column={storyIndex} className="report-feed h-full w-full shrink-0 snap-start snap-always overflow-x-clip overflow-y-auto overscroll-y-contain snap-y snap-proximity">
-                <div className="relative h-full snap-start overflow-clip bg-[#111]">
+                {(() => {
+                  const hasMedia = Boolean(story.imageSrc) || (story.format === "video" && Boolean(story.videoSrc));
+                  const textOnly = !hasMedia && story.format !== "puzzle";
+                  return (
+                <div className={`relative h-full snap-start overflow-clip ${textOnly ? "bg-[#F4F0EA]" : "bg-[#111]"}`}>
                   {story.format === "video" && story.videoSrc ? (
                     <video src={story.videoSrc} autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover" />
                   ) : story.imageSrc ? (
@@ -1329,20 +1418,21 @@ export function ReportBriefing({
                       className={`object-cover ${story.id === "tact" ? "object-right" : ""}`}
                       sizes="100vw"
                     />
-                  ) : (
-                    <div className="absolute inset-0" style={{ background: story.imageGradient }} aria-hidden />
-                  )}
-                  <div className={`absolute inset-0 ${coverScrim}`} />
+                  ) : textOnly ? (
+                    <TextOnlyDecor />
+                  ) : null}
+                  {hasMedia ? <div className={`absolute inset-0 ${coverScrim}`} /> : null}
                   {locked && storyIndex > 0 ? <CoverLock /> : null}
                   <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center px-12 pb-24 text-center">
-                    <p className="text-[12px] font-bold tracking-[0.16em] text-white uppercase" style={uiBold}>
+                    <p className={`text-[12px] font-bold tracking-[0.16em] uppercase ${textOnly ? "text-[#DF0A14]" : "text-white"}`} style={uiBold}>
                       {number(storyIndex)}
-                      <span className="text-white/70"> · {story.chip}</span>
+                      <span className={textOnly ? "text-black/45" : "text-white/70"}> · {story.chip}</span>
                     </p>
-                    <h2 className="mt-4 max-w-[12ch] text-[2.625rem] leading-none text-white" style={roman}>
+                    {textOnly ? <div className="mt-4 h-[3px] w-16 bg-[#DF0A14]" aria-hidden /> : null}
+                    <h2 className={`mt-4 max-w-[12ch] text-[2.625rem] leading-none ${textOnly ? "text-black" : "text-white"}`} style={roman}>
                       {story.displayTitle}
                     </h2>
-                    <p className="mt-3 line-clamp-2 max-w-[32ch] text-[16px] leading-6 text-white/90" style={roman}>
+                    <p className={`mt-3 line-clamp-2 max-w-[32ch] text-[16px] leading-6 ${textOnly ? "text-black/75" : "text-white/90"}`} style={roman}>
                       {story.dek}
                     </p>
                   </div>
@@ -1352,7 +1442,7 @@ export function ReportBriefing({
                       const column = event.currentTarget.closest<HTMLElement>("[data-column]");
                       column?.scrollTo({ top: column.clientHeight, behavior: "smooth" });
                     }}
-                    className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-1 text-white transition-opacity duration-200 hover:opacity-70"
+                    className={`absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-1 transition-opacity duration-200 hover:opacity-70 ${textOnly ? "text-[#DF0A14]" : "text-white"}`}
                   >
                     <BrandIcon name="chevronDown" defaultIcon={ChevronDown} className="h-6 w-6" />
                     <span className="text-[11px] font-bold tracking-[0.16em] uppercase" style={uiBold}>
@@ -1360,16 +1450,24 @@ export function ReportBriefing({
                     </span>
                   </button>
                 </div>
+                  );
+                })()}
                 <StoryBody story={story} locked={locked} lead={storyIndex === 0} place={ads ? "inline" : "none"} />
                 {next ? (
-                  <button type="button" onClick={() => goTo(storyIndex + 1)} className="flex w-full items-center gap-4 bg-[#374151] px-5 py-4 text-left text-white transition-colors duration-200 hover:bg-[#1F2937]">
-                    <span className="relative h-16 w-16 shrink-0 overflow-hidden bg-black">
+                  <button type="button" onClick={() => goTo(storyIndex + 1)} className="flex w-full items-center gap-4 bg-[#DF0A14] px-5 py-4 text-left text-white transition-colors duration-200 hover:bg-[#B20810]">
+                    <span className="relative h-16 w-16 shrink-0 overflow-hidden bg-[#F4F0EA]">
                       {next.imageSrc ? (
-                        <Image src={next.imageSrc} alt="" fill unoptimized={next.imageSrc.startsWith("/") || next.imageSrc.startsWith("http")} className="object-cover" sizes="64px" />
+                        <>
+                          <Image src={next.imageSrc} alt="" fill unoptimized={next.imageSrc.startsWith("/") || next.imageSrc.startsWith("http")} className="object-cover" sizes="64px" />
+                          <span className={`absolute inset-0 ${coverScrim}`} aria-hidden />
+                        </>
                       ) : (
-                        <span className="absolute inset-0" style={{ background: next.imageGradient }} aria-hidden />
+                        <span className="absolute inset-0 flex items-end justify-start p-2" aria-hidden>
+                          <span className="text-[10px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
+                            {next.chip}
+                          </span>
+                        </span>
                       )}
-                      <span className={`absolute inset-0 ${coverScrim}`} aria-hidden />
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-[11px] font-bold tracking-[0.16em] text-white/70 uppercase" style={uiBold}>
@@ -1400,8 +1498,8 @@ export function ReportBriefing({
                 )}
               </section>
               {ads && storyIndex === 5 ? (
-                <section data-slide aria-label="Advertisement" className="report-feed flex h-full w-full shrink-0 snap-start snap-always items-center justify-center bg-[#EEEEEE]">
-                  <p className="text-[12px] tracking-[0.14em] text-[#737373] uppercase" style={ui}>
+                <section data-slide aria-label="Advertisement" className={`report-feed flex h-full w-full shrink-0 snap-start snap-always items-center justify-center ${softPanel}`}>
+                  <p className="text-[12px] tracking-[0.14em] text-[#DF0A14] uppercase" style={ui}>
                     Advertisement
                   </p>
                 </section>
