@@ -281,9 +281,15 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
   const hook = part !== "rest";
   const rest = part !== "hook";
   const framed = part !== "rest";
+  const altered = ALTERED_COVERS[story.id];
+  const frameBg = altered
+    ? altered.tone === "pink"
+      ? "bg-[var(--report-section-pink)]"
+      : "bg-[var(--report-section-sky)]"
+    : "bg-[#F4F0EA]";
 
   return (
-    <div className={framed ? "relative bg-[#F4F0EA] py-16 xl:py-20" : ""}>
+    <div className={framed ? `relative py-16 xl:py-20 ${frameBg}` : ""}>
       <div className={framed ? `relative mx-auto flex flex-col gap-16 px-4 xl:gap-24 ${readColumn}` : "flex flex-col gap-6"}>
         {hook && story.format !== "quote" && story.whatHappened ? (
           <section>
@@ -656,7 +662,61 @@ function CoverLock() {
   );
 }
 
-const SKY_BLUE_COVERS = new Set(["tact", "tall-tale"]);
+const ALTERED_COVERS: Record<string, { tone: "pink" | "sky"; graphic: string; inset?: string }> = {
+  tact: { tone: "pink", graphic: "/the-week/tact-lollipop.png", inset: "/the-week/section-tact.jpg" },
+  "chicago-fire": { tone: "sky", graphic: "/the-week/chicago-fire-painting.png", inset: "/the-week/section-chicago-fire.jpg" },
+  "tall-tale": { tone: "sky", graphic: "/the-week/section-tall-tale.jpg", inset: "/the-week/section-tall-tale.jpg" },
+};
+
+function ScribbleMark({ className = "" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 160 40" fill="none" aria-hidden>
+      <path
+        d="M4 28c18-16 34-18 52-10 14 6 22 4 34-4 12-8 28-12 46-6 8 3 16 8 22 14"
+        stroke="#0A0A0A"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+      <path
+        d="M18 34c22-8 40-6 58 2 16 7 30 2 42-6"
+        stroke="#0A0A0A"
+        strokeWidth="1.1"
+        strokeLinecap="round"
+        opacity="0.55"
+      />
+    </svg>
+  );
+}
+
+/** Pastel plate + grayscale collage cutouts — “It’s not all bad” / On this day / Tall tale. */
+function AlteredCoverDecor({
+  tone,
+  graphic,
+  inset,
+}: {
+  tone: "pink" | "sky";
+  graphic: string;
+  inset?: string;
+}) {
+  const plate = tone === "pink" ? "bg-[var(--report-section-pink)]" : "bg-[var(--report-section-sky)]";
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+      <div className={`absolute inset-0 ${plate}`} />
+      <div className="absolute top-[6%] right-[-6%] h-[56%] w-[68%] max-w-[720px] rotate-[-2.5deg] sm:right-[4%] sm:w-[54%]">
+        <div className="relative h-full w-full overflow-hidden border-[5px] border-white shadow-[0_22px_48px_rgba(10,10,10,0.18)] sm:border-[7px]">
+          <Image src={graphic} alt="" fill unoptimized sizes="70vw" className="object-cover grayscale contrast-125" />
+          <div className="absolute inset-0 bg-[#011535]/12 mix-blend-multiply" />
+        </div>
+      </div>
+      {inset ? (
+        <div className="absolute bottom-[30%] left-[4%] h-[26%] w-[30%] max-w-[240px] rotate-[3deg] overflow-hidden border-[4px] border-white shadow-[0_14px_28px_rgba(10,10,10,0.16)] sm:left-[8%]">
+          <Image src={inset} alt="" fill unoptimized sizes="240px" className="object-cover grayscale contrast-110" />
+        </div>
+      ) : null}
+      <ScribbleMark className="absolute bottom-[26%] left-[6%] w-36 opacity-45 sm:left-[10%] sm:w-44" />
+    </div>
+  );
+}
 
 function TextOnlyDecor({ tone = "beige" }: { tone?: "beige" | "sky" }) {
   const sky = tone === "sky";
@@ -676,44 +736,46 @@ function TextOnlyDecor({ tone = "beige" }: { tone?: "beige" | "sky" }) {
 }
 
 function StoryCover({ story, index, edition, locked = false }: { story: WeekStory; index: number; edition?: boolean; locked?: boolean }) {
+  const altered = ALTERED_COVERS[story.id];
   const hasMedia = Boolean(story.imageSrc) || (story.format === "video" && Boolean(story.videoSrc));
-  const textOnly = !hasMedia && story.format !== "puzzle";
-  const skyTone = SKY_BLUE_COVERS.has(story.id);
-  const coverTone = skyTone ? "sky" : "beige";
+  const textOnly = !hasMedia && !altered && story.format !== "puzzle";
+  const lightPlate = Boolean(altered) || textOnly;
+  const plateBg = altered
+    ? altered.tone === "pink"
+      ? "bg-[var(--report-section-pink)]"
+      : "bg-[var(--report-section-sky)]"
+    : textOnly
+      ? "bg-[var(--report-beige)]"
+      : story.format === "puzzle"
+        ? "bg-[var(--report-beige)]"
+        : "bg-[#111]";
 
   return (
     <section
       id={story.id}
       data-story
-      className={`relative flex h-[calc(100svh-48px)] min-h-[520px] scroll-mt-12 items-end overflow-clip ${
-        story.format === "puzzle"
-          ? "bg-[var(--report-beige)]"
-          : textOnly
-            ? skyTone
-              ? "bg-[var(--tg-pale-blue)]"
-              : "bg-[var(--report-beige)]"
-            : "bg-[#111]"
-      }`}
+      className={`relative flex h-[calc(100svh-48px)] min-h-[520px] scroll-mt-12 items-end overflow-clip ${plateBg}`}
     >
-      {story.imageSrc ? (
+      {altered ? (
+        <AlteredCoverDecor tone={altered.tone} graphic={altered.graphic} inset={altered.inset} />
+      ) : story.imageSrc ? (
         <Image
           src={story.imageSrc}
           alt=""
           fill
           priority={index === 0}
           unoptimized={story.imageSrc.startsWith("/") || story.imageSrc.startsWith("http")}
-          className={`report-parallax object-cover ${story.id === "tact" ? "object-right" : "object-center"}`}
+          className="report-parallax object-cover object-center"
           sizes="100vw"
         />
       ) : story.format === "video" && story.videoSrc ? (
         <video src={story.videoSrc} muted playsInline preload="metadata" className="absolute inset-0 h-full w-full object-cover" />
       ) : textOnly ? (
-        <TextOnlyDecor tone={coverTone} />
+        <TextOnlyDecor tone="beige" />
       ) : null}
       {hasMedia || story.format === "puzzle" ? (
         <div className={`absolute inset-0 ${story.format === "puzzle" ? "bg-gradient-to-t from-black/75 via-black/10 to-transparent" : coverScrim}`} />
       ) : null}
-      {/* Big translucent index — same idea as photo hero “02” */}
       {hasMedia && !edition ? (
         <span
           className="pointer-events-none absolute inset-x-0 bottom-[22%] z-[5] text-center text-[min(28vw,220px)] leading-none font-normal text-white/25 select-none"
@@ -741,42 +803,40 @@ function StoryCover({ story, index, edition, locked = false }: { story: WeekStor
       ) : null}
       <div className={`relative z-10 flex w-full flex-col items-center pb-12 text-center sm:pb-16 ${pagePad}`}>
         {edition ? (
-          <div className={`mb-8 flex items-center justify-center gap-3 ${textOnly ? "text-black" : "text-white"}`}>
+          <div className={`mb-8 flex items-center justify-center gap-3 ${lightPlate ? "text-black" : "text-white"}`}>
             <WeekMark />
             <span className="text-[14px] font-bold tracking-[0.28em]" style={romanBold}>
               THE WEEK
             </span>
           </div>
-        ) : textOnly ? (
-          <div className="mb-6">
-            <WeekMark />
-          </div>
         ) : null}
         <p
           className={`text-[12px] font-bold tracking-[0.16em] uppercase ${
-            textOnly ? "text-[#011535]" : "text-[#DF0A14]"
+            lightPlate || altered ? "text-[#DF0A14]" : "text-[#DF0A14]"
           }`}
           style={uiBold}
         >
           {edition ? story.chip : (
             <>
               {number(index)}
-              <span className={textOnly ? "text-black/45" : "text-white/80"}> · {story.chip}</span>
+              <span className={lightPlate ? "text-black/50" : "text-white/80"}> · {story.chip}</span>
             </>
           )}
         </p>
-        {textOnly ? <div className="mt-4 h-[3px] w-16 bg-[#DF0A14]" aria-hidden /> : null}
+        {lightPlate ? <div className="mt-4 h-[3px] w-16 bg-[#DF0A14]" aria-hidden /> : null}
         <h2
-          className={`mt-4 max-w-[14ch] text-[56px] leading-[0.95] sm:text-[72px] lg:max-w-none lg:whitespace-nowrap ${textOnly ? "text-black" : "text-white"}`}
+          className={`mt-4 max-w-[14ch] text-[56px] leading-[0.95] sm:text-[72px] lg:max-w-none lg:whitespace-nowrap ${
+            lightPlate ? (altered?.tone === "pink" ? "text-[#DF0A14]" : "text-black") : "text-white"
+          }`}
           style={roman}
         >
           {story.displayTitle}
         </h2>
-        <p className={`mt-4 max-w-[36ch] text-[20px] leading-7 ${textOnly ? "text-black/70" : "text-white/90"}`} style={roman}>
+        <p className={`mt-4 max-w-[36ch] text-[20px] leading-7 ${lightPlate ? "text-black/75" : "text-white/90"}`} style={roman}>
           {story.dek}
         </p>
-        {story.imageCaption ? (
-          <p className={`mt-4 text-sm leading-5 ${textOnly ? "text-black/50" : "text-white/70"}`}>
+        {story.imageCaption && !altered ? (
+          <p className={`mt-4 text-sm leading-5 ${lightPlate ? "text-black/50" : "text-white/70"}`}>
             {story.imageCaption}
           </p>
         ) : null}
@@ -1446,16 +1506,22 @@ export function ReportBriefing({
               <Fragment key={story.id}>
               <section id={`feed-${story.id}`} data-slide data-column={storyIndex} className="report-feed h-full w-full shrink-0 snap-start snap-always overflow-x-clip overflow-y-auto overscroll-y-contain snap-y snap-proximity">
                 {(() => {
+                  const altered = ALTERED_COVERS[story.id];
                   const hasMedia = Boolean(story.imageSrc) || (story.format === "video" && Boolean(story.videoSrc));
-                  const textOnly = !hasMedia && story.format !== "puzzle";
-                  const skyTone = SKY_BLUE_COVERS.has(story.id);
+                  const textOnly = !hasMedia && !altered && story.format !== "puzzle";
+                  const lightPlate = Boolean(altered) || textOnly;
+                  const plateBg = altered
+                    ? altered.tone === "pink"
+                      ? "bg-[var(--report-section-pink)]"
+                      : "bg-[var(--report-section-sky)]"
+                    : textOnly
+                      ? "bg-[var(--report-beige)]"
+                      : "bg-[#111]";
                   return (
-                <div
-                  className={`relative h-full snap-start overflow-clip ${
-                    textOnly ? (skyTone ? "bg-[var(--tg-pale-blue)]" : "bg-[var(--report-beige)]") : "bg-[#111]"
-                  }`}
-                >
-                  {story.format === "video" && story.videoSrc ? (
+                <div className={`relative h-full snap-start overflow-clip ${plateBg}`}>
+                  {altered ? (
+                    <AlteredCoverDecor tone={altered.tone} graphic={altered.graphic} inset={altered.inset} />
+                  ) : story.format === "video" && story.videoSrc ? (
                     <video src={story.videoSrc} autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover" />
                   ) : story.imageSrc ? (
                     <Image
@@ -1464,11 +1530,11 @@ export function ReportBriefing({
                       fill
                       priority={storyIndex === 0}
                       unoptimized={story.imageSrc.startsWith("/") || story.imageSrc.startsWith("http")}
-                      className={`object-cover ${story.id === "tact" ? "object-right" : ""}`}
+                      className="object-cover object-center"
                       sizes="100vw"
                     />
                   ) : textOnly ? (
-                    <TextOnlyDecor tone={skyTone ? "sky" : "beige"} />
+                    <TextOnlyDecor tone="beige" />
                   ) : null}
                   {hasMedia ? <div className={`absolute inset-0 ${coverScrim}`} /> : null}
                   {hasMedia ? (
@@ -1482,25 +1548,20 @@ export function ReportBriefing({
                   ) : null}
                   {locked && storyIndex > 0 ? <CoverLock /> : null}
                   <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center px-12 pb-24 text-center">
-                    {textOnly ? (
-                      <div className="mb-5">
-                        <WeekMark />
-                      </div>
-                    ) : null}
-                    <p
-                      className={`text-[12px] font-bold tracking-[0.16em] uppercase ${
-                        textOnly ? "text-[#011535]" : "text-[#DF0A14]"
-                      }`}
-                      style={uiBold}
-                    >
+                    <p className="text-[12px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
                       {number(storyIndex)}
-                      <span className={textOnly ? "text-black/45" : "text-white/80"}> · {story.chip}</span>
+                      <span className={lightPlate ? "text-black/50" : "text-white/80"}> · {story.chip}</span>
                     </p>
-                    {textOnly ? <div className="mt-4 h-[3px] w-16 bg-[#DF0A14]" aria-hidden /> : null}
-                    <h2 className={`mt-4 max-w-[12ch] text-[2.625rem] leading-none ${textOnly ? "text-black" : "text-white"}`} style={roman}>
+                    {lightPlate ? <div className="mt-4 h-[3px] w-16 bg-[#DF0A14]" aria-hidden /> : null}
+                    <h2
+                      className={`mt-4 max-w-[12ch] text-[2.625rem] leading-none ${
+                        lightPlate ? (altered?.tone === "pink" ? "text-[#DF0A14]" : "text-black") : "text-white"
+                      }`}
+                      style={roman}
+                    >
                       {story.displayTitle}
                     </h2>
-                    <p className={`mt-3 line-clamp-2 max-w-[32ch] text-[16px] leading-6 ${textOnly ? "text-black/70" : "text-white/90"}`} style={roman}>
+                    <p className={`mt-3 line-clamp-2 max-w-[32ch] text-[16px] leading-6 ${lightPlate ? "text-black/75" : "text-white/90"}`} style={roman}>
                       {story.dek}
                     </p>
                   </div>
@@ -1510,7 +1571,7 @@ export function ReportBriefing({
                       const column = event.currentTarget.closest<HTMLElement>("[data-column]");
                       column?.scrollTo({ top: column.clientHeight, behavior: "smooth" });
                     }}
-                    className={`absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-1 transition-opacity duration-200 hover:opacity-70 ${textOnly ? "text-[#011535]" : "text-white"}`}
+                    className={`absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-1 transition-opacity duration-200 hover:opacity-70 ${lightPlate ? "text-[#011535]" : "text-white"}`}
                   >
                     <BrandIcon name="chevronDown" defaultIcon={ChevronDown} className="h-6 w-6" />
                     <span className="text-[11px] font-bold tracking-[0.16em] uppercase" style={uiBold}>

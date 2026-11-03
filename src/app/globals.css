@@ -40,6 +40,9 @@
   --tg-pale-blue-deep: #d4e4ff;
   --report-beige: #f0eae1;
   --report-beige-deep: #e4dcd0;
+  /* Section plates from The Week feature treatment */
+  --report-section-pink: #fce4e4;
+  --report-section-sky: #ddebf1;
   --background: #ffffff;
   --foreground: #0a0a0a;
 }
