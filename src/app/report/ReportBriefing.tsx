@@ -1299,7 +1299,7 @@ export function ReportBriefing({
         }
         .report-page .brand-icon-button:hover,
         .report-page .brand-icon-button:focus {
-          background-color: #F8E8E6;
+          background-color: #F0EAE1;
           color: #DF0A14;
         }
         .report-page .brand-scroll-arrow {
