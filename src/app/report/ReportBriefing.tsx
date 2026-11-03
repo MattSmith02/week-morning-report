@@ -7,7 +7,7 @@ import { BrandIcon } from "@/components/atoms/icons/BrandIcon";
 import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
-import type { SourceBias, WeekStory } from "../the-week/stories";
+import type { WeekStory } from "../the-week/stories";
 
 const ROMAN = "Palatino, 'Palatino Linotype', 'Book Antiqua', Georgia, serif";
 const UI = "Arial, Helvetica, sans-serif";
@@ -25,8 +25,13 @@ const weekHeaderCta =
   "inline-flex h-[41px] items-center rounded bg-[#DF0A14] px-4 py-3 text-[14px] leading-4 font-bold text-white uppercase transition-colors duration-200 hover:bg-[#B20810]";
 const kicker = "text-xs font-bold tracking-[0.05em] text-[#DF0A14] uppercase";
 const heading = "text-[2rem] leading-10 text-black";
+const subInfo = "text-[11px] font-bold tracking-[0.12em] text-[#6B7280] uppercase";
 const readColumn = "w-full max-w-[65ch]";
 const bodyCopy = "mt-6 text-base leading-6";
+const softPanel = "bg-[#EEEAE4]";
+const hairline = "border-black/12";
+/** Shared cover/thumbnail scrim — same on mobile and desktop. */
+const coverScrim = "bg-gradient-to-t from-black/75 via-black/15 to-black/25";
 
 const PAPER_COVERS = [
   {
@@ -264,13 +269,13 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
           </section>
         ) : null}
         {rest && story.items && story.items.length > 0 ? (
-          <ul className="max-w-[635px] border-t border-black/15">
+          <ul className={`max-w-[635px] border-t ${hairline}`}>
             {story.items.map((item) => (
-              <li key={item.label} className="border-b border-black/15 py-4">
-                <p className={kicker} style={uiBold}>
+              <li key={item.label} className={`border-b ${hairline} py-5`}>
+                <p className={subInfo} style={uiBold}>
                   {item.label}
                 </p>
-                <p className="mt-2 text-2xl leading-8" style={roman}>
+                <p className="mt-2 text-xl leading-7 text-black" style={roman}>
                   {item.text}
                 </p>
               </li>
@@ -278,14 +283,14 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
           </ul>
         ) : null}
         {rest && story.quote ? (
-          <figure className="max-w-[635px]">
+          <figure className={`max-w-[635px] ${softPanel} px-5 py-6`}>
             <div className="flex items-start gap-4">
               <QuoteMark />
               <div>
-                <blockquote className="text-[2rem] italic leading-10" style={roman}>
+                <blockquote className="text-[1.75rem] italic leading-9" style={roman}>
                   {story.quote}
                 </blockquote>
-                <p className="mt-2 text-sm leading-5 text-[#4B5563]" style={ui}>
+                <p className={`mt-3 ${subInfo}`} style={ui}>
                   Quote{story.quoteAttribution ? ` · ${story.quoteAttribution}` : ""}
                 </p>
               </div>
@@ -300,36 +305,35 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
             </section>
           ) : null}
           {story.whoSaidWhat ? (
-            <section>
+            <section className={`border-t ${hairline} pt-10`}>
               <SectionHeading>Who said what</SectionHeading>
               <Body>{story.whoSaidWhat}</Body>
             </section>
           ) : null}
           {story.stats.length > 0 ? (
-            <section>
+            <section className={`${softPanel} px-5 py-8 sm:px-6`}>
               {story.statsHeading ? <SectionHeading rule={false}>{story.statsHeading}</SectionHeading> : null}
-              <div className={`grid gap-x-12 gap-y-8 sm:grid-cols-2 ${story.statsHeading ? "mt-6" : ""}`}>
+              <div className={`grid gap-x-8 gap-y-6 sm:grid-cols-2 ${story.statsHeading ? "mt-8" : ""}`}>
                 {story.stats.map((stat) => (
-                  <div key={stat.label}>
-                    <div className="h-[3px] w-16 bg-[#DF0A14]" />
-                    <p className="mt-4 text-[2rem] leading-10" style={roman}>
+                  <div key={stat.label} className={`border-t border-[#DF0A14]/60 pt-4`}>
+                    <p className="text-[2.75rem] leading-none tracking-tight text-black sm:text-[3.25rem]" style={roman}>
                       {stat.value}
                     </p>
-                    <p className="mt-3 text-sm uppercase leading-5 text-[#4B5563]" style={ui}>
+                    <p className={`mt-3 ${subInfo}`} style={ui}>
                       {stat.label}
                     </p>
                   </div>
                 ))}
               </div>
               {story.statsNote ? (
-                <p className="mt-6 max-w-[58ch] text-base leading-6 text-[#4B5563]" style={ui}>
+                <p className={`mt-8 max-w-[58ch] border-t ${hairline} pt-4 text-sm leading-5 text-[#6B7280]`} style={ui}>
                   {story.statsNote}
                 </p>
               ) : null}
             </section>
           ) : null}
           {story.whatsNext ? (
-            <section>
+            <section className={`border-t ${hairline} pt-10`}>
               <SectionHeading>What’s next?</SectionHeading>
               <Body>{story.whatsNext}</Body>
             </section>
@@ -633,8 +637,10 @@ function StoryCover({ story, index, edition, locked = false }: { story: WeekStor
         />
       ) : story.format === "video" && story.videoSrc ? (
         <video src={story.videoSrc} muted playsInline preload="metadata" className="absolute inset-0 h-full w-full object-cover" />
-      ) : null}
-      <div className={`absolute inset-0 ${story.format === "puzzle" ? "bg-gradient-to-t from-black/75 via-black/10 to-transparent" : "bg-gradient-to-t from-black/75 via-black/15 to-black/25"}`} />
+      ) : (
+        <div className="absolute inset-0" style={{ background: story.imageGradient }} aria-hidden />
+      )}
+      <div className={`absolute inset-0 ${story.format === "puzzle" ? "bg-gradient-to-t from-black/75 via-black/10 to-transparent" : coverScrim}`} />
       {locked ? <CoverLock /> : null}
       {story.format === "video" ? (
         <button
@@ -778,7 +784,7 @@ function Recirculation() {
               <Link href="/the-week" className="block">
                 <div className="relative aspect-square overflow-clip bg-[#111]">
                   <Image src={card.image} alt="" fill sizes="280px" className="object-cover" />
-                  <span className="absolute inset-0 bg-black/60" />
+                  <span className={`absolute inset-0 ${coverScrim}`} />
                   <EditionBanner label={card.label} size="card" className="absolute inset-x-0 top-0" />
                   <span className="absolute top-[43%] left-3 text-[#F9FAFB]">
                     <span className="block text-[72px] leading-none sm:text-[128px] sm:leading-[140px]" style={roman}>
@@ -818,85 +824,30 @@ function Recirculation() {
 }
 
 
-const BIAS_LABEL: Record<SourceBias, string> = {
-  left: "Left",
-  "lean-left": "Lean Left",
-  center: "Center",
-  "lean-right": "Lean Right",
-  right: "Right",
-};
-
-const MIX_COLOR: Record<SourceBias, string> = {
-  left: "#DF0A14",
-  "lean-left": "#F67B76",
-  center: "#83C8C5",
-  "lean-right": "#F2C14E",
-  right: "#DF0A14",
-};
-
 export type SourcePeriod = {
   id: string;
   label: string;
   detail: string;
-  lean: string;
-  score: number;
   citations: number;
-  uses: { name: string; bias: SourceBias; count: number }[];
-  mix: { bias: SourceBias; count: number }[];
+  uses: { name: string; count: number }[];
   topics: { label: string; count: number }[];
 };
 
-function LeanDonut({ period, className = "mx-auto h-64 w-64 md:h-80 md:w-80" }: { period: SourcePeriod; className?: string }) {
-  const total = Math.max(period.citations, 1);
-  const radius = 62;
-  const length = 2 * Math.PI * radius;
-  const arcs: { bias: SourceBias; arc: number; start: number }[] = [];
-  let cursor = 0;
-  for (const item of period.mix) {
-    if (item.count === 0) continue;
-    const arc = (item.count / total) * length;
-    arcs.push({ bias: item.bias, arc, start: cursor });
-    cursor += arc;
-  }
-
-  return (
-    <svg viewBox="0 0 200 200" className={className} role="img" aria-label={period.lean}>
-      <circle cx="100" cy="100" r={radius} fill="none" stroke="#F4F0EA" strokeWidth="28" />
-      {arcs.map((item) => (
-          <circle
-            key={item.bias}
-            cx="100"
-            cy="100"
-            r={radius}
-            fill="none"
-            stroke={MIX_COLOR[item.bias]}
-            strokeWidth="28"
-            strokeDasharray={`${item.arc} ${length - item.arc}`}
-            strokeDashoffset={-item.start}
-            transform="rotate(-90 100 100)"
-          />
-      ))}
-      <circle cx="100" cy="100" r="40" fill="#F4F0EA" />
-    </svg>
-  );
+function outletMark(name: string) {
+  const words = name.replace(/^The\s+/i, "").split(/\s+/).filter(Boolean);
+  const a = words[0]?.[0] ?? "?";
+  const b = words[1]?.[0] ?? words[0]?.[1] ?? "";
+  return `${a}${b}`.toUpperCase();
 }
 
-function BiasPill({ bias }: { bias: SourceBias }) {
-  const label = BIAS_LABEL[bias];
-  if (bias === "center") {
-    return (
-      <span className="inline-flex h-6 w-fit items-center gap-1 rounded-full bg-[#D1D5DB] px-2 text-[12px] leading-4 text-black" style={roman}>
-        <span className="h-2 w-2 rounded-full bg-white" aria-hidden />
-        {label}
-      </span>
-    );
-  }
-  const left = bias === "left" || bias === "lean-left";
+function SourceMark({ name }: { name: string }) {
   return (
-    <span className={`inline-flex h-6 w-fit items-center gap-1 rounded-full px-2 text-[12px] leading-4 text-[#FAFAFA] ${left ? "bg-[#DF0A14]" : "bg-[#DF0A14]"}`} style={roman}>
-      {left ? <ChevronLeft size={12} strokeWidth={2.5} aria-hidden /> : null}
-      {label}
-      {left ? null : <ChevronRight size={12} strokeWidth={2.5} aria-hidden />}
+    <span
+      className="inline-flex h-11 w-11 shrink-0 items-center justify-center bg-[#1B1B1B] text-[13px] font-bold tracking-wide text-white"
+      style={uiBold}
+      aria-hidden
+    >
+      {outletMark(name)}
     </span>
   );
 }
@@ -911,29 +862,29 @@ function BriefingSources({ periods }: { periods: SourcePeriod[] }) {
         <h2 className={heading} style={roman}>
           Sources behind this briefing
         </h2>
-        <p className="brand-muted-copy mt-4 max-w-[68ch] text-base leading-6" style={ui}>
-          News-outlet bias ratings by AllSides—not ratings of this story or factual accuracy.
+        <p className="mt-4 max-w-[68ch] text-base leading-6 text-[#6B7280]" style={ui}>
+          Outlets cited across this week’s editions — names and how often they appear.
         </p>
         <a href="/report?sources=1" target="_blank" rel="noopener noreferrer" className={`mt-6 ${weekCta}`}>
           View sources
           <ChevronRight size={14} aria-hidden />
         </a>
         <div className="mt-8 flex items-center gap-4">
-          <p className="shrink-0 text-sm leading-5 text-[#1B1B1B]" style={ui}>
-            Sources cited in this briefing
+          <p className={`shrink-0 ${subInfo}`} style={ui}>
+            Cited this week
           </p>
-          <div className="h-px min-w-8 flex-1 bg-black/15" />
+          <div className="h-px min-w-8 flex-1 bg-black/12" />
         </div>
-        <ul className="report-cards mt-4 flex gap-3 overflow-x-auto pb-1">
+        <ul className="mt-4 grid gap-px bg-black/10 sm:grid-cols-2">
           {period.uses.map((source) => (
-            <li key={source.name} className="brand-soft-border flex w-[210px] shrink-0 flex-col items-start gap-4 rounded-lg border bg-white px-4 py-4">
-              <BiasPill bias={source.bias} />
-              <span>
+            <li key={source.name} className={`flex items-center gap-3 ${softPanel} px-4 py-4`}>
+              <SourceMark name={source.name} />
+              <span className="min-w-0 flex-1">
                 <span className="block text-base leading-6 text-black" style={romanBold}>
                   {source.name}
                 </span>
-                <span className="brand-muted-copy mt-1 block text-sm leading-5" style={ui}>
-                  {BIAS_LABEL[source.bias]} (AllSides)
+                <span className={`mt-1 block ${subInfo}`} style={ui}>
+                  {source.count} {source.count === 1 ? "citation" : "citations"}
                 </span>
               </span>
             </li>
@@ -974,8 +925,8 @@ function SourcesChart({ periods }: { periods: SourcePeriod[] }) {
         <h2 className={`mt-4 ${heading}`} style={roman}>
           Behind this briefing
         </h2>
-        <p className="brand-muted-copy mt-4 text-base leading-6" style={ui}>
-          News-outlet bias ratings by AllSides. Not a rating of these stories.
+        <p className="mt-4 text-base leading-6 text-[#6B7280]" style={ui}>
+          {period.detail} {period.citations} citations from {period.uses.length} outlets.
         </p>
         <div className="mt-6 flex flex-wrap gap-2">
           {periods.map((item) => (
@@ -989,32 +940,18 @@ function SourcesChart({ periods }: { periods: SourcePeriod[] }) {
             />
           ))}
         </div>
-        <div className="mt-10 flex flex-col items-center">
-          <LeanDonut period={period} />
-          <h3 className="mt-6 text-center text-[2rem] leading-10" style={roman}>
-            {period.lean}
-          </h3>
-          <p className="mt-2 text-center text-sm leading-5 text-[var(--brand-text-primary)]">
-            {period.detail} {period.citations} rated citations.
-          </p>
-          <ul className="mt-6 flex flex-wrap justify-center gap-x-4 gap-y-2">
-            {period.mix.filter((item) => item.count > 0).map((item) => (
-              <li key={item.bias} className="inline-flex items-center gap-2 text-sm" style={ui}>
-                <span className="h-3 w-3 rounded-full" style={{ background: MIX_COLOR[item.bias] }} />
-                {BIAS_LABEL[item.bias]}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <ul className="mt-12 flex flex-col gap-4">
+        <ul className={`mt-10 divide-y divide-black/10 border-y ${hairline}`}>
           {period.uses.map((source) => (
-            <li key={source.name}>
-              <span className="flex items-baseline justify-between gap-3 text-base leading-6" style={roman}>
-                <span className="min-w-0">{source.name}</span>
-                <span>{source.count}</span>
-              </span>
-              <span className="mt-2 block h-3 overflow-hidden rounded-full bg-black/10">
-                <span className="block h-full rounded-full" style={{ width: `${Math.max(8, (source.count / topUse) * 100)}%`, background: MIX_COLOR[source.bias] }} />
+            <li key={source.name} className="flex items-center gap-4 py-5">
+              <SourceMark name={source.name} />
+              <span className="min-w-0 flex-1">
+                <span className="flex items-baseline justify-between gap-3 text-base leading-6" style={roman}>
+                  <span className="min-w-0">{source.name}</span>
+                  <span className="shrink-0 text-[#6B7280]" style={ui}>{source.count}</span>
+                </span>
+                <span className="mt-2 block h-1.5 overflow-hidden bg-black/10">
+                  <span className="block h-full bg-[#DF0A14]" style={{ width: `${Math.max(8, (source.count / topUse) * 100)}%` }} />
+                </span>
               </span>
             </li>
           ))}
@@ -1392,8 +1329,10 @@ export function ReportBriefing({
                       className={`object-cover ${story.id === "tact" ? "object-right" : ""}`}
                       sizes="100vw"
                     />
-                  ) : null}
-                  <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/35 to-black/80" />
+                  ) : (
+                    <div className="absolute inset-0" style={{ background: story.imageGradient }} aria-hidden />
+                  )}
+                  <div className={`absolute inset-0 ${coverScrim}`} />
                   {locked && storyIndex > 0 ? <CoverLock /> : null}
                   <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center px-12 pb-24 text-center">
                     <p className="text-[12px] font-bold tracking-[0.16em] text-white uppercase" style={uiBold}>
@@ -1427,7 +1366,10 @@ export function ReportBriefing({
                     <span className="relative h-16 w-16 shrink-0 overflow-hidden bg-black">
                       {next.imageSrc ? (
                         <Image src={next.imageSrc} alt="" fill unoptimized={next.imageSrc.startsWith("/") || next.imageSrc.startsWith("http")} className="object-cover" sizes="64px" />
-                      ) : null}
+                      ) : (
+                        <span className="absolute inset-0" style={{ background: next.imageGradient }} aria-hidden />
+                      )}
+                      <span className={`absolute inset-0 ${coverScrim}`} aria-hidden />
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-[11px] font-bold tracking-[0.16em] text-white/70 uppercase" style={uiBold}>
