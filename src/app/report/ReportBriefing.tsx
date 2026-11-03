@@ -294,7 +294,13 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
   const muted = dark ? "text-white/75" : "text-black/70";
 
   return (
-    <div className={framed ? `relative py-16 xl:py-20 ${frameBg}` : ""}>
+    <div
+      className={
+        framed
+          ? `relative pb-16 xl:pb-20 ${frameBg} ${imageless ? "pt-8 md:pt-6 xl:pt-8" : "pt-16 xl:pt-20"}`
+          : ""
+      }
+    >
       <div className={framed ? `relative mx-auto flex flex-col gap-16 px-4 xl:gap-24 ${readColumn}` : "flex flex-col gap-6"}>
         {hook && story.format !== "quote" && story.whatHappened ? (
           <section>
@@ -381,38 +387,6 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
                 {story.whoSaidWhat}
               </p>
             </section>
-          ) : null}
-          {story.stats.length > 0 ? (
-            <FullBleedBrand tone={imageless?.tone ?? null}>
-              <section>
-                {story.statsHeading ? (
-                  <div>
-                    <h3 className={`text-[2rem] leading-10 ${ink}`} style={roman}>
-                      {story.statsHeading}
-                    </h3>
-                    <div className="mt-2 h-[3px] w-16 bg-[#DF0A14]" />
-                  </div>
-                ) : null}
-                <div className={`grid gap-x-8 gap-y-8 sm:grid-cols-2 ${story.statsHeading ? "mt-8" : ""}`}>
-                  {story.stats.map((stat) => (
-                    <div key={stat.label}>
-                      <div className="h-[3px] w-12 bg-[#DF0A14]" aria-hidden />
-                      <p className={`mt-4 text-[2.75rem] leading-none tracking-tight sm:text-[3.25rem] ${ink}`} style={roman}>
-                        {stat.value}
-                      </p>
-                      <p className="mt-3 text-[11px] font-bold tracking-[0.12em] text-[#DF0A14]/80 uppercase" style={ui}>
-                        {stat.label}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-                {story.statsNote ? (
-                  <p className={`mt-8 max-w-[58ch] border-t pt-4 text-sm leading-5 ${dark ? "border-white/15 text-white/55" : `${hairline} text-[#6B7280]`}`} style={ui}>
-                    {story.statsNote}
-                  </p>
-                ) : null}
-              </section>
-            </FullBleedBrand>
           ) : null}
           {story.whatsNext ? (
             <section className={`border-t pt-10 ${dark ? "border-white/15" : hairline}`}>
@@ -762,10 +736,10 @@ function ImagelessCover({
     <section
       id={story.id}
       data-story
-      className={`relative flex min-h-[calc(100svh-48px)] flex-col items-center justify-center overflow-clip px-4 pb-20 pt-10 text-center sm:px-8 md:min-h-[min(72vh,640px)] md:justify-start md:pt-14 md:pb-16 lg:pt-16 ${imagelessPlateClass(tone)}`}
+      className={`relative flex min-h-[calc(100svh-48px)] flex-col items-center justify-center overflow-clip px-4 pb-20 pt-10 text-center sm:px-8 md:min-h-0 md:justify-start md:px-8 md:pt-16 md:pb-8 lg:pt-20 ${imagelessPlateClass(tone)}`}
     >
       {locked ? <CoverLock /> : null}
-      <div className="relative z-10 flex w-full max-w-[40rem] flex-col items-center pt-16 sm:pt-20">
+      <div className="relative z-10 flex w-full max-w-[40rem] flex-col items-center pt-16 sm:pt-20 md:pt-10">
         <CoverWatermark
           index={index}
           className={`top-0 -translate-y-[18%] text-[min(36vw,220px)] ${dark ? "text-white/12" : "text-black/10"}`}
@@ -787,7 +761,7 @@ function ImagelessCover({
         >
           {story.displayTitle}
         </h2>
-        {story.dek ? (
+        {story.dek && story.dek !== story.displayTitle ? (
           <p className={`relative z-10 mt-4 max-w-[34ch] text-lg leading-7 sm:text-xl ${dark ? "text-white/80" : "text-black/70"}`} style={roman}>
             {story.dek}
           </p>
