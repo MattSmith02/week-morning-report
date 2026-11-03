@@ -268,9 +268,15 @@ function CaptureGate({ children }: { children: ReactNode }) {
   );
 }
 
-function FullBleedBrand({ children }: { children: ReactNode }) {
+function FullBleedBrand({ children, tone = null }: { children: ReactNode; tone?: ImagelessTone | null }) {
+  const bg =
+    tone === "dark"
+      ? "bg-[var(--report-section-dark-band)]"
+      : tone === "pink" || tone === "sky"
+        ? "bg-black/[0.04]"
+        : softPanel;
   return (
-    <div className={`relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2 ${softPanel}`}>
+    <div className={`relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2 ${bg}`}>
       <div className={`mx-auto px-4 py-10 sm:px-8 xl:py-12 ${readColumn}`}>{children}</div>
     </div>
   );
@@ -339,15 +345,15 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
               </div>
             </figure>
           ) : (
-            <FullBleedBrand>
+            <FullBleedBrand tone={imageless?.tone ?? null}>
               <figure>
                 <div className="flex items-start gap-4">
                   <QuoteMark />
                   <div>
-                    <blockquote className="text-[1.75rem] italic leading-9" style={roman}>
+                    <blockquote className={`text-[1.75rem] italic leading-9 ${ink}`} style={roman}>
                       {story.quote}
                     </blockquote>
-                    <p className={`mt-3 ${subInfo}`} style={ui}>
+                    <p className={`mt-3 ${dark ? "text-[11px] font-bold tracking-[0.12em] text-white/70 uppercase" : subInfo}`} style={ui}>
                       Quote{story.quoteAttribution ? ` · ${story.quoteAttribution}` : ""}
                     </p>
                   </div>
@@ -377,14 +383,21 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
             </section>
           ) : null}
           {story.stats.length > 0 ? (
-            <FullBleedBrand>
+            <FullBleedBrand tone={imageless?.tone ?? null}>
               <section>
-                {story.statsHeading ? <SectionHeading>{story.statsHeading}</SectionHeading> : null}
+                {story.statsHeading ? (
+                  <div>
+                    <h3 className={`text-[2rem] leading-10 ${ink}`} style={roman}>
+                      {story.statsHeading}
+                    </h3>
+                    <div className="mt-2 h-[3px] w-16 bg-[#DF0A14]" />
+                  </div>
+                ) : null}
                 <div className={`grid gap-x-8 gap-y-8 sm:grid-cols-2 ${story.statsHeading ? "mt-8" : ""}`}>
                   {story.stats.map((stat) => (
                     <div key={stat.label}>
                       <div className="h-[3px] w-12 bg-[#DF0A14]" aria-hidden />
-                      <p className="mt-4 text-[2.75rem] leading-none tracking-tight text-black sm:text-[3.25rem]" style={roman}>
+                      <p className={`mt-4 text-[2.75rem] leading-none tracking-tight sm:text-[3.25rem] ${ink}`} style={roman}>
                         {stat.value}
                       </p>
                       <p className="mt-3 text-[11px] font-bold tracking-[0.12em] text-[#DF0A14]/80 uppercase" style={ui}>
@@ -394,7 +407,7 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
                   ))}
                 </div>
                 {story.statsNote ? (
-                  <p className={`mt-8 max-w-[58ch] border-t ${hairline} pt-4 text-sm leading-5 text-[#6B7280]`} style={ui}>
+                  <p className={`mt-8 max-w-[58ch] border-t pt-4 text-sm leading-5 ${dark ? "border-white/15 text-white/55" : `${hairline} text-[#6B7280]`}`} style={ui}>
                     {story.statsNote}
                   </p>
                 ) : null}
@@ -1552,7 +1565,14 @@ export function ReportBriefing({
                 <StoryBody story={story} locked={locked} lead={storyIndex === 0} place={ads ? "inline" : "none"} />
                 {next ? (
                   <button type="button" onClick={() => goTo(storyIndex + 1)} className="flex w-full items-center gap-4 bg-[#011535] px-5 py-4 text-left text-white transition-colors duration-200 hover:bg-[#0A2744]">
-                    <span className="relative h-16 w-16 shrink-0 overflow-hidden bg-[#F0EAE1]">
+                    {(() => {
+                      const nextPlate = imagelessFor(next);
+                      return (
+                    <span
+                      className={`relative h-16 w-16 shrink-0 overflow-hidden ${
+                        nextPlate ? imagelessPlateClass(nextPlate.tone) : "bg-[#F0EAE1]"
+                      }`}
+                    >
                       {next.imageSrc ? (
                         <>
                           <Image src={next.imageSrc} alt="" fill unoptimized={next.imageSrc.startsWith("/") || next.imageSrc.startsWith("http")} className="object-cover" sizes="64px" />
@@ -1560,12 +1580,19 @@ export function ReportBriefing({
                         </>
                       ) : (
                         <span className="absolute inset-0 flex items-end justify-start p-2" aria-hidden>
-                          <span className="text-[10px] font-bold tracking-[0.12em] text-[#011535] uppercase" style={uiBold}>
+                          <span
+                            className={`text-[10px] font-bold tracking-[0.12em] uppercase ${
+                              nextPlate?.tone === "dark" ? "text-white" : "text-[#011535]"
+                            }`}
+                            style={uiBold}
+                          >
                             {next.chip}
                           </span>
                         </span>
                       )}
                     </span>
+                      );
+                    })()}
                     <span className="min-w-0 flex-1">
                       <span className="block text-[11px] font-bold tracking-[0.16em] text-white/70 uppercase" style={uiBold}>
                         Next story
