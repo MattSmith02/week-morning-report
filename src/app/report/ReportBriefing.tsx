@@ -281,7 +281,7 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
   const hook = part !== "rest";
   const rest = part !== "hook";
   const framed = part !== "rest";
-  const altered = ALTERED_COVERS[story.id];
+  const altered = alteredCoverFor(story);
   const frameBg = altered
     ? altered.tone === "pink"
       ? "bg-[var(--report-section-pink)]"
@@ -662,11 +662,28 @@ function CoverLock() {
   );
 }
 
-const ALTERED_COVERS: Record<string, { tone: "pink" | "sky"; graphic: string; inset?: string }> = {
-  tact: { tone: "pink", graphic: "/the-week/tact-lollipop.png", inset: "/the-week/section-tact.jpg" },
-  "chicago-fire": { tone: "sky", graphic: "/the-week/chicago-fire-painting.png", inset: "/the-week/section-chicago-fire.jpg" },
-  "tall-tale": { tone: "sky", graphic: "/the-week/section-tall-tale.jpg", inset: "/the-week/section-tall-tale.jpg" },
+type AlteredCover = { tone: "pink" | "sky"; graphic: string; inset: string };
+
+/** Shared collage art — not story-specific, reusable for any piece in these sections. */
+const ALTERED_BY_SECTION: Record<"pink" | "sky", AlteredCover> = {
+  pink: {
+    tone: "pink",
+    graphic: "/the-week/ice-collage.png",
+    inset: "/the-week/film/frame-02.jpg",
+  },
+  sky: {
+    tone: "sky",
+    graphic: "/the-week/gambling-collage.png",
+    inset: "/the-week/film/frame-04.jpg",
+  },
 };
+
+function alteredCoverFor(story: WeekStory): AlteredCover | null {
+  const key = `${story.chip} ${story.kicker}`.toLowerCase();
+  if (key.includes("not all bad")) return ALTERED_BY_SECTION.pink;
+  if (key.includes("on this day") || key.includes("tall tale")) return ALTERED_BY_SECTION.sky;
+  return null;
+}
 
 function ScribbleMark({ className = "" }: { className?: string }) {
   return (
@@ -736,7 +753,7 @@ function TextOnlyDecor({ tone = "beige" }: { tone?: "beige" | "sky" }) {
 }
 
 function StoryCover({ story, index, edition, locked = false }: { story: WeekStory; index: number; edition?: boolean; locked?: boolean }) {
-  const altered = ALTERED_COVERS[story.id];
+  const altered = alteredCoverFor(story);
   const hasMedia = Boolean(story.imageSrc) || (story.format === "video" && Boolean(story.videoSrc));
   const textOnly = !hasMedia && !altered && story.format !== "puzzle";
   const lightPlate = Boolean(altered) || textOnly;
@@ -1506,7 +1523,7 @@ export function ReportBriefing({
               <Fragment key={story.id}>
               <section id={`feed-${story.id}`} data-slide data-column={storyIndex} className="report-feed h-full w-full shrink-0 snap-start snap-always overflow-x-clip overflow-y-auto overscroll-y-contain snap-y snap-proximity">
                 {(() => {
-                  const altered = ALTERED_COVERS[story.id];
+                  const altered = alteredCoverFor(story);
                   const hasMedia = Boolean(story.imageSrc) || (story.format === "video" && Boolean(story.videoSrc));
                   const textOnly = !hasMedia && !altered && story.format !== "puzzle";
                   const lightPlate = Boolean(altered) || textOnly;

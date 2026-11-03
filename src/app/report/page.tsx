@@ -3,8 +3,14 @@ import { ReportBriefing, type SourcePeriod } from "./ReportBriefing";
 
 export const dynamic = "force-dynamic";
 
-/** Lesser pieces that demo typographic covers when editors lack art. */
-const TEXT_ONLY_COVERS = new Set(["tact", "okinawa", "chicago-fire", "tall-tale"]);
+/** Stories without a photo — typographic / altered-section covers instead. */
+const TEXT_ONLY_IDS = new Set(["okinawa"]);
+
+/** Section chips that use shared pastel plates + generic collage art (any story). */
+function isAlteredSection(story: { chip?: string; kicker?: string }) {
+  const key = `${story.chip ?? ""} ${story.kicker ?? ""}`.toLowerCase();
+  return key.includes("not all bad") || key.includes("on this day") || key.includes("tall tale");
+}
 
 const STOCK_COVERS: Record<string, { imageSrc: string; imageCaption: string }> = {
   newspapers: {
@@ -90,7 +96,7 @@ export default async function ReportPage({
       ...(stock ? { ...story, ...stock, imageFit: "cover" as const } : story),
       sources: story.sources ?? STORY_SOURCES[story.id],
     };
-    if (!TEXT_ONLY_COVERS.has(story.id)) return base;
+    if (!TEXT_ONLY_IDS.has(story.id) && !isAlteredSection(story)) return base;
     return { ...base, imageSrc: undefined, imageCaption: "" };
   });
   const periods = [
