@@ -1,26 +1,169 @@
 @import "tailwindcss";
 
+@theme {
+  --color-background: #ffffff;
+  --color-foreground: #0a0a0a;
+  --color-radar-blue: #1f69ff;
+  --color-accent-green: #01fe9e;
+  --color-tg-pale-blue: #e7f0ff;
+}
+
 :root {
+  --font-brand-sans: Arial, Helvetica, sans-serif;
+  --font-brand-heading: Arial, Helvetica, sans-serif;
+  --brand-primary: #1f69ff;
+  --brand-primary-dark: #011535;
+  --brand-surface-primary: #ffffff;
+  --brand-surface-secondary: #dff7f7;
+  --brand-border-default: #e2e8f0;
+  --brand-border-strong: #011535;
+  --brand-text-primary: #0f172b;
+  --brand-text-secondary: #45556c;
+  --brand-text-inverse: #ffffff;
+  --brand-icon-primary: #1f69ff;
+  --brand-icon-muted: #64748b;
+  --brand-focus-ring: #1f69ff;
+  --brand-button-primary-border: #011535;
+  --brand-button-secondary-border: #011535;
+  --brand-button-secondary-bg: #ffffff;
+  --brand-button-secondary-text: #011535;
+  --brand-button-secondary-hover-border: #011535;
+  --brand-button-secondary-hover-bg: #dff7f7;
+  --brand-button-secondary-hover-text: #011535;
+  --brand-button-secondary-selected-border: #011535;
+  --brand-button-secondary-selected-bg: #011535;
+  --brand-button-secondary-selected-text: #ffffff;
+  --brand-button-secondary-focus-outline: #1f69ff;
+  --brand-radius-control: 8px;
+  --radar-blue: #1f69ff;
+  --tg-pale-blue: #e7f0ff;
   --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --foreground: #0a0a0a;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer utilities {
+  .brand-soft-border {
+    border-color: var(--ui-soft-border-border-color, rgb(226 232 240));
+  }
+
+  .brand-muted-copy {
+    color: var(--brand-text-secondary);
+  }
+
+  .brand-label-copy {
+    color: var(--brand-text-secondary);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .brand-breadcrumbs {
+    color: var(--ui-breadcrumbs-color, rgb(255 255 255 / 0.9));
+    font-weight: 600;
+    letter-spacing: 0.025em;
+  }
+
+  .brand-breadcrumb-link {
+    color: var(--ui-breadcrumb-link-color, rgb(255 255 255 / 0.9));
+  }
+
+  .brand-breadcrumb-link:hover {
+    color: var(--ui-breadcrumb-link-hover-color, white);
+    text-decoration: underline;
+  }
+
+  .brand-breadcrumb-separator {
+    color: var(--ui-breadcrumb-separator-color, rgb(255 255 255 / 0.6));
+  }
+
+  .brand-breadcrumb-current {
+    color: var(--ui-breadcrumb-current-color, white);
+  }
+
+  .brand-icon-button {
+    color: inherit;
+  }
+
+  .brand-icon-button:hover,
+  .brand-icon-button:focus {
+    opacity: 0.85;
+  }
+
+  .brand-icon-button:focus-visible {
+    outline: 2px solid var(--brand-focus-ring);
+    outline-offset: 2px;
+  }
+
+  .brand-scroll-arrow {
+    position: relative;
+    display: flex;
+    height: var(--ui-scroll-arrow-height, 2rem);
+    width: var(--ui-scroll-arrow-width, 2rem);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+    background-color: var(--ui-scroll-arrow-background-color, var(--tg-pale-blue));
+    color: var(--ui-scroll-arrow-color, var(--radar-blue));
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+    border-radius: var(--ui-scroll-arrow-border-radius, initial);
+    backdrop-filter: var(--ui-scroll-arrow-backdrop-filter, none);
+  }
+
+  .brand-scroll-arrow:hover {
+    color: var(--ui-scroll-arrow-hover-color, rgb(37 99 235));
+    background-color: var(--ui-scroll-arrow-hover-background-color, currentColor);
+  }
+
+  .brand-scroll-arrow--hero {
+    height: var(--ui-scroll-arrow-hero-height, 2.25rem);
+    width: var(--ui-scroll-arrow-hero-width, 2.25rem);
+    border-radius: var(--ui-scroll-arrow-hero-border-radius, 9999px);
+    border: var(--ui-scroll-arrow-hero-border, 0 solid transparent);
+    background-color: var(--ui-scroll-arrow-hero-background-color, rgb(255 255 255 / 0.18));
+    color: var(--ui-scroll-arrow-hero-color, white);
+    backdrop-filter: var(--ui-scroll-arrow-hero-backdrop-filter, blur(4px));
+    box-shadow: var(--ui-scroll-arrow-hero-box-shadow, none);
+  }
+
+  .brand-scroll-arrow--hero:hover {
+    background-color: var(--ui-scroll-arrow-hero-hover-background-color, rgb(255 255 255 / 0.28));
+    color: var(--ui-scroll-arrow-hero-hover-color, white);
+  }
+
+  .chip-brand {
+    border-color: var(--brand-button-secondary-border);
+    background-color: var(--brand-button-secondary-bg);
+    color: var(--brand-button-secondary-text);
+    font-family: var(--font-brand-sans), ui-sans-serif, system-ui, sans-serif;
+    transition:
+      background-color 0.2s cubic-bezier(0.3, 0.8, 0.4, 1),
+      border-color 0.2s cubic-bezier(0.3, 0.8, 0.4, 1),
+      color 0.2s cubic-bezier(0.3, 0.8, 0.4, 1);
+  }
+
+  .chip-brand:hover {
+    border-color: var(--brand-button-secondary-hover-border);
+    background-color: var(--brand-button-secondary-hover-bg);
+    color: var(--brand-button-secondary-hover-text);
+  }
+
+  .chip-brand:focus-visible {
+    outline: 3px solid var(--brand-button-secondary-focus-outline);
+    outline-offset: 0;
+  }
+
+  .chip-brand-selected,
+  .chip-brand-selected:hover {
+    border-color: var(--brand-button-secondary-selected-border);
+    background-color: var(--brand-button-secondary-selected-bg);
+    color: var(--brand-button-secondary-selected-text);
+  }
 }
