@@ -344,14 +344,15 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
           {story.stats.length > 0 ? (
             <FullBleedBrand>
               <section>
-                {story.statsHeading ? <SectionHeading rule={false}>{story.statsHeading}</SectionHeading> : null}
-                <div className={`grid gap-x-8 gap-y-6 sm:grid-cols-2 ${story.statsHeading ? "mt-8" : ""}`}>
+                {story.statsHeading ? <SectionHeading>{story.statsHeading}</SectionHeading> : null}
+                <div className={`grid gap-x-8 gap-y-8 sm:grid-cols-2 ${story.statsHeading ? "mt-8" : ""}`}>
                   {story.stats.map((stat) => (
-                    <div key={stat.label} className="border-t border-black/15 pt-4">
-                      <p className="text-[2.75rem] leading-none tracking-tight text-black sm:text-[3.25rem]" style={roman}>
+                    <div key={stat.label}>
+                      <div className="h-[3px] w-12 bg-[#DF0A14]" aria-hidden />
+                      <p className="mt-4 text-[2.75rem] leading-none tracking-tight text-black sm:text-[3.25rem]" style={roman}>
                         {stat.value}
                       </p>
-                      <p className={`mt-3 ${subInfo}`} style={ui}>
+                      <p className="mt-3 text-[11px] font-bold tracking-[0.12em] text-[#DF0A14]/80 uppercase" style={ui}>
                         {stat.label}
                       </p>
                     </div>
