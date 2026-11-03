@@ -3,13 +3,15 @@ import { ReportBriefing, type SourcePeriod } from "./ReportBriefing";
 
 export const dynamic = "force-dynamic";
 
-/** Stories without a photo — typographic / altered-section covers instead. */
-const TEXT_ONLY_IDS = new Set(["okinawa"]);
-
-/** Section chips that use shared pastel plates + generic collage art (any story). */
-function isAlteredSection(story: { chip?: string; kicker?: string }) {
+/** Imageless typographic plates — any story in these sections. */
+function isImagelessSection(story: { chip?: string; kicker?: string }) {
   const key = `${story.chip ?? ""} ${story.kicker ?? ""}`.toLowerCase();
-  return key.includes("not all bad") || key.includes("on this day") || key.includes("tall tale");
+  return (
+    key.includes("not all bad") ||
+    key.includes("on this day") ||
+    key.includes("tall tale") ||
+    key.includes("under the radar")
+  );
 }
 
 const STOCK_COVERS: Record<string, { imageSrc: string; imageCaption: string }> = {
@@ -96,7 +98,7 @@ export default async function ReportPage({
       ...(stock ? { ...story, ...stock, imageFit: "cover" as const } : story),
       sources: story.sources ?? STORY_SOURCES[story.id],
     };
-    if (!TEXT_ONLY_IDS.has(story.id) && !isAlteredSection(story)) return base;
+    if (!isImagelessSection(story)) return base;
     return { ...base, imageSrc: undefined, imageCaption: "" };
   });
   const periods = [

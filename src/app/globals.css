@@ -40,11 +40,11 @@
   --tg-pale-blue-deep: #d4e4ff;
   --report-beige: #f0eae1;
   --report-beige-deep: #e4dcd0;
-  /* Bright section plates (edition-card energy) */
-  --report-section-pink: #f4a89a;
-  --report-section-sky: #7eb8c4;
-  --report-section-mint: #9dceb8;
-  --report-section-oval: #f7f3ea;
+  /* Imageless story plates (Figma) */
+  --report-section-pink: #fde4e4;
+  --report-section-sky: #e3f2fd;
+  --report-section-dark: #1c2a38;
+  --report-section-dark-band: #243445;
   --background: #ffffff;
   --foreground: #0a0a0a;
 }

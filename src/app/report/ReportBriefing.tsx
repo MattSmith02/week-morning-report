@@ -281,32 +281,42 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
   const hook = part !== "rest";
   const rest = part !== "hook";
   const framed = part !== "rest";
-  const altered = alteredCoverFor(story);
-  const frameBg = altered ? alteredPlateClass(altered.tone) : "bg-[#F4F0EA]";
+  const imageless = imagelessFor(story);
+  const dark = imageless?.tone === "dark";
+  const frameBg = imageless ? imagelessPlateClass(imageless.tone) : "bg-[#F4F0EA]";
+  const ink = dark ? "text-white" : "text-black";
+  const muted = dark ? "text-white/75" : "text-black/70";
 
   return (
     <div className={framed ? `relative py-16 xl:py-20 ${frameBg}` : ""}>
       <div className={framed ? `relative mx-auto flex flex-col gap-16 px-4 xl:gap-24 ${readColumn}` : "flex flex-col gap-6"}>
         {hook && story.format !== "quote" && story.whatHappened ? (
           <section>
-            <SectionHeading>{happenedLabel}</SectionHeading>
+            <div>
+              <h3 className={`text-[2rem] leading-10 ${ink}`} style={roman}>
+                {happenedLabel}
+              </h3>
+              <div className="mt-2 h-[3px] w-16 bg-[#DF0A14]" />
+            </div>
             {story.format === "tale" ? (
-              <p className="mt-6 border-l-2 border-[#DF0A14] pl-4 text-2xl italic leading-8" style={roman}>
+              <p className={`mt-6 border-l-2 border-[#DF0A14] pl-4 text-2xl italic leading-8 ${ink}`} style={roman}>
                 {story.whatHappened}
               </p>
             ) : (
-              <Body>{story.whatHappened}</Body>
+              <p className={`mt-6 text-base leading-6 ${muted}`} style={roman}>
+                {story.whatHappened}
+              </p>
             )}
           </section>
         ) : null}
         {rest && story.items && story.items.length > 0 ? (
-          <ul className={`max-w-[635px] border-t ${hairline}`}>
+          <ul className={`max-w-[635px] border-t ${dark ? "border-white/15" : hairline}`}>
             {story.items.map((item) => (
-              <li key={item.label} className={`border-b ${hairline} py-5`}>
+              <li key={item.label} className={`border-b py-5 ${dark ? "border-white/15" : hairline}`}>
                 <p className={subInfo} style={uiBold}>
                   {item.label}
                 </p>
-                <p className="mt-2 text-xl leading-7 text-black" style={roman}>
+                <p className={`mt-2 text-xl leading-7 ${ink}`} style={roman}>
                   {item.text}
                 </p>
               </li>
@@ -314,21 +324,37 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
           </ul>
         ) : null}
         {rest && story.quote ? (
-          <FullBleedBrand>
-            <figure>
-              <div className="flex items-start gap-4">
+          dark ? (
+            <figure className="relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2 bg-[var(--report-section-dark-band)] px-4 py-12 sm:px-8">
+              <div className={`mx-auto flex items-start gap-4 ${readColumn}`}>
                 <QuoteMark />
                 <div>
-                  <blockquote className="text-[1.75rem] italic leading-9" style={roman}>
+                  <blockquote className="text-[1.75rem] italic leading-9 text-white" style={roman}>
                     {story.quote}
                   </blockquote>
-                  <p className={`mt-3 ${subInfo}`} style={ui}>
+                  <p className="mt-3 text-[11px] font-bold tracking-[0.12em] text-white/70 uppercase" style={ui}>
                     Quote{story.quoteAttribution ? ` · ${story.quoteAttribution}` : ""}
                   </p>
                 </div>
               </div>
             </figure>
-          </FullBleedBrand>
+          ) : (
+            <FullBleedBrand>
+              <figure>
+                <div className="flex items-start gap-4">
+                  <QuoteMark />
+                  <div>
+                    <blockquote className="text-[1.75rem] italic leading-9" style={roman}>
+                      {story.quote}
+                    </blockquote>
+                    <p className={`mt-3 ${subInfo}`} style={ui}>
+                      Quote{story.quoteAttribution ? ` · ${story.quoteAttribution}` : ""}
+                    </p>
+                  </div>
+                </div>
+              </figure>
+            </FullBleedBrand>
+          )
         ) : null}
         {rest ? <div className="contents">
           {story.format === "quote" && story.whatHappened ? (
@@ -338,9 +364,16 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
             </section>
           ) : null}
           {story.whoSaidWhat ? (
-            <section className={`border-t ${hairline} pt-10`}>
-              <SectionHeading>Who said what</SectionHeading>
-              <Body>{story.whoSaidWhat}</Body>
+            <section className={`border-t pt-10 ${dark ? "border-white/15" : hairline}`}>
+              <div>
+                <h3 className={`text-[2rem] leading-10 ${ink}`} style={roman}>
+                  Who said what
+                </h3>
+                <div className="mt-2 h-[3px] w-16 bg-[#DF0A14]" />
+              </div>
+              <p className={`mt-6 text-base leading-6 ${muted}`} style={roman}>
+                {story.whoSaidWhat}
+              </p>
             </section>
           ) : null}
           {story.stats.length > 0 ? (
@@ -369,9 +402,16 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
             </FullBleedBrand>
           ) : null}
           {story.whatsNext ? (
-            <section className={`border-t ${hairline} pt-10`}>
-              <SectionHeading>What’s next?</SectionHeading>
-              <Body>{story.whatsNext}</Body>
+            <section className={`border-t pt-10 ${dark ? "border-white/15" : hairline}`}>
+              <div>
+                <h3 className={`text-[2rem] leading-10 ${ink}`} style={roman}>
+                  What’s next?
+                </h3>
+                <div className="mt-2 h-[3px] w-16 bg-[#DF0A14]" />
+              </div>
+              <p className={`mt-6 text-base leading-6 ${muted}`} style={roman}>
+                {story.whatsNext}
+              </p>
             </section>
           ) : null}
         </div> : null}
@@ -658,123 +698,89 @@ function CoverLock() {
   );
 }
 
-type AlteredTone = "pink" | "sky" | "mint";
-type AlteredCover = { tone: AlteredTone; motif: "sun" | "lens" | "paper" };
+type ImagelessTone = "pink" | "sky" | "dark";
 
-/** Bright plates + generic artled motifs — reusable for any story in these sections. */
-function alteredCoverFor(story: WeekStory): AlteredCover | null {
+/** Figma imageless plates — by section chip, reusable for any story. */
+function imagelessFor(story: WeekStory): { tone: ImagelessTone } | null {
   const key = `${story.chip} ${story.kicker}`.toLowerCase();
-  if (key.includes("not all bad")) return { tone: "pink", motif: "sun" };
-  if (key.includes("on this day")) return { tone: "sky", motif: "lens" };
-  if (key.includes("tall tale")) return { tone: "mint", motif: "paper" };
+  if (key.includes("tall tale") || key.includes("not all bad")) return { tone: "pink" };
+  if (key.includes("on this day")) return { tone: "sky" };
+  if (key.includes("under the radar")) return { tone: "dark" };
   return null;
 }
 
-function alteredPlateClass(tone: AlteredTone) {
+function imagelessPlateClass(tone: ImagelessTone) {
   if (tone === "pink") return "bg-[var(--report-section-pink)]";
-  if (tone === "mint") return "bg-[var(--report-section-mint)]";
+  if (tone === "dark") return "bg-[var(--report-section-dark)]";
   return "bg-[var(--report-section-sky)]";
 }
 
-/** Oval artled graphic: flat shapes + arrows (edition-card language). */
-function ArtledMotif({ motif }: { motif: AlteredCover["motif"] }) {
-  if (motif === "sun") {
-    return (
-      <svg viewBox="0 0 320 180" className="h-full w-full" aria-hidden>
-        <ellipse cx="160" cy="96" rx="54" ry="52" fill="#F5C542" />
-        {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg) => {
-          const rad = (deg * Math.PI) / 180;
-          const x2 = 160 + Math.cos(rad) * 118;
-          const y2 = 96 + Math.sin(rad) * 78;
-          return (
-            <path
-              key={deg}
-              d={`M160 96 L${x2} ${y2}`}
-              stroke={deg % 60 === 0 ? "#E85D04" : "#2F9E6B"}
-              strokeWidth={deg % 60 === 0 ? 14 : 10}
-              strokeLinecap="round"
-              opacity="0.92"
-            />
-          );
-        })}
-      </svg>
-    );
-  }
-  if (motif === "lens") {
-    return (
-      <svg viewBox="0 0 320 180" className="h-full w-full" aria-hidden>
-        <rect x="36" y="28" width="248" height="124" rx="8" fill="#E8E4DC" />
-        {[0, 1, 2, 3, 4].map((row) =>
-          [0, 1, 2, 3, 4, 5].map((col) => (
-            <path
-              key={`${row}-${col}`}
-              d={`M${58 + col * 36} ${44 + row * 22} l8 14 -16 0 z`}
-              fill="#F67B9A"
-              opacity="0.85"
-            />
-          )),
-        )}
-        <circle cx="168" cy="92" r="46" fill="none" stroke="#1B1B1B" strokeWidth="10" />
-        <circle cx="168" cy="92" r="28" fill="none" stroke="#1B1B1B" strokeWidth="6" />
-        <path d="M198 122 L248 156" stroke="#1B1B1B" strokeWidth="12" strokeLinecap="round" />
-      </svg>
-    );
-  }
+function ImagelessCover({
+  story,
+  index,
+  tone,
+  locked = false,
+}: {
+  story: WeekStory;
+  index: number;
+  tone: ImagelessTone;
+  locked?: boolean;
+}) {
+  const dark = tone === "dark";
   return (
-    <svg viewBox="0 0 320 180" className="h-full w-full" aria-hidden>
-      <rect x="96" y="34" width="88" height="112" rx="4" fill="#D9D4CC" transform="rotate(-18 140 90)" />
-      <rect x="118" y="40" width="88" height="112" rx="4" fill="#EFEBE3" transform="rotate(12 162 96)" />
-      <rect x="128" y="48" width="72" height="10" fill="#C4BDB2" transform="rotate(12 164 53)" />
-      <rect x="128" y="66" width="56" height="6" fill="#C4BDB2" transform="rotate(12 156 69)" />
-      <path d="M70 40 L250 140" stroke="#DF0A14" strokeWidth="18" strokeLinecap="round" opacity="0.85" />
-      <path d="M250 40 L70 140" stroke="#DF0A14" strokeWidth="18" strokeLinecap="round" opacity="0.85" />
-    </svg>
-  );
-}
-
-/** Bright plate + cream oval artled motif — matches edition-card covers. */
-function AlteredCoverDecor({ tone, motif }: AlteredCover) {
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-      <div className={`absolute inset-0 ${alteredPlateClass(tone)}`} />
-      <div className="absolute top-[12%] left-1/2 h-[42%] w-[min(88%,560px)] -translate-x-1/2 sm:top-[14%] sm:h-[46%]">
-        <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-[999px] bg-[var(--report-section-oval)] px-8 shadow-[0_12px_32px_rgba(10,10,10,0.12)]">
-          <ArtledMotif motif={motif} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function TextOnlyDecor({ tone = "beige" }: { tone?: "beige" | "sky" }) {
-  const sky = tone === "sky";
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-      <div className={`absolute inset-0 ${sky ? "bg-[var(--tg-pale-blue)]" : "bg-[var(--report-beige)]"}`} />
-      <div
-        className={`absolute -top-24 -right-20 h-[68vmin] w-[68vmin] rounded-full ${
-          sky ? "bg-[var(--tg-pale-blue-deep)]" : "bg-[var(--report-beige-deep)]"
+    <section
+      id={story.id}
+      data-story
+      className={`relative flex min-h-[calc(100svh-48px)] flex-col items-center justify-center overflow-clip px-4 py-24 text-center sm:px-8 ${imagelessPlateClass(tone)}`}
+    >
+      <span
+        className={`pointer-events-none absolute top-[6%] left-1/2 -translate-x-1/2 text-[min(42vw,300px)] leading-none select-none ${
+          dark ? "text-white/10" : "text-black/10"
         }`}
-      />
-      <div className="absolute top-[18%] left-1/2 -translate-x-1/2 scale-[2.4] opacity-[0.1] sm:scale-[3]">
-        <WeekMark />
+        style={roman}
+        aria-hidden
+      >
+        {number(index)}
+      </span>
+      {locked ? <CoverLock /> : null}
+      <div className="relative z-10 flex max-w-[40rem] flex-col items-center">
+        <p
+          className={`inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.16em] uppercase ${
+            dark ? "text-white" : "text-black"
+          }`}
+          style={uiBold}
+        >
+          {dark ? <span className="h-1.5 w-1.5 rounded-full bg-[#DF0A14]" aria-hidden /> : null}
+          <span className="text-[#DF0A14]">{number(index)}</span>
+          <span className={dark ? "text-white/70" : "text-black/55"}>· {story.chip}</span>
+        </p>
+        <div className="mt-3 h-px w-14 bg-[#DF0A14]" aria-hidden />
+        <h2
+          className={`mt-6 text-[2.75rem] leading-[1.05] sm:text-[3.5rem] ${dark ? "text-white" : "text-black"}`}
+          style={roman}
+        >
+          {story.displayTitle}
+        </h2>
+        {story.dek ? (
+          <p className={`mt-4 max-w-[34ch] text-lg leading-7 sm:text-xl ${dark ? "text-white/80" : "text-black/70"}`} style={roman}>
+            {story.dek}
+          </p>
+        ) : null}
       </div>
-    </div>
+    </section>
   );
 }
 
 function StoryCover({ story, index, edition, locked = false }: { story: WeekStory; index: number; edition?: boolean; locked?: boolean }) {
-  const altered = alteredCoverFor(story);
+  const imageless = imagelessFor(story);
+  if (imageless) {
+    return <ImagelessCover story={story} index={index} tone={imageless.tone} locked={locked} />;
+  }
+
   const hasMedia = Boolean(story.imageSrc) || (story.format === "video" && Boolean(story.videoSrc));
-  const textOnly = !hasMedia && !altered && story.format !== "puzzle";
-  const lightPlate = Boolean(altered) || textOnly;
-  const plateBg = altered
-    ? alteredPlateClass(altered.tone)
-    : textOnly
-      ? "bg-[var(--report-beige)]"
-      : story.format === "puzzle"
-        ? "bg-[var(--report-beige)]"
-        : "bg-[#111]";
+  const textOnly = !hasMedia && story.format !== "puzzle";
+  const lightPlate = textOnly;
+  const plateBg = textOnly || story.format === "puzzle" ? "bg-[var(--report-beige)]" : "bg-[#111]";
 
   return (
     <section
@@ -782,9 +788,7 @@ function StoryCover({ story, index, edition, locked = false }: { story: WeekStor
       data-story
       className={`relative flex h-[calc(100svh-48px)] min-h-[520px] scroll-mt-12 items-end overflow-clip ${plateBg}`}
     >
-      {altered ? (
-        <AlteredCoverDecor tone={altered.tone} motif={altered.motif} />
-      ) : story.imageSrc ? (
+      {story.imageSrc ? (
         <Image
           src={story.imageSrc}
           alt=""
@@ -797,17 +801,14 @@ function StoryCover({ story, index, edition, locked = false }: { story: WeekStor
       ) : story.format === "video" && story.videoSrc ? (
         <video src={story.videoSrc} muted playsInline preload="metadata" className="absolute inset-0 h-full w-full object-cover" />
       ) : textOnly ? (
-        <TextOnlyDecor tone="beige" />
+        <div className="absolute inset-0 bg-[var(--report-beige)]" aria-hidden />
       ) : null}
       {hasMedia || story.format === "puzzle" ? (
         <div className={`absolute inset-0 ${story.format === "puzzle" ? "bg-gradient-to-t from-black/75 via-black/10 to-transparent" : coverScrim}`} />
       ) : null}
-      {/* Story index watermark — includes 01 on the first / edition cover */}
-      {hasMedia || altered ? (
+      {hasMedia ? (
         <span
-          className={`pointer-events-none absolute inset-x-0 z-[5] text-center text-[min(28vw,220px)] leading-none font-normal select-none ${
-            lightPlate ? "bottom-[38%] text-black/12" : "bottom-[22%] text-white/25"
-          }`}
+          className="pointer-events-none absolute inset-x-0 bottom-[22%] z-[5] text-center text-[min(28vw,220px)] leading-none font-normal text-white/25 select-none"
           style={roman}
           aria-hidden
         >
@@ -855,7 +856,7 @@ function StoryCover({ story, index, edition, locked = false }: { story: WeekStor
         <p className={`mt-4 max-w-[36ch] text-[20px] leading-7 ${lightPlate ? "text-black/75" : "text-white/90"}`} style={roman}>
           {story.dek}
         </p>
-        {story.imageCaption && !altered ? (
+        {story.imageCaption ? (
           <p className={`mt-4 text-sm leading-5 ${lightPlate ? "text-black/50" : "text-white/70"}`}>
             {story.imageCaption}
           </p>
@@ -1525,68 +1526,22 @@ export function ReportBriefing({
             return (
               <Fragment key={story.id}>
               <section id={`feed-${story.id}`} data-slide data-column={storyIndex} className="report-feed h-full w-full shrink-0 snap-start snap-always overflow-x-clip overflow-y-auto overscroll-y-contain snap-y snap-proximity">
-                {(() => {
-                  const altered = alteredCoverFor(story);
-                  const hasMedia = Boolean(story.imageSrc) || (story.format === "video" && Boolean(story.videoSrc));
-                  const textOnly = !hasMedia && !altered && story.format !== "puzzle";
-                  const lightPlate = Boolean(altered) || textOnly;
-                  const plateBg = altered
-                    ? alteredPlateClass(altered.tone)
-                    : textOnly
-                      ? "bg-[var(--report-beige)]"
-                      : "bg-[#111]";
-                  return (
-                <div className={`relative h-full snap-start overflow-clip ${plateBg}`}>
-                  {altered ? (
-                    <AlteredCoverDecor tone={altered.tone} motif={altered.motif} />
-                  ) : story.format === "video" && story.videoSrc ? (
-                    <video src={story.videoSrc} autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover" />
-                  ) : story.imageSrc ? (
-                    <Image
-                      src={story.imageSrc}
-                      alt=""
-                      fill
-                      priority={storyIndex === 0}
-                      unoptimized={story.imageSrc.startsWith("/") || story.imageSrc.startsWith("http")}
-                      className="object-cover object-center"
-                      sizes="100vw"
-                    />
-                  ) : textOnly ? (
-                    <TextOnlyDecor tone="beige" />
-                  ) : null}
-                  {hasMedia ? <div className={`absolute inset-0 ${coverScrim}`} /> : null}
-                  {hasMedia || altered ? (
-                    <span
-                      className={`pointer-events-none absolute inset-x-0 z-[5] text-center text-[32vw] leading-none select-none ${
-                        lightPlate ? "bottom-[40%] text-black/12" : "bottom-[26%] text-white/25"
-                      }`}
-                      style={roman}
-                      aria-hidden
-                    >
-                      {number(storyIndex)}
-                    </span>
-                  ) : null}
-                  {locked && storyIndex > 0 ? <CoverLock /> : null}
-                  <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center px-12 pb-24 text-center">
-                    <p className="text-[12px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
-                      {number(storyIndex)}
-                      <span className={lightPlate ? "text-black/55" : "text-white/80"}> · {story.chip}</span>
-                    </p>
-                    {lightPlate ? <div className="mt-4 h-[3px] w-16 bg-[#DF0A14]" aria-hidden /> : null}
-                    <h2 className={`mt-4 max-w-[12ch] text-[2.625rem] leading-none ${lightPlate ? "text-black" : "text-white"}`} style={roman}>
-                      {story.displayTitle}
-                    </h2>
-                    <p className={`mt-3 line-clamp-2 max-w-[32ch] text-[16px] leading-6 ${lightPlate ? "text-black/75" : "text-white/90"}`} style={roman}>
-                      {story.dek}
-                    </p>
-                  </div>
+                <div className="relative snap-start">
+                  <StoryCover
+                    story={story}
+                    index={storyIndex}
+                    edition={storyIndex === 0}
+                    locked={locked && storyIndex > 0}
+                  />
                   <button
                     type="button"
                     onClick={(event) => {
                       const column = event.currentTarget.closest<HTMLElement>("[data-column]");
                       column?.scrollTo({ top: column.clientHeight, behavior: "smooth" });
                     }}
-                    className={`absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-1 transition-opacity duration-200 hover:opacity-70 ${lightPlate ? "text-[#011535]" : "text-white"}`}
+                    className={`absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-1 transition-opacity duration-200 hover:opacity-70 ${
+                      imagelessFor(story)?.tone === "dark" ? "text-white" : imagelessFor(story) ? "text-[#011535]" : "text-white"
+                    }`}
                   >
                     <BrandIcon name="chevronDown" defaultIcon={ChevronDown} className="h-6 w-6" />
                     <span className="text-[11px] font-bold tracking-[0.16em] uppercase" style={uiBold}>
@@ -1594,8 +1549,6 @@ export function ReportBriefing({
                     </span>
                   </button>
                 </div>
-                  );
-                })()}
                 <StoryBody story={story} locked={locked} lead={storyIndex === 0} place={ads ? "inline" : "none"} />
                 {next ? (
                   <button type="button" onClick={() => goTo(storyIndex + 1)} className="flex w-full items-center gap-4 bg-[#011535] px-5 py-4 text-left text-white transition-colors duration-200 hover:bg-[#0A2744]">
