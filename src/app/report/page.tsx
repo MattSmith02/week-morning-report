@@ -3,8 +3,15 @@ import { ReportBriefing, type SourcePeriod } from "./ReportBriefing";
 
 export const dynamic = "force-dynamic";
 
-/** Lesser pieces that demo typographic / gradient covers when editors lack art. */
-const TEXT_ONLY_COVERS = new Set(["tact", "okinawa", "chicago-fire", "newspapers", "tall-tale"]);
+/** Lesser pieces that demo typographic covers when editors lack art. */
+const TEXT_ONLY_COVERS = new Set(["tact", "okinawa", "chicago-fire", "tall-tale"]);
+
+const STOCK_COVERS: Record<string, { imageSrc: string; imageCaption: string }> = {
+  newspapers: {
+    imageSrc: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=1600&q=80",
+    imageCaption: "Thursday’s front pages",
+  },
+};
 
 function citedOutlets(story: WeekStory) {
   return (story.sources ?? STORY_SOURCES[story.id])?.outlets ?? [];
@@ -78,8 +85,9 @@ export default async function ReportPage({
   const morning = edition?.stories ?? [];
   const week = EDITIONS.filter((item) => item.id !== "all").flatMap((item) => item.stories);
   const stories = [...morning, videoStory, ...(puzzleStory ? [puzzleStory] : [])].map((story) => {
+    const stock = STOCK_COVERS[story.id];
     const base = {
-      ...story,
+      ...(stock ? { ...story, ...stock, imageFit: "cover" as const } : story),
       sources: story.sources ?? STORY_SOURCES[story.id],
     };
     if (!TEXT_ONLY_COVERS.has(story.id)) return base;

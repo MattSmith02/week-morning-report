@@ -347,7 +347,7 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
                 {story.statsHeading ? <SectionHeading rule={false}>{story.statsHeading}</SectionHeading> : null}
                 <div className={`grid gap-x-8 gap-y-6 sm:grid-cols-2 ${story.statsHeading ? "mt-8" : ""}`}>
                   {story.stats.map((stat) => (
-                    <div key={stat.label} className="border-t border-black/20 pt-4">
+                    <div key={stat.label} className="border-t border-black/15 pt-4">
                       <p className="text-[2.75rem] leading-none tracking-tight text-black sm:text-[3.25rem]" style={roman}>
                         {stat.value}
                       </p>
@@ -659,10 +659,12 @@ function TextOnlyDecor() {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
       <div className="absolute inset-0 bg-[#F0EAE1]" />
-      <div className="absolute -top-28 -right-24 h-[75vmin] w-[75vmin] rounded-full bg-[#E4DCD0]" />
-      <div className="absolute -bottom-36 -left-24 h-[60vmin] w-[60vmin] rounded-full bg-[#E8E0D4]/90" />
-      <div className="absolute inset-y-0 left-0 w-1.5 bg-[#D6CEC2] sm:w-2" />
-      <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-[#E4DCD0] to-transparent" />
+      {/* Quiet geometry — enough depth without competing with type */}
+      <div className="absolute -top-24 -right-20 h-[68vmin] w-[68vmin] rounded-full bg-[#E4DCD0]" />
+      {/* Brand mark, low opacity — signals The Week without a fake photo plate */}
+      <div className="absolute top-[18%] left-1/2 -translate-x-1/2 scale-[2.4] opacity-[0.09] sm:scale-[3]">
+        <WeekMark />
+      </div>
     </div>
   );
 }
@@ -721,6 +723,10 @@ function StoryCover({ story, index, edition, locked = false }: { story: WeekStor
               THE WEEK
             </span>
           </div>
+        ) : textOnly ? (
+          <div className="mb-6">
+            <WeekMark />
+          </div>
         ) : null}
         <p className={`text-[12px] font-bold tracking-[0.16em] uppercase ${textOnly ? "text-[#011535]" : "text-white"}`} style={uiBold}>
           {edition ? story.chip : (
@@ -730,14 +736,14 @@ function StoryCover({ story, index, edition, locked = false }: { story: WeekStor
             </>
           )}
         </p>
-        {textOnly ? <div className="mt-4 h-[3px] w-16 bg-[#011535]/35" aria-hidden /> : null}
+        {textOnly ? <div className="mt-4 h-[3px] w-16 bg-[#DF0A14]" aria-hidden /> : null}
         <h2
           className={`mt-4 max-w-[14ch] text-[56px] leading-[0.95] sm:text-[72px] lg:max-w-none lg:whitespace-nowrap ${textOnly ? "text-black" : "text-white"}`}
           style={roman}
         >
           {story.displayTitle}
         </h2>
-        <p className={`mt-4 max-w-[36ch] text-[20px] leading-7 ${textOnly ? "text-black/75" : "text-white/90"}`} style={roman}>
+        <p className={`mt-4 max-w-[36ch] text-[20px] leading-7 ${textOnly ? "text-black/70" : "text-white/90"}`} style={roman}>
           {story.dek}
         </p>
         {story.imageCaption ? (
@@ -1421,15 +1427,20 @@ export function ReportBriefing({
                   {hasMedia ? <div className={`absolute inset-0 ${coverScrim}`} /> : null}
                   {locked && storyIndex > 0 ? <CoverLock /> : null}
                   <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center px-12 pb-24 text-center">
+                    {textOnly ? (
+                      <div className="mb-5">
+                        <WeekMark />
+                      </div>
+                    ) : null}
                     <p className={`text-[12px] font-bold tracking-[0.16em] uppercase ${textOnly ? "text-[#011535]" : "text-white"}`} style={uiBold}>
                       {number(storyIndex)}
                       <span className={textOnly ? "text-black/45" : "text-white/70"}> · {story.chip}</span>
                     </p>
-                    {textOnly ? <div className="mt-4 h-[3px] w-16 bg-[#011535]/35" aria-hidden /> : null}
+                    {textOnly ? <div className="mt-4 h-[3px] w-16 bg-[#DF0A14]" aria-hidden /> : null}
                     <h2 className={`mt-4 max-w-[12ch] text-[2.625rem] leading-none ${textOnly ? "text-black" : "text-white"}`} style={roman}>
                       {story.displayTitle}
                     </h2>
-                    <p className={`mt-3 line-clamp-2 max-w-[32ch] text-[16px] leading-6 ${textOnly ? "text-black/75" : "text-white/90"}`} style={roman}>
+                    <p className={`mt-3 line-clamp-2 max-w-[32ch] text-[16px] leading-6 ${textOnly ? "text-black/70" : "text-white/90"}`} style={roman}>
                       {story.dek}
                     </p>
                   </div>
