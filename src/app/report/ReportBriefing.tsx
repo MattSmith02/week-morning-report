@@ -728,6 +728,24 @@ function imagelessPlateClass(tone: ImagelessTone) {
   return "bg-[var(--report-section-sky)]";
 }
 
+function CoverWatermark({
+  index,
+  className,
+}: {
+  index: number;
+  className: string;
+}) {
+  return (
+    <span
+      className={`pointer-events-none absolute left-1/2 z-0 -translate-x-1/2 leading-none select-none ${className}`}
+      style={roman}
+      aria-hidden
+    >
+      {number(index)}
+    </span>
+  );
+}
+
 function ImagelessCover({
   story,
   index,
@@ -744,21 +762,16 @@ function ImagelessCover({
     <section
       id={story.id}
       data-story
-      className={`relative flex min-h-[calc(100svh-48px)] flex-col items-center justify-center overflow-clip px-4 py-24 text-center sm:px-8 ${imagelessPlateClass(tone)}`}
+      className={`relative flex min-h-[calc(100svh-48px)] flex-col items-center justify-center overflow-clip px-4 pb-20 pt-10 text-center sm:px-8 md:min-h-[min(72vh,640px)] md:justify-start md:pt-14 md:pb-16 lg:pt-16 ${imagelessPlateClass(tone)}`}
     >
-      <span
-        className={`pointer-events-none absolute top-[6%] left-1/2 -translate-x-1/2 text-[min(42vw,300px)] leading-none select-none ${
-          dark ? "text-white/10" : "text-black/10"
-        }`}
-        style={roman}
-        aria-hidden
-      >
-        {number(index)}
-      </span>
       {locked ? <CoverLock /> : null}
-      <div className="relative z-10 flex max-w-[40rem] flex-col items-center">
+      <div className="relative z-10 flex w-full max-w-[40rem] flex-col items-center pt-16 sm:pt-20">
+        <CoverWatermark
+          index={index}
+          className={`top-0 -translate-y-[18%] text-[min(36vw,220px)] ${dark ? "text-white/12" : "text-black/10"}`}
+        />
         <p
-          className={`inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.16em] uppercase ${
+          className={`relative z-10 inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.16em] uppercase ${
             dark ? "text-white" : "text-black"
           }`}
           style={uiBold}
@@ -767,15 +780,15 @@ function ImagelessCover({
           <span className="text-[#DF0A14]">{number(index)}</span>
           <span className={dark ? "text-white/70" : "text-black/55"}>· {story.chip}</span>
         </p>
-        <div className="mt-3 h-px w-14 bg-[#DF0A14]" aria-hidden />
+        <div className="relative z-10 mt-3 h-px w-14 bg-[#DF0A14]" aria-hidden />
         <h2
-          className={`mt-6 text-[2.75rem] leading-[1.05] sm:text-[3.5rem] ${dark ? "text-white" : "text-black"}`}
+          className={`relative z-10 mt-6 text-[2.75rem] leading-[1.05] sm:text-[3.5rem] ${dark ? "text-white" : "text-black"}`}
           style={roman}
         >
           {story.displayTitle}
         </h2>
         {story.dek ? (
-          <p className={`mt-4 max-w-[34ch] text-lg leading-7 sm:text-xl ${dark ? "text-white/80" : "text-black/70"}`} style={roman}>
+          <p className={`relative z-10 mt-4 max-w-[34ch] text-lg leading-7 sm:text-xl ${dark ? "text-white/80" : "text-black/70"}`} style={roman}>
             {story.dek}
           </p>
         ) : null}
@@ -819,15 +832,6 @@ function StoryCover({ story, index, edition, locked = false }: { story: WeekStor
       {hasMedia || story.format === "puzzle" ? (
         <div className={`absolute inset-0 ${story.format === "puzzle" ? "bg-gradient-to-t from-black/75 via-black/10 to-transparent" : coverScrim}`} />
       ) : null}
-      {hasMedia ? (
-        <span
-          className="pointer-events-none absolute inset-x-0 bottom-[22%] z-[5] text-center text-[min(28vw,220px)] leading-none font-normal text-white/25 select-none"
-          style={roman}
-          aria-hidden
-        >
-          {number(index)}
-        </span>
-      ) : null}
       {locked ? <CoverLock /> : null}
       {story.format === "video" ? (
         <button
@@ -853,27 +857,35 @@ function StoryCover({ story, index, edition, locked = false }: { story: WeekStor
             </span>
           </div>
         ) : null}
-        <p className="text-[12px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
-          {number(index)}
-          <span className={lightPlate ? "text-black/55" : "text-white/80"}> · {story.chip}</span>
-        </p>
-        {lightPlate ? <div className="mt-4 h-[3px] w-16 bg-[#DF0A14]" aria-hidden /> : null}
-        <h2
-          className={`mt-4 max-w-[14ch] text-[56px] leading-[0.95] sm:text-[72px] lg:max-w-none lg:whitespace-nowrap ${
-            lightPlate ? "text-black" : "text-white"
-          }`}
-          style={roman}
-        >
-          {story.displayTitle}
-        </h2>
-        <p className={`mt-4 max-w-[36ch] text-[20px] leading-7 ${lightPlate ? "text-black/75" : "text-white/90"}`} style={roman}>
-          {story.dek}
-        </p>
-        {story.imageCaption ? (
-          <p className={`mt-4 text-sm leading-5 ${lightPlate ? "text-black/50" : "text-white/70"}`}>
-            {story.imageCaption}
+        <div className="relative flex w-full max-w-[40rem] flex-col items-center pt-16 sm:pt-20">
+          {hasMedia ? (
+            <CoverWatermark
+              index={index}
+              className="top-0 z-[5] -translate-y-[18%] text-[min(36vw,220px)] font-normal text-white/25"
+            />
+          ) : null}
+          <p className="relative z-10 text-[12px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
+            {number(index)}
+            <span className={lightPlate ? "text-black/55" : "text-white/80"}> · {story.chip}</span>
           </p>
-        ) : null}
+          {lightPlate ? <div className="relative z-10 mt-4 h-[3px] w-16 bg-[#DF0A14]" aria-hidden /> : null}
+          <h2
+            className={`relative z-10 mt-4 max-w-[14ch] text-[56px] leading-[0.95] sm:text-[72px] lg:max-w-none lg:whitespace-nowrap ${
+              lightPlate ? "text-black" : "text-white"
+            }`}
+            style={roman}
+          >
+            {story.displayTitle}
+          </h2>
+          <p className={`relative z-10 mt-4 max-w-[36ch] text-[20px] leading-7 ${lightPlate ? "text-black/75" : "text-white/90"}`} style={roman}>
+            {story.dek}
+          </p>
+          {story.imageCaption ? (
+            <p className={`relative z-10 mt-4 text-sm leading-5 ${lightPlate ? "text-black/50" : "text-white/70"}`}>
+              {story.imageCaption}
+            </p>
+          ) : null}
+        </div>
       </div>
     </section>
   );
@@ -1564,7 +1576,7 @@ export function ReportBriefing({
                 </div>
                 <StoryBody story={story} locked={locked} lead={storyIndex === 0} place={ads ? "inline" : "none"} />
                 {next ? (
-                  <button type="button" onClick={() => goTo(storyIndex + 1)} className="flex w-full items-center gap-4 bg-[#011535] px-5 py-4 text-left text-white transition-colors duration-200 hover:bg-[#0A2744]">
+                  <button type="button" onClick={() => goTo(storyIndex + 1)} className="flex w-full items-center gap-4 bg-[#374151] px-5 py-4 text-left text-white transition-colors duration-200 hover:bg-[#4B5563]">
                     {(() => {
                       const nextPlate = imagelessFor(next);
                       return (
