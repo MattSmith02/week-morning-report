@@ -28,8 +28,8 @@ const heading = "text-[2rem] leading-10 text-black";
 const subInfo = "text-[11px] font-bold tracking-[0.12em] text-[#6B7280] uppercase";
 const readColumn = "w-full max-w-[65ch]";
 const bodyCopy = "mt-6 text-base leading-6";
-const softPanel = "bg-[#F8E8E6]";
-const hairline = "border-[#DF0A14]/20";
+const softPanel = "bg-[#F0EAE1]";
+const hairline = "border-black/12";
 /** Shared photo cover/thumbnail scrim — same on mobile and desktop. */
 const coverScrim = "bg-gradient-to-t from-black/75 via-black/15 to-black/25";
 const OUTLET_DOMAIN: Record<string, string> = {
@@ -213,7 +213,7 @@ function SideAd({ align }: { align: "left" | "right" }) {
     <aside aria-label="Advertisement" className={`absolute inset-y-0 hidden w-[300px] min-[1400px]:block ${edge}`}>
       <div className="sticky top-16">
         <div
-          className={`flex h-[600px] items-center justify-center ${softPanel} px-4 text-center text-[12px] tracking-[0.14em] text-[#DF0A14] uppercase`}
+          className={`flex h-[600px] items-center justify-center ${softPanel} px-4 text-center text-[12px] tracking-[0.14em] text-[#6B7280] uppercase`}
           style={ui}
         >
           Advertisement
@@ -226,7 +226,7 @@ function SideAd({ align }: { align: "left" | "right" }) {
 function InArticleAd({ wideHide = false }: { wideHide?: boolean }) {
   return (
     <aside aria-label="Advertisement" className={wideHide ? "min-[1400px]:hidden" : ""}>
-      <div className={`flex h-[280px] w-full items-center justify-center ${softPanel} text-[12px] tracking-[0.14em] text-[#DF0A14] uppercase`} style={ui}>
+      <div className={`flex h-[280px] w-full items-center justify-center ${softPanel} text-[12px] tracking-[0.14em] text-[#6B7280] uppercase`} style={ui}>
         Advertisement
       </div>
     </aside>
@@ -239,7 +239,7 @@ function FullBleedAd({ tall }: { tall: "screen" | "column" }) {
       aria-label="Advertisement"
       className={`flex w-full items-center justify-center ${softPanel} ${tall === "column" ? "h-full" : "h-[calc(100svh-48px)] min-h-[520px]"}`}
     >
-      <p className="text-[12px] tracking-[0.14em] text-[#DF0A14] uppercase" style={ui}>
+      <p className="text-[12px] tracking-[0.14em] text-[#6B7280] uppercase" style={ui}>
         Advertisement
       </p>
     </aside>
@@ -347,7 +347,7 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
                 {story.statsHeading ? <SectionHeading rule={false}>{story.statsHeading}</SectionHeading> : null}
                 <div className={`grid gap-x-8 gap-y-6 sm:grid-cols-2 ${story.statsHeading ? "mt-8" : ""}`}>
                   {story.stats.map((stat) => (
-                    <div key={stat.label} className="border-t border-[#DF0A14] pt-4">
+                    <div key={stat.label} className="border-t border-black/20 pt-4">
                       <p className="text-[2.75rem] leading-none tracking-tight text-black sm:text-[3.25rem]" style={roman}>
                         {stat.value}
                       </p>
@@ -658,14 +658,11 @@ function CoverLock() {
 function TextOnlyDecor() {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-      <div className="absolute inset-0 bg-[#F4F0EA]" />
-      <div className="absolute -top-24 -right-16 h-[70vmin] w-[70vmin] rounded-full bg-[#DF0A14]/12" />
-      <div className="absolute -bottom-32 -left-20 h-[55vmin] w-[55vmin] rounded-full bg-[#DF0A14]/08" />
-      <div className="absolute inset-y-0 left-0 w-2 bg-[#DF0A14] sm:w-3" />
-      <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#DF0A14]/18 to-transparent" />
-      <div className="absolute top-10 right-8 hidden text-[18vw] leading-none font-bold text-[#DF0A14]/[0.07] select-none lg:block" style={roman}>
-        W
-      </div>
+      <div className="absolute inset-0 bg-[#F0EAE1]" />
+      <div className="absolute -top-28 -right-24 h-[75vmin] w-[75vmin] rounded-full bg-[#E4DCD0]" />
+      <div className="absolute -bottom-36 -left-24 h-[60vmin] w-[60vmin] rounded-full bg-[#E8E0D4]/90" />
+      <div className="absolute inset-y-0 left-0 w-1.5 bg-[#D6CEC2] sm:w-2" />
+      <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-[#E4DCD0] to-transparent" />
     </div>
   );
 }
@@ -679,7 +676,7 @@ function StoryCover({ story, index, edition, locked = false }: { story: WeekStor
       id={story.id}
       data-story
       className={`relative flex h-[calc(100svh-48px)] min-h-[520px] scroll-mt-12 items-end overflow-clip ${
-        story.format === "puzzle" || textOnly ? "bg-[#F4F0EA]" : "bg-[#111]"
+        story.format === "puzzle" || textOnly ? "bg-[#F0EAE1]" : "bg-[#111]"
       }`}
     >
       {story.imageSrc ? (
@@ -725,7 +722,7 @@ function StoryCover({ story, index, edition, locked = false }: { story: WeekStor
             </span>
           </div>
         ) : null}
-        <p className={`text-[12px] font-bold tracking-[0.16em] uppercase ${textOnly ? "text-[#DF0A14]" : "text-white"}`} style={uiBold}>
+        <p className={`text-[12px] font-bold tracking-[0.16em] uppercase ${textOnly ? "text-[#011535]" : "text-white"}`} style={uiBold}>
           {edition ? story.chip : (
             <>
               {number(index)}
@@ -733,7 +730,7 @@ function StoryCover({ story, index, edition, locked = false }: { story: WeekStor
             </>
           )}
         </p>
-        {textOnly ? <div className="mt-4 h-[3px] w-16 bg-[#DF0A14]" aria-hidden /> : null}
+        {textOnly ? <div className="mt-4 h-[3px] w-16 bg-[#011535]/35" aria-hidden /> : null}
         <h2
           className={`mt-4 max-w-[14ch] text-[56px] leading-[0.95] sm:text-[72px] lg:max-w-none lg:whitespace-nowrap ${textOnly ? "text-black" : "text-white"}`}
           style={roman}
@@ -867,7 +864,7 @@ function Recirculation() {
                       {card.headline}
                     </span>
                   </span>
-                  <span className="block h-px bg-[#DF0A14]/25" />
+                  <span className="block h-px bg-black/12" />
                   <span>
                     <span className="block text-[16px] leading-6 text-black" style={roman}>
                       + {card.more} more inside
@@ -955,14 +952,14 @@ function BriefingSources({ periods }: { periods: SourcePeriod[] }) {
           <p className={`shrink-0 ${subInfo}`} style={ui}>
             Cited this week
           </p>
-          <div className="h-px min-w-8 flex-1 bg-[#DF0A14]/25" />
+          <div className="h-px min-w-8 flex-1 bg-black/12" />
         </div>
       </div>
       <ul className="report-cards mt-4 flex gap-3 overflow-x-auto px-4 pb-1 sm:px-8">
         {period.uses.map((source) => (
           <li
             key={source.name}
-            className="flex w-[210px] shrink-0 flex-col items-start gap-4 border border-[#DF0A14]/15 bg-white px-4 py-4"
+            className="flex w-[210px] shrink-0 flex-col items-start gap-4 border border-black/10 bg-white px-4 py-4"
           >
             <SourceMark name={source.name} size={52} />
             <span>
@@ -1025,17 +1022,17 @@ function SourcesChart({ periods }: { periods: SourcePeriod[] }) {
             />
           ))}
         </div>
-        <ul className={`mt-10 divide-y divide-[#DF0A14]/15 border-y ${hairline}`}>
+        <ul className={`mt-10 divide-y divide-black/10 border-y ${hairline}`}>
           {period.uses.map((source) => (
             <li key={source.name} className="flex items-center gap-4 py-5">
               <SourceMark name={source.name} size={48} />
               <span className="min-w-0 flex-1">
                 <span className="flex items-baseline justify-between gap-3 text-base leading-6" style={roman}>
                   <span className="min-w-0">{source.name}</span>
-                  <span className="shrink-0 text-[#DF0A14]" style={uiBold}>{source.count}</span>
+                  <span className="shrink-0 text-[#011535]" style={uiBold}>{source.count}</span>
                 </span>
-                <span className="mt-2 block h-1.5 overflow-hidden bg-[#F8E8E6]">
-                  <span className="block h-full bg-[#DF0A14]" style={{ width: `${Math.max(8, (source.count / topUse) * 100)}%` }} />
+                <span className="mt-2 block h-1.5 overflow-hidden bg-[#F0EAE1]">
+                  <span className="block h-full bg-[#011535]" style={{ width: `${Math.max(8, (source.count / topUse) * 100)}%` }} />
                 </span>
               </span>
             </li>
@@ -1255,7 +1252,7 @@ export function ReportBriefing({
                 type="button"
                 onClick={() => jump(story.id)}
                 aria-current={current ? "true" : undefined}
-                className={`group flex w-full items-start gap-4 border-l-2 px-4 py-4 text-left transition-colors hover:bg-[#F8E8E6] focus-visible:bg-[#F8E8E6] focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#DF0A14] ${current ? "border-[#DF0A14] bg-white" : "border-transparent"}`}
+                className={`group flex w-full items-start gap-4 border-l-2 px-4 py-4 text-left transition-colors hover:bg-[#F0EAE1] focus-visible:bg-[#F0EAE1] focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#DF0A14] ${current ? "border-[#DF0A14] bg-white" : "border-transparent"}`}
               >
                 <span className={`w-8 shrink-0 text-base leading-6 ${current ? "text-[#DF0A14]" : "text-[#9CA3AF] group-hover:text-[#DF0A14]"}`} style={roman}>
                   {number(storyIndex)}
@@ -1405,7 +1402,7 @@ export function ReportBriefing({
                   const hasMedia = Boolean(story.imageSrc) || (story.format === "video" && Boolean(story.videoSrc));
                   const textOnly = !hasMedia && story.format !== "puzzle";
                   return (
-                <div className={`relative h-full snap-start overflow-clip ${textOnly ? "bg-[#F4F0EA]" : "bg-[#111]"}`}>
+                <div className={`relative h-full snap-start overflow-clip ${textOnly ? "bg-[#F0EAE1]" : "bg-[#111]"}`}>
                   {story.format === "video" && story.videoSrc ? (
                     <video src={story.videoSrc} autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover" />
                   ) : story.imageSrc ? (
@@ -1424,11 +1421,11 @@ export function ReportBriefing({
                   {hasMedia ? <div className={`absolute inset-0 ${coverScrim}`} /> : null}
                   {locked && storyIndex > 0 ? <CoverLock /> : null}
                   <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center px-12 pb-24 text-center">
-                    <p className={`text-[12px] font-bold tracking-[0.16em] uppercase ${textOnly ? "text-[#DF0A14]" : "text-white"}`} style={uiBold}>
+                    <p className={`text-[12px] font-bold tracking-[0.16em] uppercase ${textOnly ? "text-[#011535]" : "text-white"}`} style={uiBold}>
                       {number(storyIndex)}
                       <span className={textOnly ? "text-black/45" : "text-white/70"}> · {story.chip}</span>
                     </p>
-                    {textOnly ? <div className="mt-4 h-[3px] w-16 bg-[#DF0A14]" aria-hidden /> : null}
+                    {textOnly ? <div className="mt-4 h-[3px] w-16 bg-[#011535]/35" aria-hidden /> : null}
                     <h2 className={`mt-4 max-w-[12ch] text-[2.625rem] leading-none ${textOnly ? "text-black" : "text-white"}`} style={roman}>
                       {story.displayTitle}
                     </h2>
@@ -1442,7 +1439,7 @@ export function ReportBriefing({
                       const column = event.currentTarget.closest<HTMLElement>("[data-column]");
                       column?.scrollTo({ top: column.clientHeight, behavior: "smooth" });
                     }}
-                    className={`absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-1 transition-opacity duration-200 hover:opacity-70 ${textOnly ? "text-[#DF0A14]" : "text-white"}`}
+                    className={`absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-1 transition-opacity duration-200 hover:opacity-70 ${textOnly ? "text-[#011535]" : "text-white"}`}
                   >
                     <BrandIcon name="chevronDown" defaultIcon={ChevronDown} className="h-6 w-6" />
                     <span className="text-[11px] font-bold tracking-[0.16em] uppercase" style={uiBold}>
@@ -1454,8 +1451,8 @@ export function ReportBriefing({
                 })()}
                 <StoryBody story={story} locked={locked} lead={storyIndex === 0} place={ads ? "inline" : "none"} />
                 {next ? (
-                  <button type="button" onClick={() => goTo(storyIndex + 1)} className="flex w-full items-center gap-4 bg-[#DF0A14] px-5 py-4 text-left text-white transition-colors duration-200 hover:bg-[#B20810]">
-                    <span className="relative h-16 w-16 shrink-0 overflow-hidden bg-[#F4F0EA]">
+                  <button type="button" onClick={() => goTo(storyIndex + 1)} className="flex w-full items-center gap-4 bg-[#011535] px-5 py-4 text-left text-white transition-colors duration-200 hover:bg-[#0A2744]">
+                    <span className="relative h-16 w-16 shrink-0 overflow-hidden bg-[#F0EAE1]">
                       {next.imageSrc ? (
                         <>
                           <Image src={next.imageSrc} alt="" fill unoptimized={next.imageSrc.startsWith("/") || next.imageSrc.startsWith("http")} className="object-cover" sizes="64px" />
@@ -1463,7 +1460,7 @@ export function ReportBriefing({
                         </>
                       ) : (
                         <span className="absolute inset-0 flex items-end justify-start p-2" aria-hidden>
-                          <span className="text-[10px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
+                          <span className="text-[10px] font-bold tracking-[0.12em] text-[#011535] uppercase" style={uiBold}>
                             {next.chip}
                           </span>
                         </span>
@@ -1499,7 +1496,7 @@ export function ReportBriefing({
               </section>
               {ads && storyIndex === 5 ? (
                 <section data-slide aria-label="Advertisement" className={`report-feed flex h-full w-full shrink-0 snap-start snap-always items-center justify-center ${softPanel}`}>
-                  <p className="text-[12px] tracking-[0.14em] text-[#DF0A14] uppercase" style={ui}>
+                  <p className="text-[12px] tracking-[0.14em] text-[#6B7280] uppercase" style={ui}>
                     Advertisement
                   </p>
                 </section>
