@@ -656,14 +656,19 @@ function CoverLock() {
   );
 }
 
-function TextOnlyDecor() {
+const SKY_BLUE_COVERS = new Set(["tact", "tall-tale"]);
+
+function TextOnlyDecor({ tone = "beige" }: { tone?: "beige" | "sky" }) {
+  const sky = tone === "sky";
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-      <div className="absolute inset-0 bg-[#F0EAE1]" />
-      {/* Quiet geometry — enough depth without competing with type */}
-      <div className="absolute -top-24 -right-20 h-[68vmin] w-[68vmin] rounded-full bg-[#E4DCD0]" />
-      {/* Brand mark, low opacity — signals The Week without a fake photo plate */}
-      <div className="absolute top-[18%] left-1/2 -translate-x-1/2 scale-[2.4] opacity-[0.09] sm:scale-[3]">
+      <div className={`absolute inset-0 ${sky ? "bg-[var(--tg-pale-blue)]" : "bg-[var(--report-beige)]"}`} />
+      <div
+        className={`absolute -top-24 -right-20 h-[68vmin] w-[68vmin] rounded-full ${
+          sky ? "bg-[var(--tg-pale-blue-deep)]" : "bg-[var(--report-beige-deep)]"
+        }`}
+      />
+      <div className="absolute top-[18%] left-1/2 -translate-x-1/2 scale-[2.4] opacity-[0.1] sm:scale-[3]">
         <WeekMark />
       </div>
     </div>
@@ -673,13 +678,21 @@ function TextOnlyDecor() {
 function StoryCover({ story, index, edition, locked = false }: { story: WeekStory; index: number; edition?: boolean; locked?: boolean }) {
   const hasMedia = Boolean(story.imageSrc) || (story.format === "video" && Boolean(story.videoSrc));
   const textOnly = !hasMedia && story.format !== "puzzle";
+  const skyTone = SKY_BLUE_COVERS.has(story.id);
+  const coverTone = skyTone ? "sky" : "beige";
 
   return (
     <section
       id={story.id}
       data-story
       className={`relative flex h-[calc(100svh-48px)] min-h-[520px] scroll-mt-12 items-end overflow-clip ${
-        story.format === "puzzle" || textOnly ? "bg-[#F0EAE1]" : "bg-[#111]"
+        story.format === "puzzle"
+          ? "bg-[var(--report-beige)]"
+          : textOnly
+            ? skyTone
+              ? "bg-[var(--tg-pale-blue)]"
+              : "bg-[var(--report-beige)]"
+            : "bg-[#111]"
       }`}
     >
       {story.imageSrc ? (
@@ -695,10 +708,20 @@ function StoryCover({ story, index, edition, locked = false }: { story: WeekStor
       ) : story.format === "video" && story.videoSrc ? (
         <video src={story.videoSrc} muted playsInline preload="metadata" className="absolute inset-0 h-full w-full object-cover" />
       ) : textOnly ? (
-        <TextOnlyDecor />
+        <TextOnlyDecor tone={coverTone} />
       ) : null}
       {hasMedia || story.format === "puzzle" ? (
         <div className={`absolute inset-0 ${story.format === "puzzle" ? "bg-gradient-to-t from-black/75 via-black/10 to-transparent" : coverScrim}`} />
+      ) : null}
+      {/* Big translucent index — same idea as photo hero “02” */}
+      {hasMedia && !edition ? (
+        <span
+          className="pointer-events-none absolute inset-x-0 bottom-[22%] z-[5] text-center text-[min(28vw,220px)] leading-none font-normal text-white/25 select-none"
+          style={roman}
+          aria-hidden
+        >
+          {number(index)}
+        </span>
       ) : null}
       {locked ? <CoverLock /> : null}
       {story.format === "video" ? (
@@ -729,11 +752,16 @@ function StoryCover({ story, index, edition, locked = false }: { story: WeekStor
             <WeekMark />
           </div>
         ) : null}
-        <p className={`text-[12px] font-bold tracking-[0.16em] uppercase ${textOnly ? "text-[#011535]" : "text-white"}`} style={uiBold}>
+        <p
+          className={`text-[12px] font-bold tracking-[0.16em] uppercase ${
+            textOnly ? "text-[#011535]" : "text-[#DF0A14]"
+          }`}
+          style={uiBold}
+        >
           {edition ? story.chip : (
             <>
               {number(index)}
-              <span className={textOnly ? "text-black/45" : "text-white/70"}> · {story.chip}</span>
+              <span className={textOnly ? "text-black/45" : "text-white/80"}> · {story.chip}</span>
             </>
           )}
         </p>
@@ -907,33 +935,45 @@ function outletMark(name: string) {
   return `${a}${b}`.toUpperCase();
 }
 
-function SourceMark({ name, size = 44 }: { name: string; size?: number }) {
+function SourceMark({ name, size = 44, well = false }: { name: string; size?: number; well?: boolean }) {
   const [failed, setFailed] = useState(false);
   const src = outletLogo(name);
+  const showMark = !src || failed;
 
-  if (!src || failed) {
+  const mark = showMark ? (
+    <span
+      className="inline-flex items-center justify-center text-[15px] font-bold tracking-wide text-[#011535]"
+      style={{ ...uiBold, width: size, height: size }}
+      aria-hidden
+    >
+      {outletMark(name)}
+    </span>
+  ) : (
+    <Image
+      src={src}
+      alt=""
+      width={size}
+      height={size}
+      unoptimized
+      className="object-contain p-2"
+      onError={() => setFailed(true)}
+    />
+  );
+
+  if (well) {
     return (
-      <span
-        className="inline-flex shrink-0 items-center justify-center bg-[#DF0A14] text-[13px] font-bold tracking-wide text-white"
-        style={{ ...uiBold, width: size, height: size }}
-        aria-hidden
-      >
-        {outletMark(name)}
+      <span className="flex h-[112px] w-full items-center justify-center bg-[var(--tg-pale-blue)]" aria-hidden>
+        {mark}
       </span>
     );
   }
 
   return (
-    <span className="relative inline-flex shrink-0 items-center justify-center overflow-hidden bg-white" style={{ width: size, height: size }}>
-      <Image
-        src={src}
-        alt=""
-        width={size}
-        height={size}
-        unoptimized
-        className="object-contain p-1.5"
-        onError={() => setFailed(true)}
-      />
+    <span
+      className="relative inline-flex shrink-0 items-center justify-center overflow-hidden bg-[var(--tg-pale-blue)]"
+      style={{ width: size, height: size }}
+    >
+      {mark}
     </span>
   );
 }
@@ -966,14 +1006,14 @@ function BriefingSources({ periods }: { periods: SourcePeriod[] }) {
         {period.uses.map((source) => (
           <li
             key={source.name}
-            className="flex w-[210px] shrink-0 flex-col items-start gap-4 border border-black/10 bg-white px-4 py-4"
+            className="flex w-[210px] shrink-0 flex-col overflow-hidden border border-black/10 bg-white"
           >
-            <SourceMark name={source.name} size={52} />
-            <span>
+            <SourceMark name={source.name} size={64} well />
+            <span className="flex flex-col gap-1 px-4 py-4">
               <span className="block text-base leading-6 text-black" style={romanBold}>
                 {source.name}
               </span>
-              <span className={`mt-1 block ${subInfo}`} style={ui}>
+              <span className={subInfo} style={ui}>
                 {source.count} {source.count === 1 ? "citation" : "citations"}
               </span>
             </span>
@@ -1408,8 +1448,13 @@ export function ReportBriefing({
                 {(() => {
                   const hasMedia = Boolean(story.imageSrc) || (story.format === "video" && Boolean(story.videoSrc));
                   const textOnly = !hasMedia && story.format !== "puzzle";
+                  const skyTone = SKY_BLUE_COVERS.has(story.id);
                   return (
-                <div className={`relative h-full snap-start overflow-clip ${textOnly ? "bg-[#F0EAE1]" : "bg-[#111]"}`}>
+                <div
+                  className={`relative h-full snap-start overflow-clip ${
+                    textOnly ? (skyTone ? "bg-[var(--tg-pale-blue)]" : "bg-[var(--report-beige)]") : "bg-[#111]"
+                  }`}
+                >
                   {story.format === "video" && story.videoSrc ? (
                     <video src={story.videoSrc} autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover" />
                   ) : story.imageSrc ? (
@@ -1423,9 +1468,18 @@ export function ReportBriefing({
                       sizes="100vw"
                     />
                   ) : textOnly ? (
-                    <TextOnlyDecor />
+                    <TextOnlyDecor tone={skyTone ? "sky" : "beige"} />
                   ) : null}
                   {hasMedia ? <div className={`absolute inset-0 ${coverScrim}`} /> : null}
+                  {hasMedia ? (
+                    <span
+                      className="pointer-events-none absolute inset-x-0 bottom-[26%] z-[5] text-center text-[32vw] leading-none text-white/25 select-none"
+                      style={roman}
+                      aria-hidden
+                    >
+                      {number(storyIndex)}
+                    </span>
+                  ) : null}
                   {locked && storyIndex > 0 ? <CoverLock /> : null}
                   <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center px-12 pb-24 text-center">
                     {textOnly ? (
@@ -1433,9 +1487,14 @@ export function ReportBriefing({
                         <WeekMark />
                       </div>
                     ) : null}
-                    <p className={`text-[12px] font-bold tracking-[0.16em] uppercase ${textOnly ? "text-[#011535]" : "text-white"}`} style={uiBold}>
+                    <p
+                      className={`text-[12px] font-bold tracking-[0.16em] uppercase ${
+                        textOnly ? "text-[#011535]" : "text-[#DF0A14]"
+                      }`}
+                      style={uiBold}
+                    >
                       {number(storyIndex)}
-                      <span className={textOnly ? "text-black/45" : "text-white/70"}> · {story.chip}</span>
+                      <span className={textOnly ? "text-black/45" : "text-white/80"}> · {story.chip}</span>
                     </p>
                     {textOnly ? <div className="mt-4 h-[3px] w-16 bg-[#DF0A14]" aria-hidden /> : null}
                     <h2 className={`mt-4 max-w-[12ch] text-[2.625rem] leading-none ${textOnly ? "text-black" : "text-white"}`} style={roman}>
