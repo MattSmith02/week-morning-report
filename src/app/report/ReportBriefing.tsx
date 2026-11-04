@@ -268,15 +268,9 @@ function CaptureGate({ children }: { children: ReactNode }) {
   );
 }
 
-function FullBleedBrand({ children, tone = null }: { children: ReactNode; tone?: ImagelessTone | null }) {
-  const bg =
-    tone === "dark"
-      ? "bg-[var(--report-section-dark-band)]"
-      : tone === "pink" || tone === "sky"
-        ? "bg-black/[0.04]"
-        : softPanel;
+function FullBleedBrand({ children }: { children: ReactNode }) {
   return (
-    <div className={`relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2 ${bg}`}>
+    <div className={`relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2 ${softPanel}`}>
       <div className={`mx-auto px-4 py-10 sm:px-8 xl:py-12 ${readColumn}`}>{children}</div>
     </div>
   );
@@ -287,48 +281,37 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
   const hook = part !== "rest";
   const rest = part !== "hook";
   const framed = part !== "rest";
-  const imageless = imagelessFor(story);
-  const dark = imageless?.tone === "dark";
-  const frameBg = imageless ? imagelessPlateClass(imageless.tone) : "bg-[#F4F0EA]";
-  const ink = dark ? "text-white" : "text-black";
-  const muted = dark ? "text-white/75" : "text-black/70";
 
   return (
-    <div
-      className={
-        framed
-          ? `relative pb-16 xl:pb-20 ${frameBg} ${imageless ? "pt-8 md:pt-6 xl:pt-8" : "pt-16 xl:pt-20"}`
-          : ""
-      }
-    >
+    <div className={framed ? "relative bg-[#F4F0EA] py-16 xl:py-20" : ""}>
       <div className={framed ? `relative mx-auto flex flex-col gap-16 px-4 xl:gap-24 ${readColumn}` : "flex flex-col gap-6"}>
         {hook && story.format !== "quote" && story.whatHappened ? (
           <section>
             <div>
-              <h3 className={`text-[2rem] leading-10 ${ink}`} style={roman}>
+              <h3 className="text-[2rem] leading-10 text-black" style={roman}>
                 {happenedLabel}
               </h3>
               <div className="mt-2 h-[3px] w-16 bg-[#DF0A14]" />
             </div>
             {story.format === "tale" ? (
-              <p className={`mt-6 border-l-2 border-[#DF0A14] pl-4 text-2xl italic leading-8 ${ink}`} style={roman}>
+              <p className="mt-6 border-l-2 border-[#DF0A14] pl-4 text-2xl italic leading-8 text-black" style={roman}>
                 {story.whatHappened}
               </p>
             ) : (
-              <p className={`mt-6 text-base leading-6 ${muted}`} style={roman}>
+              <p className="mt-6 text-base leading-6 text-black/70" style={roman}>
                 {story.whatHappened}
               </p>
             )}
           </section>
         ) : null}
         {rest && story.items && story.items.length > 0 ? (
-          <ul className={`max-w-[635px] border-t ${dark ? "border-white/15" : hairline}`}>
+          <ul className={`max-w-[635px] border-t ${hairline}`}>
             {story.items.map((item) => (
-              <li key={item.label} className={`border-b py-5 ${dark ? "border-white/15" : hairline}`}>
+              <li key={item.label} className={`border-b py-5 ${hairline}`}>
                 <p className={subInfo} style={uiBold}>
                   {item.label}
                 </p>
-                <p className={`mt-2 text-xl leading-7 ${ink}`} style={roman}>
+                <p className="mt-2 text-xl leading-7 text-black" style={roman}>
                   {item.text}
                 </p>
               </li>
@@ -336,37 +319,21 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
           </ul>
         ) : null}
         {rest && story.quote ? (
-          dark ? (
-            <figure className="relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2 bg-[var(--report-section-dark-band)] px-4 py-12 sm:px-8">
-              <div className={`mx-auto flex items-start gap-4 ${readColumn}`}>
+          <FullBleedBrand>
+            <figure>
+              <div className="flex items-start gap-4">
                 <QuoteMark />
                 <div>
-                  <blockquote className="text-[1.75rem] italic leading-9 text-white" style={roman}>
+                  <blockquote className="text-[1.75rem] italic leading-9 text-black" style={roman}>
                     {story.quote}
                   </blockquote>
-                  <p className="mt-3 text-[11px] font-bold tracking-[0.12em] text-white/70 uppercase" style={ui}>
+                  <p className={`mt-3 ${subInfo}`} style={ui}>
                     Quote{story.quoteAttribution ? ` · ${story.quoteAttribution}` : ""}
                   </p>
                 </div>
               </div>
             </figure>
-          ) : (
-            <FullBleedBrand tone={imageless?.tone ?? null}>
-              <figure>
-                <div className="flex items-start gap-4">
-                  <QuoteMark />
-                  <div>
-                    <blockquote className={`text-[1.75rem] italic leading-9 ${ink}`} style={roman}>
-                      {story.quote}
-                    </blockquote>
-                    <p className={`mt-3 ${dark ? "text-[11px] font-bold tracking-[0.12em] text-white/70 uppercase" : subInfo}`} style={ui}>
-                      Quote{story.quoteAttribution ? ` · ${story.quoteAttribution}` : ""}
-                    </p>
-                  </div>
-                </div>
-              </figure>
-            </FullBleedBrand>
-          )
+          </FullBleedBrand>
         ) : null}
         {rest ? <div className="contents">
           {story.format === "quote" && story.whatHappened ? (
@@ -376,27 +343,27 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
             </section>
           ) : null}
           {story.whoSaidWhat ? (
-            <section className={`border-t pt-10 ${dark ? "border-white/15" : hairline}`}>
+            <section className={`border-t pt-10 ${hairline}`}>
               <div>
-                <h3 className={`text-[2rem] leading-10 ${ink}`} style={roman}>
+                <h3 className="text-[2rem] leading-10 text-black" style={roman}>
                   Who said what
                 </h3>
                 <div className="mt-2 h-[3px] w-16 bg-[#DF0A14]" />
               </div>
-              <p className={`mt-6 text-base leading-6 ${muted}`} style={roman}>
+              <p className="mt-6 text-base leading-6 text-black/70" style={roman}>
                 {story.whoSaidWhat}
               </p>
             </section>
           ) : null}
           {story.whatsNext ? (
-            <section className={`border-t pt-10 ${dark ? "border-white/15" : hairline}`}>
+            <section className={`border-t pt-10 ${hairline}`}>
               <div>
-                <h3 className={`text-[2rem] leading-10 ${ink}`} style={roman}>
+                <h3 className="text-[2rem] leading-10 text-black" style={roman}>
                   What’s next?
                 </h3>
                 <div className="mt-2 h-[3px] w-16 bg-[#DF0A14]" />
               </div>
-              <p className={`mt-6 text-base leading-6 ${muted}`} style={roman}>
+              <p className="mt-6 text-base leading-6 text-black/70" style={roman}>
                 {story.whatsNext}
               </p>
             </section>
@@ -736,10 +703,10 @@ function ImagelessCover({
     <section
       id={story.id}
       data-story
-      className={`relative flex min-h-[calc(100svh-48px)] flex-col items-center justify-center overflow-clip px-4 pb-20 pt-10 text-center sm:px-8 md:min-h-0 md:justify-start md:px-8 md:pt-16 md:pb-8 lg:pt-20 ${imagelessPlateClass(tone)}`}
+      className={`relative flex h-[calc(100svh-48px)] min-h-[520px] scroll-mt-12 flex-col items-center justify-center overflow-clip px-4 py-24 text-center sm:px-8 ${imagelessPlateClass(tone)}`}
     >
       {locked ? <CoverLock /> : null}
-      <div className="relative z-10 flex w-full max-w-[40rem] flex-col items-center pt-16 sm:pt-20 md:pt-10">
+      <div className="relative z-10 flex w-full max-w-[40rem] flex-col items-center pt-16 sm:pt-20">
         <CoverWatermark
           index={index}
           className={`top-0 -translate-y-[18%] text-[min(36vw,220px)] ${dark ? "text-white/12" : "text-black/10"}`}
