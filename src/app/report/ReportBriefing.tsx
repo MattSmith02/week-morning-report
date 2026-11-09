@@ -207,6 +207,29 @@ function Body({ children }: { children: string }) {
   );
 }
 
+const FAKE_ADS = [
+  {
+    id: "northview",
+    brand: "Northview",
+    line: "Banking that keeps pace",
+    image: "https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1600&q=80",
+  },
+  {
+    id: "westbrook",
+    brand: "Westbrook",
+    line: "Coverage for the long view",
+    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1600&q=80",
+  },
+  {
+    id: "signal",
+    brand: "Signal Shop",
+    line: "Find it before the shelf goes empty",
+    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80",
+  },
+] as const;
+
+type FakeAd = (typeof FAKE_ADS)[number];
+
 function SideAd({ align }: { align: "left" | "right" }) {
   const edge = align === "right" ? "left-[calc(50%+32.5ch+2.5rem)]" : "right-[calc(50%+32.5ch+2.5rem)]";
   return (
@@ -233,18 +256,56 @@ function InArticleAd({ wideHide = false }: { wideHide?: boolean }) {
   );
 }
 
-function FullBleedAd({ tall }: { tall: "screen" | "column" }) {
+function FakeAdUnit({
+  ad,
+  size,
+  className = "",
+}: {
+  ad: FakeAd;
+  size: "fullscreen" | "thumb";
+  className?: string;
+}) {
+  const fullscreen = size === "fullscreen";
   return (
     <aside
       aria-label="Advertisement"
-      className={`flex w-full items-center justify-center ${softPanel} ${tall === "column" ? "h-full" : "h-[calc(100svh-48px)] min-h-[520px]"}`}
+      className={`relative isolate overflow-clip bg-[#111] ${
+        fullscreen ? "h-[calc(100svh-48px)] min-h-[520px] w-full" : "aspect-[4/5] w-full max-h-[min(70vh,560px)]"
+      } ${className}`}
     >
-      <p className="text-[12px] tracking-[0.14em] text-[#6B7280] uppercase" style={ui}>
-        Advertisement
-      </p>
+      <Image
+        src={ad.image}
+        alt=""
+        fill
+        unoptimized
+        className="report-parallax object-cover object-center"
+        sizes={fullscreen ? "100vw" : "(max-width: 768px) 100vw, 420px"}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/20" aria-hidden />
+      <div className={`relative z-10 flex h-full flex-col justify-end ${fullscreen ? "px-6 pb-16 sm:px-10" : "px-5 pb-6"}`}>
+        <p className="text-[11px] font-bold tracking-[0.18em] text-white/70 uppercase" style={uiBold}>
+          Advertisement
+        </p>
+        <p className={`mt-3 font-bold tracking-[0.2em] text-white uppercase ${fullscreen ? "text-sm" : "text-[11px]"}`} style={uiBold}>
+          {ad.brand}
+        </p>
+        <p className={`mt-2 max-w-[18ch] text-white ${fullscreen ? "text-[2.5rem] leading-none sm:text-[3.25rem]" : "text-2xl leading-7"}`} style={roman}>
+          {ad.line}
+        </p>
+      </div>
     </aside>
   );
 }
+
+function FullBleedAd({ tall, ad = FAKE_ADS[0] }: { tall: "screen" | "column"; ad?: FakeAd }) {
+  if (tall === "column") {
+    return <FakeAdUnit ad={ad} size="fullscreen" className="h-full min-h-0" />;
+  }
+  return <FakeAdUnit ad={ad} size="fullscreen" />;
+}
+
+/** Full-screen slots after these story indexes (3 in the briefing). */
+const FULLSCREEN_AD_AFTER = new Set([0, 3, 6]);
 
 function CaptureGate({ children }: { children: ReactNode }) {
   return (
@@ -1516,7 +1577,16 @@ export function ReportBriefing({
                   </button>
                 </div>
                 <StoryBody story={story} locked={locked} lead={storyIndex === 0} place={ads ? "inline" : "none"} />
+                {FULLSCREEN_AD_AFTER.has(storyIndex) ? (
+                  <div className="snap-start">
+                    <FakeAdUnit ad={FAKE_ADS[storyIndex % FAKE_ADS.length]} size="fullscreen" />
+                  </div>
+                ) : null}
                 {next ? (
+                  <>
+                  <div className="snap-start bg-[#F4F0EA] px-5 py-6">
+                    <FakeAdUnit ad={FAKE_ADS[(storyIndex + 1) % FAKE_ADS.length]} size="thumb" className="mx-auto max-w-[280px]" />
+                  </div>
                   <button type="button" onClick={() => goTo(storyIndex + 1)} className="flex w-full items-center gap-4 bg-[#374151] px-5 py-4 text-left text-white transition-colors duration-200 hover:bg-[#4B5563]">
                     {(() => {
                       const nextPlate = imagelessFor(next);
@@ -1556,6 +1626,7 @@ export function ReportBriefing({
                     </span>
                     <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-5 w-5 shrink-0 text-white" />
                   </button>
+                  </>
                 ) : (
                   <>
                   <BriefingSources periods={periods} />
@@ -1574,13 +1645,6 @@ export function ReportBriefing({
                   </>
                 )}
               </section>
-              {ads && storyIndex === 5 ? (
-                <section data-slide aria-label="Advertisement" className={`report-feed flex h-full w-full shrink-0 snap-start snap-always items-center justify-center ${softPanel}`}>
-                  <p className="text-[12px] tracking-[0.14em] text-[#6B7280] uppercase" style={ui}>
-                    Advertisement
-                  </p>
-                </section>
-              ) : null}
               </Fragment>
             );
           })}
@@ -1631,7 +1695,7 @@ export function ReportBriefing({
           <span aria-hidden>·</span>
           {locked ? <span className="text-[#6B7280]">Locked</span> : <Link href="/report?locked=1" className="hover:text-[#374151] hover:underline">Locked</Link>}
           <span aria-hidden>·</span>
-          {ads ? <span className="text-[#6B7280]">Ads</span> : <Link href="/report?ads=1" className="hover:text-[#374151] hover:underline">Ads</Link>}
+          {ads ? <Link href="/report?ads=0" className="hover:text-[#374151] hover:underline">Ads on</Link> : <span className="text-[#6B7280]">Ads off</span>}
           <span aria-hidden className="max-sm:hidden">
             ·
           </span>
@@ -1697,13 +1761,23 @@ export function ReportBriefing({
         </div>
       </div>
 
-      {stories.map((story, storyIndex) => (
+      {stories.map((story, storyIndex) => {
+        const next = stories[storyIndex + 1];
+        return (
         <div key={story.id}>
           <StoryCover story={story} index={storyIndex} edition={storyIndex === 0} locked={locked && storyIndex > 0} />
           <StoryBody story={story} locked={locked} lead={storyIndex === 0} place={ads ? "sides" : "none"} />
-          {ads && storyIndex === 0 ? <FullBleedAd tall="screen" /> : null}
+          {FULLSCREEN_AD_AFTER.has(storyIndex) ? (
+            <FullBleedAd tall="screen" ad={FAKE_ADS[storyIndex % FAKE_ADS.length]} />
+          ) : null}
+          {next ? (
+            <div className="flex justify-center bg-[#F4F0EA] px-4 py-10">
+              <FakeAdUnit ad={FAKE_ADS[(storyIndex + 1) % FAKE_ADS.length]} size="thumb" className="w-full max-w-[320px]" />
+            </div>
+          ) : null}
         </div>
-      ))}
+        );
+      })}
 
       <BriefingSources periods={periods} />
       <section className="flex min-h-[40vh] items-center justify-center bg-white px-4 py-20">
