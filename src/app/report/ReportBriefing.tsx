@@ -207,41 +207,6 @@ function Body({ children }: { children: string }) {
   );
 }
 
-/** Cover-sized Northview creatives — same footprint as story covers. */
-const COVER_AD = {
-  mobile: "/the-week/ads/northview-mobile.jpg",
-  desktop: "/the-week/ads/northview-desktop.jpg",
-} as const;
-
-/** Three cover ads in the briefing, after these story indexes. */
-const COVER_AD_AFTER = new Set([0, 3, 6]);
-
-function CoverAd() {
-  return (
-    <aside
-      aria-label="Advertisement"
-      className="relative h-[calc(100svh-48px)] min-h-[520px] w-full scroll-mt-12 overflow-clip bg-[#002D54]"
-    >
-      <Image
-        src={COVER_AD.mobile}
-        alt=""
-        fill
-        unoptimized
-        className="report-parallax object-cover object-center md:hidden"
-        sizes="100vw"
-      />
-      <Image
-        src={COVER_AD.desktop}
-        alt=""
-        fill
-        unoptimized
-        className="report-parallax hidden object-cover object-center md:block"
-        sizes="100vw"
-      />
-    </aside>
-  );
-}
-
 function CaptureGate({ children }: { children: ReactNode }) {
   return (
     <div className="flex justify-center bg-[#F4F0EA] px-4 pt-8 pb-12">
@@ -1490,11 +1455,6 @@ export function ReportBriefing({
                   </button>
                 </div>
                 <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" />
-                {ads && COVER_AD_AFTER.has(storyIndex) ? (
-                  <div className="snap-start">
-                    <CoverAd />
-                  </div>
-                ) : null}
                 {next ? (
                   <button type="button" onClick={() => goTo(storyIndex + 1)} className="flex w-full items-center gap-4 bg-[#374151] px-5 py-4 text-left text-white transition-colors duration-200 hover:bg-[#4B5563]">
                     {(() => {
@@ -1603,7 +1563,7 @@ export function ReportBriefing({
           <span aria-hidden>·</span>
           {locked ? <span className="text-[#6B7280]">Locked</span> : <Link href="/report?locked=1" className="hover:text-[#374151] hover:underline">Locked</Link>}
           <span aria-hidden>·</span>
-          {ads ? <Link href="/report?ads=0" className="hover:text-[#374151] hover:underline">Ads on</Link> : <span className="text-[#6B7280]">Ads off</span>}
+          {ads ? <span className="text-[#6B7280]">Ads</span> : <Link href="/report?ads=1" className="hover:text-[#374151] hover:underline">Ads</Link>}
           <span aria-hidden className="max-sm:hidden">
             ·
           </span>
@@ -1673,7 +1633,6 @@ export function ReportBriefing({
         <div key={story.id}>
           <StoryCover story={story} index={storyIndex} edition={storyIndex === 0} locked={locked && storyIndex > 0} />
           <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" />
-          {ads && COVER_AD_AFTER.has(storyIndex) ? <CoverAd /> : null}
         </div>
       ))}
 

@@ -61,7 +61,7 @@ export default async function ReportPage({
   const params = await searchParams;
   const sourcesView = params.sources === "1";
   const locked = params.locked === "1";
-  const ads = params.ads !== "0";
+  const ads = params.ads === "1";
 
   const edition = EDITIONS.find((item) => item.id === "morning");
   const sudoku = EDITIONS.find((item) => item.id === "evening")?.stories.find((story) => story.id === "sudoku");
