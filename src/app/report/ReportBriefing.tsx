@@ -207,105 +207,40 @@ function Body({ children }: { children: string }) {
   );
 }
 
-const FAKE_ADS = [
-  {
-    id: "northview",
-    brand: "Northview",
-    line: "Banking that keeps pace",
-    image: "https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1600&q=80",
-  },
-  {
-    id: "westbrook",
-    brand: "Westbrook",
-    line: "Coverage for the long view",
-    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1600&q=80",
-  },
-  {
-    id: "signal",
-    brand: "Signal Shop",
-    line: "Find it before the shelf goes empty",
-    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80",
-  },
-] as const;
+/** Cover-sized Northview creatives — same footprint as story covers. */
+const COVER_AD = {
+  mobile: "/the-week/ads/northview-mobile.jpg",
+  desktop: "/the-week/ads/northview-desktop.jpg",
+} as const;
 
-type FakeAd = (typeof FAKE_ADS)[number];
+/** Three cover ads in the briefing, after these story indexes. */
+const COVER_AD_AFTER = new Set([0, 3, 6]);
 
-function SideAd({ align }: { align: "left" | "right" }) {
-  const edge = align === "right" ? "left-[calc(50%+32.5ch+2.5rem)]" : "right-[calc(50%+32.5ch+2.5rem)]";
-  return (
-    <aside aria-label="Advertisement" className={`absolute inset-y-0 hidden w-[300px] min-[1400px]:block ${edge}`}>
-      <div className="sticky top-16">
-        <div
-          className={`flex h-[600px] items-center justify-center ${softPanel} px-4 text-center text-[12px] tracking-[0.14em] text-[#6B7280] uppercase`}
-          style={ui}
-        >
-          Advertisement
-        </div>
-      </div>
-    </aside>
-  );
-}
-
-function InArticleAd({ wideHide = false }: { wideHide?: boolean }) {
-  return (
-    <aside aria-label="Advertisement" className={wideHide ? "min-[1400px]:hidden" : ""}>
-      <div className={`flex h-[280px] w-full items-center justify-center ${softPanel} text-[12px] tracking-[0.14em] text-[#6B7280] uppercase`} style={ui}>
-        Advertisement
-      </div>
-    </aside>
-  );
-}
-
-function FakeAdUnit({
-  ad,
-  size,
-  className = "",
-}: {
-  ad: FakeAd;
-  size: "fullscreen" | "thumb";
-  className?: string;
-}) {
-  const fullscreen = size === "fullscreen";
+function CoverAd() {
   return (
     <aside
       aria-label="Advertisement"
-      className={`relative isolate overflow-clip bg-[#111] ${
-        fullscreen ? "h-[calc(100svh-48px)] min-h-[520px] w-full" : "aspect-[4/5] w-full max-h-[min(70vh,560px)]"
-      } ${className}`}
+      className="relative h-[calc(100svh-48px)] min-h-[520px] w-full scroll-mt-12 overflow-clip bg-[#002D54]"
     >
       <Image
-        src={ad.image}
+        src={COVER_AD.mobile}
         alt=""
         fill
         unoptimized
-        className="report-parallax object-cover object-center"
-        sizes={fullscreen ? "100vw" : "(max-width: 768px) 100vw, 420px"}
+        className="report-parallax object-cover object-center md:hidden"
+        sizes="100vw"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/20" aria-hidden />
-      <div className={`relative z-10 flex h-full flex-col justify-end ${fullscreen ? "px-6 pb-16 sm:px-10" : "px-5 pb-6"}`}>
-        <p className="text-[11px] font-bold tracking-[0.18em] text-white/70 uppercase" style={uiBold}>
-          Advertisement
-        </p>
-        <p className={`mt-3 font-bold tracking-[0.2em] text-white uppercase ${fullscreen ? "text-sm" : "text-[11px]"}`} style={uiBold}>
-          {ad.brand}
-        </p>
-        <p className={`mt-2 max-w-[18ch] text-white ${fullscreen ? "text-[2.5rem] leading-none sm:text-[3.25rem]" : "text-2xl leading-7"}`} style={roman}>
-          {ad.line}
-        </p>
-      </div>
+      <Image
+        src={COVER_AD.desktop}
+        alt=""
+        fill
+        unoptimized
+        className="report-parallax hidden object-cover object-center md:block"
+        sizes="100vw"
+      />
     </aside>
   );
 }
-
-function FullBleedAd({ tall, ad = FAKE_ADS[0] }: { tall: "screen" | "column"; ad?: FakeAd }) {
-  if (tall === "column") {
-    return <FakeAdUnit ad={ad} size="fullscreen" className="h-full min-h-0" />;
-  }
-  return <FakeAdUnit ad={ad} size="fullscreen" />;
-}
-
-/** Full-screen slots after these story indexes (3 in the briefing). */
-const FULLSCREEN_AD_AFTER = new Set([0, 3, 6]);
 
 function CaptureGate({ children }: { children: ReactNode }) {
   return (
@@ -430,21 +365,14 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
             </section>
           ) : null}
         </div> : null}
-        {framed && place !== "none" ? <InArticleAd wideHide={place === "sides"} /> : null}
       </div>
-      {framed && place === "sides" ? (
-        <>
-          <SideAd align="left" />
-          <SideAd align="right" />
-        </>
-      ) : null}
     </div>
   );
 }
 
 const WEEK_SUDOKU = "https://theweek.com/puzzles/medium-sudoku-october-2026";
 
-function VideoStory({ story, place = "none" }: { story: WeekStory; place?: "none" | "sides" | "inline" }) {
+function VideoStory({ story }: { story: WeekStory; place?: "none" | "sides" | "inline" }) {
   return (
     <div className="relative flex justify-center bg-[#F4F0EA] px-4 py-16 xl:py-20">
       <div className={readColumn}>
@@ -463,14 +391,7 @@ function VideoStory({ story, place = "none" }: { story: WeekStory; place?: "none
             {story.imageCaption}
           </figcaption>
         </figure>
-        {place !== "none" ? <div className="mt-16"><InArticleAd wideHide={place === "sides"} /></div> : null}
       </div>
-      {place === "sides" ? (
-        <>
-          <SideAd align="left" />
-          <SideAd align="right" />
-        </>
-      ) : null}
     </div>
   );
 }
@@ -500,14 +421,7 @@ function PuzzleStory({ story, place = "none" }: { story: WeekStory; place?: "non
         <a href={WEEK_SUDOKU} target="_blank" rel="noopener noreferrer" className={`mt-6 ${weekCta}`}>
           Play on The Week
         </a>
-        {place !== "none" ? <div className="mt-16"><InArticleAd wideHide={place === "sides"} /></div> : null}
       </div>
-      {place === "sides" ? (
-        <>
-          <SideAd align="left" />
-          <SideAd align="right" />
-        </>
-      ) : null}
     </div>
   );
 }
@@ -630,7 +544,6 @@ function PapersSpread({ story, place = "none" }: { story: WeekStory; place?: "no
               );
             })}
           </ol>
-          {place !== "none" ? <div className="mt-16"><InArticleAd /></div> : null}
         </div>
 
         <div className="order-1 hidden lg:order-2 lg:block">
@@ -1576,17 +1489,13 @@ export function ReportBriefing({
                     </span>
                   </button>
                 </div>
-                <StoryBody story={story} locked={locked} lead={storyIndex === 0} place={ads ? "inline" : "none"} />
-                {FULLSCREEN_AD_AFTER.has(storyIndex) ? (
+                <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" />
+                {ads && COVER_AD_AFTER.has(storyIndex) ? (
                   <div className="snap-start">
-                    <FakeAdUnit ad={FAKE_ADS[storyIndex % FAKE_ADS.length]} size="fullscreen" />
+                    <CoverAd />
                   </div>
                 ) : null}
                 {next ? (
-                  <>
-                  <div className="snap-start bg-[#F4F0EA] px-5 py-6">
-                    <FakeAdUnit ad={FAKE_ADS[(storyIndex + 1) % FAKE_ADS.length]} size="thumb" className="mx-auto max-w-[280px]" />
-                  </div>
                   <button type="button" onClick={() => goTo(storyIndex + 1)} className="flex w-full items-center gap-4 bg-[#374151] px-5 py-4 text-left text-white transition-colors duration-200 hover:bg-[#4B5563]">
                     {(() => {
                       const nextPlate = imagelessFor(next);
@@ -1626,7 +1535,6 @@ export function ReportBriefing({
                     </span>
                     <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-5 w-5 shrink-0 text-white" />
                   </button>
-                  </>
                 ) : (
                   <>
                   <BriefingSources periods={periods} />
@@ -1761,23 +1669,13 @@ export function ReportBriefing({
         </div>
       </div>
 
-      {stories.map((story, storyIndex) => {
-        const next = stories[storyIndex + 1];
-        return (
+      {stories.map((story, storyIndex) => (
         <div key={story.id}>
           <StoryCover story={story} index={storyIndex} edition={storyIndex === 0} locked={locked && storyIndex > 0} />
-          <StoryBody story={story} locked={locked} lead={storyIndex === 0} place={ads ? "sides" : "none"} />
-          {FULLSCREEN_AD_AFTER.has(storyIndex) ? (
-            <FullBleedAd tall="screen" ad={FAKE_ADS[storyIndex % FAKE_ADS.length]} />
-          ) : null}
-          {next ? (
-            <div className="flex justify-center bg-[#F4F0EA] px-4 py-10">
-              <FakeAdUnit ad={FAKE_ADS[(storyIndex + 1) % FAKE_ADS.length]} size="thumb" className="w-full max-w-[320px]" />
-            </div>
-          ) : null}
+          <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" />
+          {ads && COVER_AD_AFTER.has(storyIndex) ? <CoverAd /> : null}
         </div>
-        );
-      })}
+      ))}
 
       <BriefingSources periods={periods} />
       <section className="flex min-h-[40vh] items-center justify-center bg-white px-4 py-20">
