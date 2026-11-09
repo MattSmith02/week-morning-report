@@ -664,9 +664,9 @@ function imagelessFor(story: WeekStory): { tone: ImagelessTone } | null {
 }
 
 function imagelessPlateClass(tone: ImagelessTone) {
-  if (tone === "pink") return "bg-[var(--report-section-pink)]";
-  if (tone === "dark") return "bg-[var(--report-section-dark)]";
-  return "bg-[var(--report-section-sky)]";
+  if (tone === "pink") return "bg-[#FDE4E4]";
+  if (tone === "dark") return "bg-[#1C2A38]";
+  return "bg-[#E3F2FD]";
 }
 
 function CoverWatermark({
