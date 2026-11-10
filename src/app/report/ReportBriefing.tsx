@@ -20,20 +20,19 @@ const uiBold: CSSProperties = { fontFamily: UI, fontWeight: 700 };
 const pagePad = "px-4 sm:px-8 lg:px-8 xl:px-12 min-[1440px]:px-20 2xl:px-[177px]";
 const iconButton = "brand-icon-button inline-flex h-12 w-12 items-center justify-center rounded-full focus:outline-none focus-visible:ring-2";
 
-/** Week-red sunrise mark (user asset, recolored). */
-function RisingSunMark({ className = "h-5 w-5" }: { className?: string }) {
+/** Red marker-pen highlight behind a word or phrase. */
+function MarkerHighlight({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <Image
-      src="/the-week/sunrise-mark.png"
-      alt=""
-      width={40}
-      height={40}
-      unoptimized
-      aria-hidden
-      className={`shrink-0 object-contain ${className}`}
-    />
+    <span className={`relative inline-block px-[0.12em] ${className}`}>
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-x-[-0.06em] top-[0.42em] bottom-[0.08em] -rotate-[1.2deg] skew-x-[-4deg] rounded-[2px] bg-[#DF0A14]/32"
+      />
+      <span className="relative z-[1]">{children}</span>
+    </span>
   );
 }
+
 /** The Week primary CTA — red fill, Arial bold uppercase (not shop PrimaryButton). */
 const weekCta =
   "inline-flex w-fit items-center justify-center gap-2 rounded-lg bg-[#DF0A14] px-4 py-3 text-xs font-bold tracking-[0.05em] text-[#FAFAFA] uppercase transition-colors duration-200 hover:bg-[#B20810] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#DF0A14]";
@@ -1267,9 +1266,8 @@ function BriefingDigest({ briefing }: { briefing: string }) {
       <p className="brand-label-copy text-[11px] tracking-[0.22em] text-[#DF0A14]" style={romanBold}>
         The Week
       </p>
-      <h1 className="mt-2 inline-flex items-center gap-3 text-[2.5rem] leading-none text-[var(--brand-text-primary,#0f172b)] sm:text-[3.15rem]" style={roman}>
-        <span>{briefing}</span>
-        <RisingSunMark className="h-8 w-8 sm:h-10 sm:w-10" />
+      <h1 className="mt-2 text-[2.5rem] leading-none text-[var(--brand-text-primary,#0f172b)] sm:text-[3.15rem]" style={roman}>
+        <MarkerHighlight>{briefing}</MarkerHighlight>
       </h1>
       <p className="brand-muted-copy mt-2 text-[13px] leading-5" style={ui}>
         {today}
@@ -2120,10 +2118,11 @@ export function ReportBriefing({
       {digest ? null : <WeekSiteHeader />}
       <div className="sticky top-0 z-40 bg-[var(--report-beige,#F4F0EA)]">
         <div className={`flex h-12 items-center gap-3 border-b border-[var(--brand-border-default,#e2e8f0)] bg-[var(--report-beige,#F4F0EA)] ${pagePad}`}>
-          <p className="flex min-w-0 flex-1 items-center gap-1.5 truncate text-sm text-black" style={romanBold}>
-            <span className="truncate">The Week · {briefing}</span>
-            <RisingSunMark className="h-4 w-4" />
+          <p className="min-w-0 flex-1 truncate text-sm text-black" style={romanBold}>
+            <span>The Week · </span>
+            <MarkerHighlight>{briefing}</MarkerHighlight>
             <span className="tabular-nums" aria-label={`Story ${number(index)} of ${total}`}>
+              {" "}
               · {number(index)}/{total}
             </span>
           </p>
