@@ -56,12 +56,13 @@ function sourcePeriod(id: string, label: string, detail: string, list: WeekStory
 export default async function ReportPage({
   searchParams,
 }: {
-  searchParams: Promise<{ sources?: string; locked?: string; ads?: string }>;
+  searchParams: Promise<{ sources?: string; locked?: string; ads?: string; layout?: string }>;
 }) {
   const params = await searchParams;
   const sourcesView = params.sources === "1";
   const locked = params.locked === "1";
   const ads = params.ads === "1";
+  const layout = params.layout === "classic" ? "classic" : "digest";
 
   const edition = EDITIONS.find((item) => item.id === "morning");
   const sudoku = EDITIONS.find((item) => item.id === "evening")?.stories.find((story) => story.id === "sudoku");
@@ -110,7 +111,16 @@ export default async function ReportPage({
 
   return (
     <main className="bg-[#F4F0EA]">
-      <ReportBriefing stories={stories} briefing={edition?.briefing ?? "Morning Report"} caughtUp={edition?.caughtUp ?? ""} periods={periods} sourcesView={sourcesView} locked={locked} ads={ads} />
+      <ReportBriefing
+        stories={stories}
+        briefing={edition?.briefing ?? "Morning Report"}
+        caughtUp={edition?.caughtUp ?? ""}
+        periods={periods}
+        sourcesView={sourcesView}
+        locked={locked}
+        ads={ads}
+        layout={layout}
+      />
     </main>
   );
 }

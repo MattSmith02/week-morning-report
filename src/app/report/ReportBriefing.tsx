@@ -703,49 +703,68 @@ function CompactStoryHeader({
   return (
     <section id={story.id} data-story className="relative scroll-mt-12 border-b border-black/10 bg-[#F4F0EA]">
       {locked ? <CoverLock /> : null}
-      <div className={`mx-auto max-w-[1180px] py-10 ${pagePad}`}>
-        <p className="text-[11px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
-          {number(index)} · {story.chip}
-        </p>
-        <h2 className="mt-3 max-w-[22ch] text-[2.25rem] leading-[1.1] text-black sm:text-[2.75rem]" style={roman}>
-          {story.displayTitle}
-        </h2>
-        {story.dek && story.dek !== story.displayTitle ? (
-          <p className="mt-3 max-w-[42ch] text-lg leading-7 text-black/70" style={roman}>
-            {story.dek}
-          </p>
-        ) : null}
-        {hasImage ? (
-          <figure className="relative mt-7 overflow-clip bg-[#111]">
-            <div className="relative aspect-[16/9] max-h-[380px] w-full">
-              <Image
-                src={story.imageSrc!}
-                alt=""
-                fill
-                unoptimized={story.imageSrc!.startsWith("/") || story.imageSrc!.startsWith("http")}
-                className="object-cover object-center"
-                sizes="(max-width: 1180px) 100vw, 1180px"
-              />
-            </div>
-            {story.imageCaption ? (
-              <figcaption className="mt-2 text-sm leading-5 text-black/50" style={ui}>
-                {story.imageCaption}
-              </figcaption>
+      <div className={`mx-auto max-w-[1180px] py-8 sm:py-10 ${pagePad}`}>
+        <div className={hasImage ? "lg:grid lg:grid-cols-12 lg:items-end lg:gap-10" : ""}>
+          <div className={hasImage ? "lg:col-span-5" : ""}>
+            <p className="text-[11px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
+              {number(index)} · {story.chip}
+            </p>
+            <h2 className="mt-3 max-w-[22ch] text-[1.875rem] leading-[1.1] text-black sm:text-[2.5rem]" style={roman}>
+              {story.displayTitle}
+            </h2>
+            {story.dek && story.dek !== story.displayTitle ? (
+              <p className="mt-3 max-w-[42ch] text-base leading-6 text-black/70 sm:text-lg sm:leading-7" style={roman}>
+                {story.dek}
+              </p>
             ) : null}
-          </figure>
-        ) : null}
+          </div>
+          {hasImage ? (
+            <figure className="relative mt-6 overflow-clip bg-[#111] lg:col-span-7 lg:mt-0">
+              <div className="relative aspect-[4/3] w-full sm:aspect-[16/9] lg:max-h-[320px]">
+                <Image
+                  src={story.imageSrc!}
+                  alt=""
+                  fill
+                  unoptimized={story.imageSrc!.startsWith("/") || story.imageSrc!.startsWith("http")}
+                  className="object-cover object-center"
+                  sizes="(max-width: 1024px) 100vw, 55vw"
+                />
+              </div>
+              {story.imageCaption ? (
+                <figcaption className="mt-2 text-sm leading-5 text-black/50" style={ui}>
+                  {story.imageCaption}
+                </figcaption>
+              ) : null}
+            </figure>
+          ) : null}
+        </div>
       </div>
     </section>
   );
 }
 
-function StoryCover({ story, index, edition, locked = false }: { story: WeekStory; index: number; edition?: boolean; locked?: boolean }) {
+type ReportLayout = "classic" | "digest";
+
+function StoryCover({
+  story,
+  index,
+  edition,
+  locked = false,
+  layout = "digest",
+}: {
+  story: WeekStory;
+  index: number;
+  edition?: boolean;
+  locked?: boolean;
+  layout?: ReportLayout;
+}) {
+  const classic = layout === "classic";
   const imageless = imagelessFor(story);
   if (imageless) {
-    return <ImagelessCover story={story} index={index} tone={imageless.tone} locked={locked} compact={!isHeroStory(story, index)} />;
+    return <ImagelessCover story={story} index={index} tone={imageless.tone} locked={locked} compact={!classic && !isHeroStory(story, index)} />;
   }
 
-  if (!isHeroStory(story, index)) {
+  if (!classic && !isHeroStory(story, index)) {
     return <CompactStoryHeader story={story} index={index} locked={locked} />;
   }
 
@@ -847,26 +866,49 @@ function BriefingDigest({
   onJump: (id: string) => void;
 }) {
   const lead = stories[0];
-  const rest = stories.slice(1, 9);
+  const rail = stories.slice(1, 5);
+  const rest = stories.slice(5);
   if (!lead) return null;
 
   return (
-    <section aria-label={`${briefing} overview`} className="border-b border-black/10 bg-white">
-      <div className={`mx-auto max-w-[1180px] py-10 ${pagePad}`}>
-        <p className="text-center text-[12px] font-bold tracking-[0.28em] text-[#DF0A14] uppercase" style={romanBold}>
+    <section aria-label={`${briefing} overview`} className={`border-b border-black/10 ${softPanel}`}>
+      <div className={`mx-auto max-w-[1180px] py-8 sm:py-10 ${pagePad}`}>
+        <p className="text-center text-[11px] font-bold tracking-[0.28em] text-[#DF0A14] uppercase sm:text-[12px]" style={romanBold}>
           The Week
         </p>
-        <h1 className="mt-3 text-center text-[2.75rem] leading-none text-black sm:text-[3.5rem]" style={roman}>
+        <h1 className="mt-2 text-center text-[2.25rem] leading-none text-black sm:mt-3 sm:text-[3.25rem]" style={roman}>
           {briefing}
         </h1>
-        <p className="mx-auto mt-3 max-w-[42ch] text-center text-base leading-6 text-black/65" style={roman}>
-          Today’s briefing — pick a story, or scroll the full report.
+        <p className="mx-auto mt-3 max-w-[42ch] text-center text-sm leading-5 text-black/65 sm:text-base sm:leading-6" style={roman}>
+          Scan the report, jump to a story, or keep scrolling.
         </p>
 
-        <div className="mt-10 grid gap-10 lg:grid-cols-12 lg:gap-12">
+        {/* Mobile: horizontal story chips for quick jumps */}
+        <div className="-mx-4 mt-6 overflow-x-auto px-4 sm:mx-0 sm:hidden">
+          <ul className="flex w-max gap-2 pb-1">
+            {stories.map((story, i) => (
+              <li key={story.id}>
+                <button
+                  type="button"
+                  onClick={() => onJump(story.id)}
+                  className="inline-flex max-w-[11rem] flex-col rounded border border-black/10 bg-[#F4F0EA] px-3 py-2 text-left"
+                >
+                  <span className="text-[10px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
+                    {number(i)} · {story.chip}
+                  </span>
+                  <span className="mt-1 line-clamp-2 text-sm leading-4 text-black" style={roman}>
+                    {story.displayTitle}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="mt-8 grid gap-8 lg:mt-10 lg:grid-cols-12 lg:gap-12">
           <button type="button" onClick={() => onJump(lead.id)} className="group text-left lg:col-span-7">
             {lead.imageSrc ? (
-              <span className="relative block aspect-[16/10] overflow-clip bg-[#111]">
+              <span className="relative block aspect-[4/3] overflow-clip bg-[#111] sm:aspect-[16/10]">
                 <Image
                   src={lead.imageSrc}
                   alt=""
@@ -881,7 +923,7 @@ function BriefingDigest({
             <span className="mt-4 block text-[11px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
               {number(0)} · {lead.chip}
             </span>
-            <span className="mt-2 block text-[2rem] leading-[1.1] text-black group-hover:text-[#DF0A14] sm:text-[2.5rem]" style={roman}>
+            <span className="mt-2 block text-[1.75rem] leading-[1.1] text-black group-hover:text-[#DF0A14] sm:text-[2.5rem]" style={roman}>
               {lead.displayTitle}
             </span>
             <span className="mt-2 block max-w-[40ch] text-base leading-6 text-black/70" style={roman}>
@@ -889,12 +931,12 @@ function BriefingDigest({
             </span>
           </button>
 
-          <div className="lg:col-span-5">
+          <div className="hidden sm:block lg:col-span-5">
             <p className="border-b border-black text-[12px] font-bold tracking-[0.14em] text-black uppercase" style={uiBold}>
               In this report
             </p>
             <ul>
-              {rest.map((story, i) => {
+              {rail.map((story, i) => {
                 const plate = imagelessFor(story);
                 return (
                   <li key={story.id} className="border-b border-black/15">
@@ -906,7 +948,7 @@ function BriefingDigest({
                         <span className="block text-[11px] font-bold tracking-[0.12em] text-black/45 uppercase" style={uiBold}>
                           {story.chip}
                         </span>
-                        <span className="mt-1 block text-xl leading-6 text-black group-hover:text-[#DF0A14]" style={roman}>
+                        <span className="mt-1 block text-lg leading-6 text-black group-hover:text-[#DF0A14] lg:text-xl" style={roman}>
                           {story.displayTitle}
                         </span>
                         {story.dek && story.dek !== story.displayTitle ? (
@@ -916,7 +958,7 @@ function BriefingDigest({
                         ) : null}
                       </span>
                       {story.imageSrc && !plate ? (
-                        <span className="relative hidden h-16 w-16 shrink-0 overflow-clip sm:block">
+                        <span className="relative hidden h-16 w-16 shrink-0 overflow-clip md:block">
                           <Image
                             src={story.imageSrc}
                             alt=""
@@ -927,7 +969,7 @@ function BriefingDigest({
                           />
                         </span>
                       ) : plate ? (
-                        <span className={`hidden h-16 w-16 shrink-0 sm:block ${imagelessPlateClass(plate.tone)}`} aria-hidden />
+                        <span className={`hidden h-16 w-16 shrink-0 md:block ${imagelessPlateClass(plate.tone)}`} aria-hidden />
                       ) : null}
                     </button>
                   </li>
@@ -937,12 +979,12 @@ function BriefingDigest({
           </div>
         </div>
 
-        {stories.length > 9 ? (
-          <div className="mt-10 grid gap-6 border-t border-black/15 pt-8 sm:grid-cols-2 lg:grid-cols-4">
-            {stories.slice(9).map((story, i) => (
+        {rest.length > 0 ? (
+          <div className="mt-8 hidden gap-5 border-t border-black/15 pt-8 sm:grid sm:grid-cols-2 lg:grid-cols-4">
+            {rest.map((story, i) => (
               <button key={story.id} type="button" onClick={() => onJump(story.id)} className="group border-t border-black pt-3 text-left">
                 <span className="block text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
-                  {number(i + 9)} · {story.chip}
+                  {number(i + 5)} · {story.chip}
                 </span>
                 <span className="mt-2 block text-lg leading-6 text-black group-hover:text-[#DF0A14]" style={roman}>
                   {story.displayTitle}
@@ -954,6 +996,15 @@ function BriefingDigest({
       </div>
     </section>
   );
+}
+
+function layoutHref(layout: ReportLayout, locked: boolean, ads: boolean) {
+  const params = new URLSearchParams();
+  if (layout === "classic") params.set("layout", "classic");
+  if (locked) params.set("locked", "1");
+  if (ads) params.set("ads", "1");
+  const query = params.toString();
+  return query ? `/report?${query}` : "/report";
 }
 
 type ArchiveCard = {
@@ -1297,6 +1348,7 @@ export function ReportBriefing({
   sourcesView = false,
   locked = false,
   ads = false,
+  layout = "digest",
 }: {
   stories: WeekStory[];
   briefing: string;
@@ -1305,7 +1357,9 @@ export function ReportBriefing({
   sourcesView?: boolean;
   locked?: boolean;
   ads?: boolean;
+  layout?: ReportLayout;
 }) {
+  const digest = layout === "digest";
   const [index, setIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const [open, setOpen] = useState(false);
@@ -1563,7 +1617,7 @@ export function ReportBriefing({
         .report-feed, .report-article, .report-end, .report-cards { scrollbar-width: none; }
         .report-feed::-webkit-scrollbar, .report-article::-webkit-scrollbar, .report-end::-webkit-scrollbar, .report-cards::-webkit-scrollbar { display: none; }
       `}</style>
-      <div className="report-page relative flex h-dvh flex-col md:hidden">
+      <div className={`report-page relative flex h-dvh flex-col ${digest ? "hidden" : "md:hidden"}`}>
         <WeekSiteHeader />
         <header className="relative z-20 shrink-0 bg-white text-[#0A0A0A]" style={roman}>
           <div className="flex gap-1 px-3 pt-2" aria-hidden>
@@ -1622,24 +1676,23 @@ export function ReportBriefing({
                     index={storyIndex}
                     edition={storyIndex === 0}
                     locked={locked && storyIndex > 0}
+                    layout="classic"
                   />
-                  {isHeroStory(story, storyIndex) ? (
-                    <button
-                      type="button"
-                      onClick={(event) => {
-                        const column = event.currentTarget.closest<HTMLElement>("[data-column]");
-                        column?.scrollTo({ top: column.clientHeight, behavior: "smooth" });
-                      }}
-                      className={`absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-1 transition-opacity duration-200 hover:opacity-70 ${
-                        imagelessFor(story)?.tone === "dark" ? "text-white" : imagelessFor(story) ? "text-[#011535]" : "text-white"
-                      }`}
-                    >
-                      <BrandIcon name="chevronDown" defaultIcon={ChevronDown} className="h-6 w-6" />
-                      <span className="text-[11px] font-bold tracking-[0.16em] uppercase" style={uiBold}>
-                        Story
-                      </span>
-                    </button>
-                  ) : null}
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      const column = event.currentTarget.closest<HTMLElement>("[data-column]");
+                      column?.scrollTo({ top: column.clientHeight, behavior: "smooth" });
+                    }}
+                    className={`absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-1 transition-opacity duration-200 hover:opacity-70 ${
+                      imagelessFor(story)?.tone === "dark" ? "text-white" : imagelessFor(story) ? "text-[#011535]" : "text-white"
+                    }`}
+                  >
+                    <BrandIcon name="chevronDown" defaultIcon={ChevronDown} className="h-6 w-6" />
+                    <span className="text-[11px] font-bold tracking-[0.16em] uppercase" style={uiBold}>
+                      Story
+                    </span>
+                  </button>
                 </div>
                 <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" />
                 {next ? (
@@ -1727,49 +1780,41 @@ export function ReportBriefing({
           </>
         ) : null}
       </div>
-      <div className="report-page hidden md:block">
+      <div className={`report-page ${digest ? "block" : "hidden md:block"}`}>
       <WeekSiteHeader />
       <div className="flex items-center justify-between gap-6 border-b border-black/10 bg-[#F4F0EA] px-5 py-2">
         <p className="text-[12px] leading-none text-[#6B7280]" style={ui}>
           Version
         </p>
         <nav aria-label="Version" className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[12px] leading-none text-[#9CA3AF]" style={ui}>
-          <Link href="/the-week" className="hover:text-[#374151] hover:underline">
-            Prototype
-          </Link>
+          {digest ? (
+            <span className="text-[#6B7280]">Digest</span>
+          ) : (
+            <Link href={layoutHref("digest", locked, ads)} className="hover:text-[#374151] hover:underline">
+              Digest
+            </Link>
+          )}
           <span aria-hidden>·</span>
-          <Link href="/article" className="hover:text-[#374151] hover:underline">
-            Article
-          </Link>
+          {digest ? (
+            <Link href={layoutHref("classic", locked, ads)} className="hover:text-[#374151] hover:underline">
+              Classic
+            </Link>
+          ) : (
+            <span className="text-[#6B7280]">Classic</span>
+          )}
           <span aria-hidden>·</span>
-          <Link href="/premium" className="hover:text-[#374151] hover:underline">
-            Premium
-          </Link>
+          {locked ? <Link href={layoutHref(layout, false, ads)} className="hover:text-[#374151] hover:underline">Report</Link> : <span className="text-[#6B7280]">Report</span>}
           <span aria-hidden>·</span>
-          {locked ? <Link href="/report" className="hover:text-[#374151] hover:underline">Report</Link> : <span className="text-[#6B7280]">Report</span>}
+          {locked ? <span className="text-[#6B7280]">Locked</span> : <Link href={layoutHref(layout, true, ads)} className="hover:text-[#374151] hover:underline">Locked</Link>}
           <span aria-hidden>·</span>
-          {locked ? <span className="text-[#6B7280]">Locked</span> : <Link href="/report?locked=1" className="hover:text-[#374151] hover:underline">Locked</Link>}
-          <span aria-hidden>·</span>
-          {ads ? <span className="text-[#6B7280]">Ads</span> : <Link href="/report?ads=1" className="hover:text-[#374151] hover:underline">Ads</Link>}
-          <span aria-hidden className="max-sm:hidden">
-            ·
-          </span>
-          <Link href="/browser" className="hover:text-[#374151] hover:underline max-sm:hidden">
-            Browser
-          </Link>
-          <span aria-hidden className="max-sm:hidden">
-            ·
-          </span>
-          <Link href="/email" className="hover:text-[#374151] hover:underline max-sm:hidden">
-            Email
-          </Link>
+          {ads ? <span className="text-[#6B7280]">Ads</span> : <Link href={layoutHref(layout, locked, true)} className="hover:text-[#374151] hover:underline">Ads</Link>}
         </nav>
       </div>
-      <div className="sticky top-0 z-40 bg-white">
+      <div className="sticky top-0 z-40 bg-[#F4F0EA]">
         <div className="h-[3px] bg-black/10" aria-hidden>
           <div className="h-full bg-[#DF0A14]" style={{ width: `${progress * 100}%` }} />
         </div>
-        <div className={`brand-soft-border flex h-11 items-center gap-3 border-b bg-white ${pagePad}`} style={roman}>
+        <div className={`brand-soft-border flex h-11 items-center gap-3 border-b bg-[#F4F0EA] ${pagePad}`} style={roman}>
           <nav aria-label="Place in the briefing" className="report-crumbs brand-breadcrumbs min-w-0 flex-1 text-xs">
             <ol className="flex min-w-0 items-center gap-1">
               <li className="shrink-0">
@@ -1816,17 +1861,17 @@ export function ReportBriefing({
         </div>
       </div>
 
-      <BriefingDigest stories={stories} briefing={briefing} onJump={jump} />
+      {digest ? <BriefingDigest stories={stories} briefing={briefing} onJump={jump} /> : null}
 
       {stories.map((story, storyIndex) => (
         <div key={story.id}>
-          <StoryCover story={story} index={storyIndex} edition={storyIndex === 0} locked={locked && storyIndex > 0} />
+          <StoryCover story={story} index={storyIndex} edition={storyIndex === 0} locked={locked && storyIndex > 0} layout={layout} />
           <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" />
         </div>
       ))}
 
       <BriefingSources periods={periods} />
-      <section className="flex min-h-[40vh] items-center justify-center bg-white px-4 py-20">
+      <section className="flex min-h-[40vh] items-center justify-center bg-[#F4F0EA] px-4 py-20">
         <div className={readColumn}>
           <p className="text-[12px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
             {briefing}
