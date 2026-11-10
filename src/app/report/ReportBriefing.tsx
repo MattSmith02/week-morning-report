@@ -690,9 +690,9 @@ function ImagelessCover({
 
 const DIGEST_STORY_PLATES = [
   "bg-[#F4F0EA]",
-  "bg-[#EFE8DC]",
-  "bg-[#F7F1EA]",
   "bg-[#E8E4DA]",
+  "bg-[#F7F1EA]",
+  "bg-[#E3EEF2]",
   "bg-[#F3EEE6]",
   "bg-[#EDE7DF]",
 ] as const;
@@ -877,82 +877,6 @@ function StoryCover({
   );
 }
 
-function InsideEdition({ stories, onJump }: { stories: WeekStory[]; onJump: (id: string) => void }) {
-  const big = stories.find((story) => /big question/i.test(story.chip) || /big question/i.test(story.kicker ?? ""));
-  const quote = stories.find((story) => story.format === "quote" || /quote/i.test(story.chip));
-  const stat = stories.find((story) => story.format === "stat" || /statistic/i.test(story.chip));
-  const modules = [
-    big
-      ? {
-          id: big.id,
-          label: "Today's big question",
-          title: big.dek && big.dek !== big.displayTitle ? big.dek.replace(/\?$/, "") + (big.dek.includes("?") ? "?" : "") : big.displayTitle,
-          body: big.whatHappened,
-        }
-      : null,
-    quote
-      ? {
-          id: quote.id,
-          label: "Quote of the day",
-          title: quote.quote ? `“${quote.quote}”` : quote.displayTitle,
-          body: quote.quoteAttribution || quote.dek,
-          isQuote: true,
-        }
-      : null,
-    stat
-      ? {
-          id: stat.id,
-          label: "Statistics",
-          title: stat.stats?.[0]?.value || stat.dek || "—",
-          body: stat.stats?.[0]?.label || stat.displayTitle,
-          isStat: true,
-        }
-      : null,
-  ].filter(Boolean) as Array<{ id: string; label: string; title: string; body?: string; isQuote?: boolean; isStat?: boolean }>;
-
-  if (modules.length === 0) return null;
-
-  return (
-    <aside aria-label="Inside this edition" className="border border-black/15 bg-[#F4F0EA]">
-      <div className="flex items-center gap-2 border-b border-black/15 px-4 py-3">
-        <span className="inline-flex h-5 w-5 items-center justify-center bg-[#DF0A14] text-[10px] font-bold text-white" style={uiBold} aria-hidden>
-          W
-        </span>
-        <p className="text-[11px] font-bold tracking-[0.16em] text-black uppercase" style={uiBold}>
-          Inside this edition
-        </p>
-      </div>
-      <ul>
-        {modules.map((item, itemIndex) => (
-          <li key={item.id} className={itemIndex > 0 ? "border-t border-black/12" : undefined}>
-            <button type="button" onClick={() => onJump(item.id)} className="group w-full px-4 py-5 text-left">
-              <span className="block text-[10px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
-                {item.label}
-              </span>
-              {item.isQuote ? (
-                <span className="mt-3 block text-[28px] leading-none text-black" style={roman} aria-hidden>
-                  “
-                </span>
-              ) : null}
-              <span
-                className={`mt-2 block text-black transition-colors group-hover:text-[#DF0A14] ${item.isStat ? "text-[2.35rem] leading-none" : item.isQuote ? "line-clamp-5 text-[15px] leading-6" : "text-[17px] leading-6"}`}
-                style={roman}
-              >
-                {item.title}
-              </span>
-              {item.body ? (
-                <span className={`mt-2 block text-[13px] leading-5 text-black/60 ${item.isQuote || item.isStat ? "" : "line-clamp-3"}`} style={roman}>
-                  {item.body}
-                </span>
-              ) : null}
-            </button>
-          </li>
-        ))}
-      </ul>
-    </aside>
-  );
-}
-
 function DigestRail({
   stories,
   onJump,
@@ -1001,110 +925,57 @@ function DigestRail({
   );
 }
 
-function FrontCarousel({
-  stories,
-  onJump,
-}: {
-  stories: WeekStory[];
-  onJump: (id: string) => void;
-}) {
+const ROUNDUP_PLATES = [
+  { ground: "#83C8C5", ink: "#0A0A0A" },
+  { ground: "#1254A8", ink: "#FFFFFF" },
+  { ground: "#75C298", ink: "#0A0A0A" },
+  { ground: "#F67B76", ink: "#0A0A0A" },
+] as const;
+
+function FrontPagesStrip({ stories, onJump }: { stories: WeekStory[]; onJump: (id: string) => void }) {
   const slides = stories.filter((story) => Boolean(story.imageSrc)).slice(0, 8);
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState(0);
-
-  useEffect(() => {
-    const root = scrollerRef.current;
-    if (!root || slides.length === 0) return;
-    const onScroll = () => {
-      const width = Math.max(root.clientWidth, 1);
-      setActive(Math.min(slides.length - 1, Math.max(0, Math.round(root.scrollLeft / width))));
-    };
-    root.addEventListener("scroll", onScroll, { passive: true });
-    return () => root.removeEventListener("scroll", onScroll);
-  }, [slides.length]);
-
-  const go = (direction: -1 | 1) => {
-    const root = scrollerRef.current;
-    if (!root) return;
-    const width = Math.max(root.clientWidth, 1);
-    const next = Math.min(slides.length - 1, Math.max(0, active + direction));
-    root.scrollTo({ left: next * width, behavior: "smooth" });
-  };
-
   if (slides.length === 0) return null;
 
   return (
-    <div className="relative mt-6 overflow-hidden">
-      <div
-        ref={scrollerRef}
-        className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain"
-        style={{ scrollbarWidth: "none" }}
-      >
+    <section aria-label="Front pages" className="border-t border-black/12 pt-8">
+      <div className="flex items-end justify-between gap-4">
+        <h2 className="text-[1.75rem] leading-none text-black sm:text-[2rem]" style={roman}>
+          Front pages
+        </h2>
+        <p className="text-[12px] text-black/50" style={ui}>
+          Swipe the covers
+        </p>
+      </div>
+      <ul className="mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {slides.map((story, slideIndex) => (
-          <button
-            key={story.id}
-            type="button"
-            onClick={() => onJump(story.id)}
-            className="relative aspect-[16/10] w-full min-w-full shrink-0 snap-start overflow-hidden bg-[#111] text-left"
-          >
-            <Image
-              src={story.imageSrc!}
-              alt=""
-              fill
-              priority={slideIndex === 0}
-              unoptimized={story.imageSrc!.startsWith("/") || story.imageSrc!.startsWith("http")}
-              className="object-cover object-center"
-              sizes="(max-width: 1024px) 100vw, 65vw"
-            />
-            <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" aria-hidden />
-            <span className="absolute inset-x-0 bottom-0 z-10 p-4 sm:p-6">
-              <span className="block text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
+          <li key={story.id} className="w-[42%] shrink-0 snap-start sm:w-[28%] lg:w-[22%]">
+            <button type="button" onClick={() => onJump(story.id)} className="group w-full text-left">
+              <span className="relative block aspect-square overflow-hidden bg-[#111]">
+                <Image
+                  src={story.imageSrc!}
+                  alt=""
+                  fill
+                  priority={slideIndex < 3}
+                  unoptimized={story.imageSrc!.startsWith("/") || story.imageSrc!.startsWith("http")}
+                  className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.03]"
+                  sizes="180px"
+                />
+                <span className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" aria-hidden />
+                <span className="absolute right-2 bottom-2">
+                  <WeekMark />
+                </span>
+              </span>
+              <span className="mt-2 block text-[10px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
                 {number(stories.findIndex((item) => item.id === story.id))} · {story.chip}
               </span>
-              <span className="mt-2 block max-w-[22ch] text-[1.5rem] leading-[1.1] text-white sm:text-[2rem]" style={roman}>
+              <span className="mt-1 line-clamp-2 block text-[14px] leading-5 text-black" style={roman}>
                 {story.displayTitle}
               </span>
-            </span>
-          </button>
+            </button>
+          </li>
         ))}
-      </div>
-      {slides.length > 1 ? (
-        <>
-          <button
-            type="button"
-            aria-label="Previous slide"
-            onClick={() => go(-1)}
-            className={`${iconButton} absolute top-1/2 left-2 z-10 hidden -translate-y-1/2 bg-white/90 text-black sm:inline-flex`}
-          >
-            <BrandIcon name="chevronLeft" defaultIcon={ChevronLeft} className="h-5 w-5" />
-          </button>
-          <button
-            type="button"
-            aria-label="Next slide"
-            onClick={() => go(1)}
-            className={`${iconButton} absolute top-1/2 right-2 z-10 hidden -translate-y-1/2 bg-white/90 text-black sm:inline-flex`}
-          >
-            <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-5 w-5" />
-          </button>
-          <div className="mt-3 flex items-center justify-center gap-1.5">
-            {slides.map((story, slideIndex) => (
-              <button
-                key={story.id}
-                type="button"
-                aria-label={`Go to slide ${slideIndex + 1}`}
-                aria-current={slideIndex === active ? "true" : undefined}
-                onClick={() => {
-                  const root = scrollerRef.current;
-                  if (!root) return;
-                  root.scrollTo({ left: slideIndex * root.clientWidth, behavior: "smooth" });
-                }}
-                className={`h-1.5 rounded-full transition-all ${slideIndex === active ? "w-5 bg-[#DF0A14]" : "w-1.5 bg-black/25"}`}
-              />
-            ))}
-          </div>
-        </>
-      ) : null}
-    </div>
+      </ul>
+    </section>
   );
 }
 
@@ -1118,22 +989,186 @@ function BriefingDigest({
   onJump: (id: string) => void;
 }) {
   const today = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date());
+  const lead = stories[0];
+  const catchUp = stories.slice(1, 5);
+  const big = stories.find((story) => /big question/i.test(story.chip) || /big question/i.test(story.kicker ?? ""));
+  const quote = stories.find((story) => story.format === "quote" || /quote/i.test(story.chip));
+  const stat = stories.find((story) => story.format === "stat" || /statistic/i.test(story.chip));
+  const picture = stories.find((story) => /picture/i.test(story.chip) || story.format === "picture");
+  const roundups = [
+    big
+      ? { id: big.id, label: "Big question", title: big.dek && big.dek.includes("?") ? big.dek : big.displayTitle, note: "Weekdays" }
+      : null,
+    quote
+      ? { id: quote.id, label: "Quote of the day", title: quote.quoteAttribution || quote.displayTitle, note: quote.dek }
+      : null,
+    stat
+      ? { id: stat.id, label: "Statistic", title: stat.stats?.[0]?.value || stat.dek || stat.displayTitle, note: stat.stats?.[0]?.label || "Of the day" }
+      : null,
+    picture
+      ? { id: picture.id, label: "Picture of the day", title: picture.displayTitle, note: picture.imageCaption || picture.chip }
+      : stories[2]
+        ? { id: stories[2].id, label: stories[2].chip, title: stories[2].displayTitle, note: "Also inside" }
+        : null,
+  ].filter(Boolean) as Array<{ id: string; label: string; title: string; note?: string }>;
 
   return (
-    <header className="border-b border-black/20 bg-[#F4F0EA] pb-8 pt-6 sm:pb-10 sm:pt-8">
-      <p className="text-[11px] font-bold tracking-[0.22em] text-[#DF0A14] uppercase" style={romanBold}>
-        The Week
-      </p>
-      <h1 className="mt-2 text-[2.35rem] leading-none text-black sm:text-[3.15rem]" style={roman}>
-        {briefing}
-      </h1>
-      <p className="mt-2 text-[13px] leading-5 text-black/60" style={ui}>
-        {today}
-      </p>
-      <p className="mt-4 max-w-[46ch] text-[15px] leading-6 text-black/75" style={roman}>
-        Good morning. Browse the front page, then jump from The latest.
-      </p>
-      <FrontCarousel stories={stories} onJump={onJump} />
+    <header className="pb-10 pt-6 sm:pb-12 sm:pt-8">
+      <div className="flex flex-wrap items-center gap-3 text-[12px] text-black/55" style={ui}>
+        <span className="inline-flex items-center gap-2 font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
+          <WeekMark />
+          Daily editions
+        </span>
+        <span aria-hidden>·</span>
+        <span>{today}</span>
+      </div>
+
+      {lead ? (
+        <button
+          type="button"
+          onClick={() => onJump(lead.id)}
+          className="relative mt-5 block w-full overflow-hidden bg-[#111] text-left"
+        >
+          <span className="relative block aspect-[16/10] sm:aspect-[21/9]">
+            {lead.imageSrc ? (
+              <Image
+                src={lead.imageSrc}
+                alt=""
+                fill
+                priority
+                unoptimized={lead.imageSrc.startsWith("/") || lead.imageSrc.startsWith("http")}
+                className="object-cover object-center"
+                sizes="(max-width: 1024px) 100vw, 70vw"
+              />
+            ) : null}
+            <span className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/20" aria-hidden />
+          </span>
+          <span className="absolute inset-x-0 bottom-0 z-10 p-5 sm:p-8">
+            <EditionBanner label={briefing} size="feature" className="mb-4 max-w-fit" />
+            <span className="block text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
+              {lead.chip}
+            </span>
+            <span className="mt-2 block max-w-[18ch] text-[2rem] leading-[1.05] text-white sm:text-[2.75rem]" style={roman}>
+              {lead.displayTitle}
+            </span>
+            {lead.dek && lead.dek !== lead.displayTitle ? (
+              <span className="mt-3 block max-w-[42ch] text-[15px] leading-6 text-white/80" style={roman}>
+                {lead.dek}
+              </span>
+            ) : null}
+            <span className={`${weekCta} mt-5`} style={uiBold}>
+              Read the report
+            </span>
+          </span>
+        </button>
+      ) : null}
+
+      {roundups.length > 0 ? (
+        <section aria-label="Inside this edition" className="mt-8">
+          <h2 className="text-[1.75rem] leading-none text-black sm:text-[2rem]" style={roman}>
+            Inside this edition
+          </h2>
+          <ul className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {roundups.map((item, itemIndex) => {
+              const plate = ROUNDUP_PLATES[itemIndex % ROUNDUP_PLATES.length];
+              return (
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    onClick={() => onJump(item.id)}
+                    className="flex h-full min-h-[180px] w-full flex-col justify-between p-4 text-left transition-opacity hover:opacity-90"
+                    style={{ background: plate.ground, color: plate.ink }}
+                  >
+                    <span>
+                      <span className="inline-flex">
+                        <WeekMark />
+                      </span>
+                      <span className="mt-4 block text-[10px] font-bold tracking-[0.14em] uppercase opacity-80" style={uiBold}>
+                        {item.label}
+                      </span>
+                      <span className="mt-2 block text-[1.2rem] leading-6" style={roman}>
+                        {item.title}
+                      </span>
+                    </span>
+                    {item.note ? (
+                      <span className="mt-4 block text-[12px] leading-4 opacity-75" style={ui}>
+                        {item.note}
+                      </span>
+                    ) : null}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ) : null}
+
+      {lead && catchUp.length > 0 ? (
+        <section aria-label="Catch up" className="mt-10 border-t border-black/12 pt-8">
+          <h2 className="text-[1.75rem] leading-none text-black sm:text-[2rem]" style={roman}>
+            Catch up
+          </h2>
+          <div className="mt-5 grid gap-6 lg:grid-cols-12">
+            <button type="button" onClick={() => onJump(lead.id)} className="group text-left lg:col-span-7">
+              <span className="relative block aspect-square overflow-hidden bg-[#111] sm:aspect-[4/3]">
+                {lead.imageSrc ? (
+                  <Image
+                    src={lead.imageSrc}
+                    alt=""
+                    fill
+                    unoptimized={lead.imageSrc.startsWith("/") || lead.imageSrc.startsWith("http")}
+                    className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.02]"
+                    sizes="(max-width: 1024px) 100vw, 40vw"
+                  />
+                ) : null}
+              </span>
+              <span className="mt-3 block text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
+                {lead.chip}
+              </span>
+              <span className="mt-2 block text-[1.65rem] leading-8 text-black sm:text-[2rem] sm:leading-9" style={roman}>
+                {lead.displayTitle}
+              </span>
+              {lead.dek && lead.dek !== lead.displayTitle ? (
+                <span className="mt-2 block max-w-[40ch] text-[15px] leading-6 text-black/65" style={roman}>
+                  {lead.dek}
+                </span>
+              ) : null}
+            </button>
+            <ul className="flex flex-col divide-y divide-black/12 lg:col-span-5">
+              {catchUp.map((story, storyIndex) => (
+                <li key={story.id}>
+                  <button type="button" onClick={() => onJump(story.id)} className="group flex w-full gap-4 py-4 text-left first:pt-0 last:pb-0">
+                    {story.imageSrc ? (
+                      <span className="relative h-16 w-16 shrink-0 overflow-hidden bg-[#111] sm:h-20 sm:w-20">
+                        <Image
+                          src={story.imageSrc}
+                          alt=""
+                          fill
+                          unoptimized={story.imageSrc.startsWith("/") || story.imageSrc.startsWith("http")}
+                          className="object-cover object-center"
+                          sizes="80px"
+                        />
+                      </span>
+                    ) : null}
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[10px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
+                        {number(storyIndex + 1)} · {story.chip}
+                      </span>
+                      <span className="mt-1 block text-[16px] leading-6 text-black transition-colors group-hover:text-[#DF0A14]" style={roman}>
+                        {story.displayTitle}
+                      </span>
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      ) : null}
+
+      <div className="mt-10">
+        <FrontPagesStrip stories={stories} onJump={onJump} />
+      </div>
     </header>
   );
 }
@@ -1917,25 +1952,7 @@ export function ReportBriefing({
         ) : null}
       </div>
       <div className={`report-page ${digest ? "block" : "hidden md:block"}`}>
-      {digest ? null : <WeekSiteHeader />}
-      {digest ? null : (
-      <div className="flex items-center justify-between gap-6 border-b border-black/10 bg-[#F4F0EA] px-5 py-2">
-        <p className="text-[12px] leading-none text-[#6B7280]" style={ui}>
-          Version
-        </p>
-        <nav aria-label="Version" className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[12px] leading-none text-[#9CA3AF]" style={ui}>
-          <Link href={layoutHref("digest", locked, ads)} className="hover:text-[#374151] hover:underline">
-            Digest
-          </Link>
-          <span aria-hidden>·</span>
-          <span className="text-[#6B7280]">Classic</span>
-          <span aria-hidden>·</span>
-          {locked ? <Link href={layoutHref(layout, false, ads)} className="hover:text-[#374151] hover:underline">Report</Link> : <span className="text-[#6B7280]">Report</span>}
-          <span aria-hidden>·</span>
-          {locked ? <span className="text-[#6B7280]">Locked</span> : <Link href={layoutHref(layout, true, ads)} className="hover:text-[#374151] hover:underline">Locked</Link>}
-        </nav>
-      </div>
-      )}
+      <WeekSiteHeader />
       <div className="sticky top-0 z-40 bg-[#F4F0EA]">
         <div className={`flex h-12 items-center gap-3 border-b border-black/15 bg-[#F4F0EA] ${pagePad}`}>
           <p className="min-w-0 flex-1 truncate text-sm text-black" style={roman}>
@@ -2017,23 +2034,20 @@ export function ReportBriefing({
 
       {digest ? (
         <div className={`mx-auto max-w-[1280px] ${pagePad}`}>
-          <div className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-8 xl:gap-10">
-            <aside className="mt-6 self-start lg:col-span-3 lg:mt-8">
-              <div className="lg:sticky lg:top-14 lg:max-h-[calc(100svh-3.5rem)] lg:overflow-y-auto lg:overscroll-contain">
-                <InsideEdition stories={stories} onJump={jump} />
-              </div>
-            </aside>
-            <div className="min-w-0 lg:col-span-5 xl:col-span-6">
+          <div className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-10">
+            <div className="min-w-0 lg:col-span-8">
               <BriefingDigest stories={stories} briefing={briefing} onJump={jump} />
               {stories.map((story, storyIndex) => (
-                <article key={story.id} className={digestPlate(storyIndex)}>
+                <article key={story.id} className={`${digestPlate(storyIndex)} px-1 sm:px-2`}>
                   <StoryCover story={story} index={storyIndex} edition={storyIndex === 0} locked={locked && storyIndex > 0} layout={layout} />
-                  <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" />
+                  <div className="max-w-[65ch]">
+                    <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" />
+                  </div>
                 </article>
               ))}
             </div>
-            <aside className="hidden self-start lg:col-span-4 xl:col-span-3 lg:block">
-              <div className="sticky top-14 z-20 max-h-[calc(100svh-3.5rem)] overflow-y-auto overscroll-contain border-l border-black/15 bg-[#F4F0EA] py-8 pl-6 xl:pl-8">
+            <aside className="hidden self-start lg:col-span-4 lg:block">
+              <div className="sticky top-14 z-20 max-h-[calc(100svh-3.5rem)] overflow-y-auto overscroll-contain border-l border-black/15 bg-[#F4F0EA] py-8 pl-8">
                 <DigestRail stories={stories} onJump={jump} currentId={stories[index]?.id} />
               </div>
             </aside>
