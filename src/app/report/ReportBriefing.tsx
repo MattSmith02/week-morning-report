@@ -23,11 +23,27 @@ const iconButton = "brand-icon-button inline-flex h-12 w-12 items-center justify
 /** Red marker-pen highlight behind a word or phrase. */
 function MarkerHighlight({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <span className={`relative inline-block px-[0.12em] ${className}`}>
-      <span
+    <span className={`relative inline-block px-[0.08em] ${className}`}>
+      <svg
         aria-hidden
-        className="pointer-events-none absolute inset-x-[-0.06em] top-[0.42em] bottom-[0.08em] -rotate-[1.2deg] skew-x-[-4deg] rounded-[2px] bg-[#DF0A14]/32"
-      />
+        className="pointer-events-none absolute inset-x-[-0.08em] top-[0.38em] h-[0.62em] w-[calc(100%+0.16em)] overflow-visible"
+        viewBox="0 0 100 12"
+        preserveAspectRatio="none"
+      >
+        <path
+          d="M1.2 7.2 C 8 3.8, 18 9.6, 28 6.1 S 48 2.4, 58 6.8 S 78 10.2, 88 5.9 S 96 3.2, 99 6.4 L 98.4 9.8 C 92 11.6, 82 8.1, 72 9.4 S 52 12.2, 42 8.6 S 22 5.2, 12 9.1 S 4 11.4, 1.6 8.8 Z"
+          fill="#DF0A14"
+          opacity="0.38"
+        />
+        <path
+          d="M2 6.4 C 12 4.2, 22 8.8, 34 5.6 S 54 3.1, 66 7.2 S 84 9.4, 97.5 5.8"
+          fill="none"
+          stroke="#DF0A14"
+          strokeWidth="5.2"
+          strokeLinecap="round"
+          opacity="0.22"
+        />
+      </svg>
       <span className="relative z-[1]">{children}</span>
     </span>
   );
