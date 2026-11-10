@@ -1268,8 +1268,8 @@ function BriefingDigest({ briefing }: { briefing: string }) {
         The Week
       </p>
       <h1 className="mt-2 inline-flex items-center gap-3 text-[2.5rem] leading-none text-[var(--brand-text-primary,#0f172b)] sm:text-[3.15rem]" style={roman}>
-        <RisingSunMark className="h-8 w-8 sm:h-10 sm:w-10" />
         <span>{briefing}</span>
+        <RisingSunMark className="h-8 w-8 sm:h-10 sm:w-10" />
       </h1>
       <p className="brand-muted-copy mt-2 text-[13px] leading-5" style={ui}>
         {today}
