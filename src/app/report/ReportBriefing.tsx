@@ -1207,41 +1207,34 @@ function DigestRail({
       <p className="border-b border-black pb-2 text-[11px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
         The latest
       </p>
-      <ul className="flex flex-col gap-1 pt-2">
+      <ul>
         {stories.map((story, storyIndex) => {
           const current = story.id === currentId;
           return (
-            <li key={story.id}>
+            <li key={story.id} className="border-b border-black/12">
               <button
                 ref={current ? activeRef : undefined}
                 type="button"
                 onClick={() => onJump(story.id)}
                 aria-current={current ? "true" : undefined}
-                className={`group flex w-full cursor-pointer items-start gap-2 rounded-[var(--brand-radius-control,8px)] border px-3 py-3 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#DF0A14] ${
+                className={`group w-full border-l-2 py-3 text-left transition-colors ${
                   current
-                    ? "border-black/15 bg-[#F0EAE1]"
-                    : "border-transparent hover:border-black/10 hover:bg-[#F0EAE1]"
+                    ? "border-[#DF0A14] bg-[#F0EAE1] pl-3 pr-1"
+                    : "border-transparent pl-3 pr-1 hover:bg-[#F0EAE1]/hover:border-black/20"
                 }`}
               >
-                <span className="mt-0.5 shrink-0 text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
-                  {number(storyIndex)}
+                <span
+                  className={`block text-[11px] font-bold tracking-[0.12em] uppercase ${current ? "text-[#DF0A14]" : "text-[#DF0A14]/group-hover:text-[#DF0A14]"}`}
+                  style={uiBold}
+                >
+                  {number(storyIndex)} · {story.chip}
                 </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
-                    {story.chip}
-                  </span>
-                  <span
-                    className={`mt-1.5 block text-[15px] leading-6 ${current ? "text-black" : "text-black/70 group-hover:text-black"}`}
-                    style={current ? romanBold : roman}
-                  >
-                    {story.displayTitle}
-                  </span>
+                <span
+                  className={`mt-1.5 block text-[15px] leading-6 ${current ? "text-black" : "text-black/65 group-hover:text-black"}`}
+                  style={current ? romanBold : roman}
+                >
+                  {story.displayTitle}
                 </span>
-                <BrandIcon
-                  name="chevronRight"
-                  defaultIcon={ChevronRight}
-                  className={`mt-1 h-4 w-4 shrink-0 transition-opacity ${current ? "opacity-100 text-[#DF0A14]" : "opacity-40 group-hover:opacity-70"}`}
-                />
               </button>
             </li>
           );
