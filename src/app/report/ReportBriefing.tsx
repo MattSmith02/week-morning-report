@@ -690,11 +690,11 @@ function ImagelessCover({
 
 const DIGEST_STORY_PLATES = [
   "bg-[#F4F0EA]",
-  "bg-[#EFE8DC]",
-  "bg-[#F7F1EA]",
-  "bg-[#E8E4DA]",
-  "bg-[#F3EEE6]",
   "bg-[#EDE7DF]",
+  "bg-[#F7F1EA]",
+  "bg-[#E8EEF2]",
+  "bg-[#F3EEE6]",
+  "bg-[#F0E6E4]",
 ] as const;
 
 function digestPlate(index: number) {
@@ -877,82 +877,6 @@ function StoryCover({
   );
 }
 
-function InsideEdition({ stories, onJump }: { stories: WeekStory[]; onJump: (id: string) => void }) {
-  const big = stories.find((story) => /big question/i.test(story.chip) || /big question/i.test(story.kicker ?? ""));
-  const quote = stories.find((story) => story.format === "quote" || /quote/i.test(story.chip));
-  const stat = stories.find((story) => story.format === "stat" || /statistic/i.test(story.chip));
-  const modules = [
-    big
-      ? {
-          id: big.id,
-          label: "Today's big question",
-          title: big.dek && big.dek !== big.displayTitle ? big.dek.replace(/\?$/, "") + (big.dek.includes("?") ? "?" : "") : big.displayTitle,
-          body: big.whatHappened,
-        }
-      : null,
-    quote
-      ? {
-          id: quote.id,
-          label: "Quote of the day",
-          title: quote.quote ? `“${quote.quote}”` : quote.displayTitle,
-          body: quote.quoteAttribution || quote.dek,
-          isQuote: true,
-        }
-      : null,
-    stat
-      ? {
-          id: stat.id,
-          label: "Statistics",
-          title: stat.stats?.[0]?.value || stat.dek || "—",
-          body: stat.stats?.[0]?.label || stat.displayTitle,
-          isStat: true,
-        }
-      : null,
-  ].filter(Boolean) as Array<{ id: string; label: string; title: string; body?: string; isQuote?: boolean; isStat?: boolean }>;
-
-  if (modules.length === 0) return null;
-
-  return (
-    <aside aria-label="Inside this edition" className="border border-black/15 bg-[#F4F0EA]">
-      <div className="flex items-center gap-2 border-b border-black/15 px-4 py-3">
-        <span className="inline-flex h-5 w-5 items-center justify-center bg-[#DF0A14] text-[10px] font-bold text-white" style={uiBold} aria-hidden>
-          W
-        </span>
-        <p className="text-[11px] font-bold tracking-[0.16em] text-black uppercase" style={uiBold}>
-          Inside this edition
-        </p>
-      </div>
-      <ul>
-        {modules.map((item, itemIndex) => (
-          <li key={item.id} className={itemIndex > 0 ? "border-t border-black/12" : undefined}>
-            <button type="button" onClick={() => onJump(item.id)} className="group w-full px-4 py-5 text-left">
-              <span className="block text-[10px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
-                {item.label}
-              </span>
-              {item.isQuote ? (
-                <span className="mt-3 block text-[28px] leading-none text-black" style={roman} aria-hidden>
-                  “
-                </span>
-              ) : null}
-              <span
-                className={`mt-2 block text-black transition-colors group-hover:text-[#DF0A14] ${item.isStat ? "text-[2.35rem] leading-none" : item.isQuote ? "line-clamp-5 text-[15px] leading-6" : "text-[17px] leading-6"}`}
-                style={roman}
-              >
-                {item.title}
-              </span>
-              {item.body ? (
-                <span className={`mt-2 block text-[13px] leading-5 text-black/60 ${item.isQuote || item.isStat ? "" : "line-clamp-3"}`} style={roman}>
-                  {item.body}
-                </span>
-              ) : null}
-            </button>
-          </li>
-        ))}
-      </ul>
-    </aside>
-  );
-}
-
 function DigestRail({
   stories,
   onJump,
@@ -1001,110 +925,105 @@ function DigestRail({
   );
 }
 
-function FrontCarousel({
-  stories,
-  onJump,
-}: {
-  stories: WeekStory[];
-  onJump: (id: string) => void;
-}) {
+function FrontPagesStrip({ stories, onJump }: { stories: WeekStory[]; onJump: (id: string) => void }) {
   const slides = stories.filter((story) => Boolean(story.imageSrc)).slice(0, 8);
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState(0);
-
-  useEffect(() => {
-    const root = scrollerRef.current;
-    if (!root || slides.length === 0) return;
-    const onScroll = () => {
-      const width = Math.max(root.clientWidth, 1);
-      setActive(Math.min(slides.length - 1, Math.max(0, Math.round(root.scrollLeft / width))));
-    };
-    root.addEventListener("scroll", onScroll, { passive: true });
-    return () => root.removeEventListener("scroll", onScroll);
-  }, [slides.length]);
-
-  const go = (direction: -1 | 1) => {
-    const root = scrollerRef.current;
-    if (!root) return;
-    const width = Math.max(root.clientWidth, 1);
-    const next = Math.min(slides.length - 1, Math.max(0, active + direction));
-    root.scrollTo({ left: next * width, behavior: "smooth" });
-  };
-
   if (slides.length === 0) return null;
-
   return (
-    <div className="relative mt-6 overflow-hidden">
-      <div
-        ref={scrollerRef}
-        className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain"
-        style={{ scrollbarWidth: "none" }}
-      >
+    <section aria-label="Front pages" className="border-t border-black/12 pt-8">
+      <div className="flex items-end justify-between gap-3">
+        <h2 className="text-[1.5rem] leading-none text-black sm:text-[1.75rem]" style={roman}>
+          Front pages
+        </h2>
+        <p className="text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
+          View more
+        </p>
+      </div>
+      <ul className="mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {slides.map((story, slideIndex) => (
-          <button
-            key={story.id}
-            type="button"
-            onClick={() => onJump(story.id)}
-            className="relative aspect-[16/10] w-full min-w-full shrink-0 snap-start overflow-hidden bg-[#111] text-left"
-          >
-            <Image
-              src={story.imageSrc!}
-              alt=""
-              fill
-              priority={slideIndex === 0}
-              unoptimized={story.imageSrc!.startsWith("/") || story.imageSrc!.startsWith("http")}
-              className="object-cover object-center"
-              sizes="(max-width: 1024px) 100vw, 65vw"
-            />
-            <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" aria-hidden />
-            <span className="absolute inset-x-0 bottom-0 z-10 p-4 sm:p-6">
-              <span className="block text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
-                {number(stories.findIndex((item) => item.id === story.id))} · {story.chip}
+          <li key={story.id} className="w-[38%] shrink-0 snap-start sm:w-[24%]">
+            <button type="button" onClick={() => onJump(story.id)} className="group w-full text-left">
+              <span className="relative block aspect-[4/3] overflow-hidden bg-[#111]">
+                <Image
+                  src={story.imageSrc!}
+                  alt=""
+                  fill
+                  priority={slideIndex < 4}
+                  unoptimized={story.imageSrc!.startsWith("/") || story.imageSrc!.startsWith("http")}
+                  className="object-cover object-center"
+                  sizes="160px"
+                />
+                <span className="absolute top-2 left-2 bg-[#DF0A14] px-1.5 py-0.5 text-[9px] font-bold tracking-[0.08em] text-white uppercase" style={uiBold}>
+                  {story.chip}
+                </span>
               </span>
-              <span className="mt-2 block max-w-[22ch] text-[1.5rem] leading-[1.1] text-white sm:text-[2rem]" style={roman}>
+              <span className="mt-2 line-clamp-2 block text-[13px] leading-5 text-black" style={roman}>
                 {story.displayTitle}
               </span>
-            </span>
-          </button>
+            </button>
+          </li>
         ))}
-      </div>
-      {slides.length > 1 ? (
-        <>
-          <button
-            type="button"
-            aria-label="Previous slide"
-            onClick={() => go(-1)}
-            className={`${iconButton} absolute top-1/2 left-2 z-10 hidden -translate-y-1/2 bg-white/90 text-black sm:inline-flex`}
-          >
-            <BrandIcon name="chevronLeft" defaultIcon={ChevronLeft} className="h-5 w-5" />
-          </button>
-          <button
-            type="button"
-            aria-label="Next slide"
-            onClick={() => go(1)}
-            className={`${iconButton} absolute top-1/2 right-2 z-10 hidden -translate-y-1/2 bg-white/90 text-black sm:inline-flex`}
-          >
-            <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-5 w-5" />
-          </button>
-          <div className="mt-3 flex items-center justify-center gap-1.5">
-            {slides.map((story, slideIndex) => (
-              <button
-                key={story.id}
-                type="button"
-                aria-label={`Go to slide ${slideIndex + 1}`}
-                aria-current={slideIndex === active ? "true" : undefined}
-                onClick={() => {
-                  const root = scrollerRef.current;
-                  if (!root) return;
-                  root.scrollTo({ left: slideIndex * root.clientWidth, behavior: "smooth" });
-                }}
-                className={`h-1.5 rounded-full transition-all ${slideIndex === active ? "w-5 bg-[#DF0A14]" : "w-1.5 bg-black/25"}`}
-              />
-            ))}
+      </ul>
+    </section>
+  );
+}
+
+function WeekUnlock({ stories, onJump }: { stories: WeekStory[]; onJump: (id: string) => void }) {
+  const picks = stories.filter((story) => Boolean(story.imageSrc)).slice(0, 4);
+  return (
+    <section aria-label="Unlock more" className="border border-black/12 bg-[#F0EAE1] px-4 py-6 sm:px-6 sm:py-8">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <div className="flex items-center gap-2">
+            <WeekMark />
+            <p className="text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
+              The Week · Exclusive
+            </p>
           </div>
-        </>
+          <h2 className="mt-3 text-[1.65rem] leading-8 text-black sm:text-[2rem] sm:leading-9" style={roman}>
+            Unlock more with the Morning Report
+          </h2>
+          <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+            {["The full briefing, every weekday", "Quote, statistic, and big question", "Sources from 200+ outlets", "Previous editions in one place"].map((item) => (
+              <li key={item} className="flex items-start gap-2 text-[13px] leading-5 text-black/75" style={roman}>
+                <span className="mt-1 inline-block h-1.5 w-1.5 shrink-0 bg-[#DF0A14]" aria-hidden />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <a href={WEEK_SUBSCRIBE} target="_blank" rel="noreferrer" className={`${weekCta} shrink-0`} style={uiBold}>
+          Explore exclusive
+        </a>
+      </div>
+      {picks.length > 0 ? (
+        <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {picks.map((story) => (
+            <li key={story.id}>
+              <button type="button" onClick={() => onJump(story.id)} className="group relative block aspect-[3/4] w-full overflow-hidden bg-[#111] text-left">
+                <Image
+                  src={story.imageSrc!}
+                  alt=""
+                  fill
+                  unoptimized={story.imageSrc!.startsWith("/") || story.imageSrc!.startsWith("http")}
+                  className="object-cover object-center brightness-75 transition-transform duration-500 group-hover:scale-[1.03]"
+                  sizes="200px"
+                />
+                <span className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" aria-hidden />
+                <span className="absolute inset-x-0 bottom-0 z-10 p-3">
+                  <span className="line-clamp-3 block text-[14px] leading-5 text-white" style={roman}>
+                    {story.displayTitle}
+                  </span>
+                  <span className="mt-2 inline-flex items-center gap-1 text-[10px] font-bold tracking-[0.1em] text-white/90 uppercase" style={uiBold}>
+                    <Lock size={10} strokeWidth={2.4} aria-hidden />
+                    Week exclusive
+                  </span>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
       ) : null}
-    </div>
+    </section>
   );
 }
 
@@ -1118,22 +1037,132 @@ function BriefingDigest({
   onJump: (id: string) => void;
 }) {
   const today = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date());
+  const lead = stories[0];
+  const seconds = stories.slice(1, 3);
+  const trending = [...new Set(stories.slice(0, 8).map((story) => story.chip))].slice(0, 6);
 
   return (
-    <header className="border-b border-black/20 bg-[#F4F0EA] pb-8 pt-6 sm:pb-10 sm:pt-8">
-      <p className="text-[11px] font-bold tracking-[0.22em] text-[#DF0A14] uppercase" style={romanBold}>
-        The Week
-      </p>
-      <h1 className="mt-2 text-[2.35rem] leading-none text-black sm:text-[3.15rem]" style={roman}>
-        {briefing}
-      </h1>
-      <p className="mt-2 text-[13px] leading-5 text-black/60" style={ui}>
-        {today}
-      </p>
-      <p className="mt-4 max-w-[46ch] text-[15px] leading-6 text-black/75" style={roman}>
-        Good morning. Browse the front page, then jump from The latest.
-      </p>
-      <FrontCarousel stories={stories} onJump={onJump} />
+    <header className="pb-8 pt-6 sm:pb-10 sm:pt-8">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-black/10 pb-3 text-[12px]" style={ui}>
+        <span className="font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
+          Trending
+        </span>
+        {trending.map((chip) => (
+          <button key={chip} type="button" onClick={() => onJump(stories.find((story) => story.chip === chip)?.id ?? stories[0].id)} className="text-black/60 transition-colors hover:text-[#DF0A14]">
+            {chip}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-5 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="text-[11px] font-bold tracking-[0.18em] text-[#DF0A14] uppercase" style={uiBold}>
+            The Week
+          </p>
+          <h1 className="mt-1 text-[2.2rem] leading-none text-black sm:text-[2.85rem]" style={roman}>
+            {briefing}
+          </h1>
+          <p className="mt-2 text-[13px] text-black/55" style={ui}>
+            {today}
+          </p>
+        </div>
+      </div>
+
+      {lead ? (
+        <div className="mt-6">
+          <button type="button" onClick={() => onJump(lead.id)} className="group block w-full text-left">
+            <span className="relative block aspect-[16/10] overflow-hidden bg-[#111] sm:aspect-[16/9]">
+              {lead.imageSrc ? (
+                <Image
+                  src={lead.imageSrc}
+                  alt=""
+                  fill
+                  priority
+                  unoptimized={lead.imageSrc.startsWith("/") || lead.imageSrc.startsWith("http")}
+                  className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.02]"
+                  sizes="(max-width: 1024px) 100vw, 70vw"
+                />
+              ) : null}
+              <span className="absolute top-3 left-3 bg-[#DF0A14] px-2 py-1 text-[10px] font-bold tracking-[0.1em] text-white uppercase" style={uiBold}>
+                {lead.chip}
+              </span>
+            </span>
+            <span className="mt-4 block max-w-[28ch] text-[1.85rem] leading-[1.12] text-black sm:text-[2.35rem]" style={roman}>
+              {lead.displayTitle}
+            </span>
+            {lead.dek && lead.dek !== lead.displayTitle ? (
+              <span className="mt-3 block max-w-[48ch] text-[15px] leading-6 text-black/70" style={roman}>
+                {lead.dek}
+              </span>
+            ) : null}
+          </button>
+
+          {seconds.length > 0 ? (
+            <ul className="mt-6 grid gap-0 border-t border-black/12 sm:grid-cols-2">
+              {seconds.map((story, storyIndex) => (
+                <li key={story.id} className={`border-black/12 py-5 ${storyIndex === 0 ? "sm:border-r sm:pr-5" : "sm:pl-5"}`}>
+                  <button type="button" onClick={() => onJump(story.id)} className="group w-full text-left">
+                    <span className="block text-[10px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
+                      {story.chip}
+                    </span>
+                    <span className="mt-2 block text-[1.15rem] leading-6 text-black transition-colors group-hover:text-[#DF0A14]" style={roman}>
+                      {story.displayTitle}
+                    </span>
+                    {story.dek && story.dek !== story.displayTitle ? (
+                      <span className="mt-2 line-clamp-2 block text-[13px] leading-5 text-black/55" style={roman}>
+                        {story.dek}
+                      </span>
+                    ) : null}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+      ) : null}
+
+      <div className="mt-8">
+        <WeekUnlock stories={stories} onJump={onJump} />
+      </div>
+
+      <section className="mt-8 border border-black/10 bg-[#EDE7DF] px-4 py-6 sm:px-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="max-w-[42ch]">
+            <h2 className="text-[1.35rem] leading-7 text-black" style={roman}>
+              Get The Morning Report — free
+            </h2>
+            <p className="mt-2 text-[13px] leading-5 text-black/65" style={roman}>
+              The Week’s weekday briefing in your inbox: the stories that matter, gathered from 200+ sources.
+            </p>
+          </div>
+          <form
+            className="flex w-full max-w-md flex-col gap-2 sm:flex-row"
+            onSubmit={(event) => {
+              event.preventDefault();
+              window.open(WEEK_SUBSCRIBE, "_blank", "noreferrer");
+            }}
+          >
+            <label className="sr-only" htmlFor="week-digest-email">
+              Email
+            </label>
+            <input
+              id="week-digest-email"
+              type="email"
+              required
+              placeholder="Email address"
+              className="h-11 flex-1 border border-black/20 bg-white px-3 text-[14px] text-black outline-none focus:border-[#DF0A14]"
+              style={ui}
+            />
+            <button type="submit" className={`${weekCta} h-11 shrink-0 px-5`} style={uiBold}>
+              Sign up
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <div className="mt-8">
+        <FrontPagesStrip stories={stories} onJump={onJump} />
+      </div>
     </header>
   );
 }
@@ -1917,25 +1946,7 @@ export function ReportBriefing({
         ) : null}
       </div>
       <div className={`report-page ${digest ? "block" : "hidden md:block"}`}>
-      {digest ? null : <WeekSiteHeader />}
-      {digest ? null : (
-      <div className="flex items-center justify-between gap-6 border-b border-black/10 bg-[#F4F0EA] px-5 py-2">
-        <p className="text-[12px] leading-none text-[#6B7280]" style={ui}>
-          Version
-        </p>
-        <nav aria-label="Version" className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[12px] leading-none text-[#9CA3AF]" style={ui}>
-          <Link href={layoutHref("digest", locked, ads)} className="hover:text-[#374151] hover:underline">
-            Digest
-          </Link>
-          <span aria-hidden>·</span>
-          <span className="text-[#6B7280]">Classic</span>
-          <span aria-hidden>·</span>
-          {locked ? <Link href={layoutHref(layout, false, ads)} className="hover:text-[#374151] hover:underline">Report</Link> : <span className="text-[#6B7280]">Report</span>}
-          <span aria-hidden>·</span>
-          {locked ? <span className="text-[#6B7280]">Locked</span> : <Link href={layoutHref(layout, true, ads)} className="hover:text-[#374151] hover:underline">Locked</Link>}
-        </nav>
-      </div>
-      )}
+      <WeekSiteHeader />
       <div className="sticky top-0 z-40 bg-[#F4F0EA]">
         <div className={`flex h-12 items-center gap-3 border-b border-black/15 bg-[#F4F0EA] ${pagePad}`}>
           <p className="min-w-0 flex-1 truncate text-sm text-black" style={roman}>
@@ -2017,23 +2028,20 @@ export function ReportBriefing({
 
       {digest ? (
         <div className={`mx-auto max-w-[1280px] ${pagePad}`}>
-          <div className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-8 xl:gap-10">
-            <aside className="mt-6 self-start lg:col-span-3 lg:mt-8">
-              <div className="lg:sticky lg:top-14 lg:max-h-[calc(100svh-3.5rem)] lg:overflow-y-auto lg:overscroll-contain">
-                <InsideEdition stories={stories} onJump={jump} />
-              </div>
-            </aside>
-            <div className="min-w-0 lg:col-span-5 xl:col-span-6">
+          <div className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-10">
+            <div className="min-w-0 lg:col-span-8">
               <BriefingDigest stories={stories} briefing={briefing} onJump={jump} />
               {stories.map((story, storyIndex) => (
-                <article key={story.id} className={digestPlate(storyIndex)}>
+                <article key={story.id} className={`${digestPlate(storyIndex)} border-b border-black/10`}>
                   <StoryCover story={story} index={storyIndex} edition={storyIndex === 0} locked={locked && storyIndex > 0} layout={layout} />
-                  <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" />
+                  <div className="max-w-[65ch] px-1">
+                    <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" />
+                  </div>
                 </article>
               ))}
             </div>
-            <aside className="hidden self-start lg:col-span-4 xl:col-span-3 lg:block">
-              <div className="sticky top-14 z-20 max-h-[calc(100svh-3.5rem)] overflow-y-auto overscroll-contain border-l border-black/15 bg-[#F4F0EA] py-8 pl-6 xl:pl-8">
+            <aside className="hidden self-start lg:col-span-4 lg:block">
+              <div className="sticky top-14 z-20 max-h-[calc(100svh-3.5rem)] overflow-y-auto overscroll-contain border-l border-black/15 bg-[#F4F0EA] py-8 pl-8">
                 <DigestRail stories={stories} onJump={jump} currentId={stories[index]?.id} />
               </div>
             </aside>
