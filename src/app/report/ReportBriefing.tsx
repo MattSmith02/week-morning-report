@@ -649,23 +649,7 @@ function ImagelessCover({
 }) {
   const dark = tone === "dark";
   if (compact) {
-    return (
-      <section id={story.id} data-story className={`relative scroll-mt-12 border-b border-black/10 ${imagelessPlateClass(tone)}`}>
-        {locked ? <CoverLock /> : null}
-        <div className="py-9 sm:py-11">
-          <Chip label={`${number(index)} · ${story.chip}`} className="min-w-0" />
-          <div className="mt-3 h-px w-10 bg-[#DF0A14]" aria-hidden />
-          <h2 className={`mt-4 text-[1.875rem] leading-[1.12] sm:text-[2.25rem] ${dark ? "text-white" : "text-black"}`} style={roman}>
-            {story.displayTitle}
-          </h2>
-          {story.dek && story.dek !== story.displayTitle ? (
-            <p className={`mt-3 max-w-[40ch] text-base leading-6 sm:text-lg sm:leading-7 ${dark ? "text-white/75" : "text-black/70"}`} style={roman}>
-              {story.dek}
-            </p>
-          ) : null}
-        </div>
-      </section>
-    );
+    return <CompactStoryHeader story={story} index={index} locked={locked} />;
   }
 
   return (
@@ -740,11 +724,11 @@ function CompactStoryHeader({
             ) : null}
           </figure>
         ) : null}
-        <div className={hasImage ? "mt-5" : ""}>
-          <Chip label={story.chip} className="min-w-0" />
-        </div>
+        <p className={`text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase ${hasImage ? "mt-5" : ""}`} style={uiBold}>
+          {story.chip}
+        </p>
         <h2
-          className={`mt-3 max-w-[24ch] leading-[1.12] text-black ${lead ? "text-[2rem] sm:text-[2.6rem]" : "text-[1.7rem] sm:text-[2.05rem]"}`}
+          className={`mt-2 max-w-[28ch] leading-[1.12] text-black ${lead ? "text-[2rem] sm:text-[2.6rem]" : "text-[1.7rem] sm:text-[2.05rem]"}`}
           style={roman}
         >
           {story.displayTitle}
@@ -888,26 +872,38 @@ function DigestRail({
   currentId?: string;
 }) {
   return (
-    <aside aria-label="The latest" className="border-black/15 lg:border-l lg:pl-8">
-      <p className="border-b border-black pb-2 text-[12px] font-bold tracking-[0.12em] text-black uppercase" style={uiBold}>
+    <nav aria-label="The latest" className="border-black/15 lg:border-l lg:pl-8">
+      <p className="border-b border-black pb-2 text-[11px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
         The latest
       </p>
       <ul>
-        {stories.map((story) => {
+        {stories.map((story, storyIndex) => {
           const current = story.id === currentId;
           return (
-            <li key={story.id} className={`border-b border-black/15 ${current ? "bg-black/[0.03]" : ""}`}>
-              <button type="button" onClick={() => onJump(story.id)} className="group w-full py-3.5 text-left">
-                <Chip label={story.chip} selected={current} className="mb-2 min-w-0" />
-                <span className={`block text-[15px] leading-6 ${current ? "text-[#DF0A14]" : "text-black group-hover:text-[#DF0A14]"}`} style={roman}>
-                  {story.dek && story.dek !== story.displayTitle ? story.dek : story.displayTitle}
+            <li key={story.id} className="border-b border-black/12">
+              <button
+                type="button"
+                onClick={() => onJump(story.id)}
+                aria-current={current ? "true" : undefined}
+                className={`group w-full py-3.5 text-left transition-colors ${current ? "bg-black/[0.03]" : "hover:bg-black/[0.02]"}`}
+              >
+                <span className="block text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
+                  {number(storyIndex)} · {story.chip}
                 </span>
+                <span className={`mt-1.5 block text-[15px] leading-6 ${current ? "text-black" : "text-black/80 group-hover:text-black"}`} style={roman}>
+                  {story.displayTitle}
+                </span>
+                {story.dek && story.dek !== story.displayTitle ? (
+                  <span className="mt-1 line-clamp-2 block text-[13px] leading-5 text-black/55" style={roman}>
+                    {story.dek}
+                  </span>
+                ) : null}
               </button>
             </li>
           );
         })}
       </ul>
-    </aside>
+    </nav>
   );
 }
 
@@ -938,9 +934,6 @@ function BriefingDigest({
       <p className="mt-4 max-w-[46ch] text-[15px] leading-6 text-black/75" style={roman}>
         Good morning. Here’s what’s worth your time today — start with the lead, or jump from The latest.
       </p>
-      <div className="mt-6 lg:hidden">
-        <DigestRail stories={stories} onJump={onJump} />
-      </div>
     </header>
   );
 }
@@ -1761,52 +1754,88 @@ export function ReportBriefing({
             <span className="text-black/40"> · </span>
             <span className="text-[#DF0A14]">{number(index)}/{total}</span>
           </p>
-          <div className="hidden items-center gap-2 sm:flex">
-            <Link href={layoutHref("digest", locked, ads)} className="inline-flex">
-              <Chip label="Digest" selected={digest} className="min-w-0 px-3" />
+          <div className="flex items-center gap-3 text-[11px] font-bold tracking-[0.1em] uppercase" style={uiBold}>
+            <Link
+              href={layoutHref("digest", locked, ads)}
+              className={digest ? "text-[#DF0A14]" : "text-black/45 hover:text-[#DF0A14]"}
+            >
+              Digest
             </Link>
-            <Link href={layoutHref("classic", locked, ads)} className="inline-flex">
-              <Chip label="Classic" selected={!digest} className="min-w-0 px-3" />
+            <Link
+              href={layoutHref("classic", locked, ads)}
+              className={!digest ? "text-[#DF0A14]" : "text-black/45 hover:text-[#DF0A14]"}
+            >
+              Classic
             </Link>
           </div>
-          <div className="relative">
+          {!digest ? (
+            <div className="relative">
+              <button
+                type="button"
+                aria-expanded={open}
+                aria-controls="story-index"
+                onClick={() => setOpen((value) => !value)}
+                className="brand-icon-button inline-flex h-10 items-center gap-1.5 px-2 text-xs font-bold tracking-[0.08em] text-black uppercase transition-colors hover:text-[#DF0A14]"
+                style={uiBold}
+              >
+                Index
+                <BrandIcon name="chevronDown" defaultIcon={ChevronDown} className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
+              </button>
+              {open ? (
+                <>
+                  <button type="button" aria-label="Close story list" className="fixed inset-0 z-40 cursor-default bg-black/20" onClick={() => setOpen(false)} />
+                  <div className="absolute top-full right-0 z-50 mt-1 w-[min(420px,calc(100vw-24px))] overflow-hidden border border-black/10 bg-[#F4F0EA] shadow-[0_18px_40px_rgba(10,10,10,0.16)]">
+                    {storyIndex("story-index")}
+                  </div>
+                </>
+              ) : null}
+            </div>
+          ) : (
             <button
               type="button"
               aria-expanded={open}
               aria-controls="story-index"
               onClick={() => setOpen((value) => !value)}
-              className="brand-icon-button inline-flex h-10 items-center gap-1.5 px-2 text-xs font-bold tracking-[0.08em] text-black uppercase transition-colors hover:text-[#DF0A14]"
+              className="inline-flex h-10 items-center gap-1.5 px-1 text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase lg:hidden"
               style={uiBold}
             >
-              Index
+              Latest
               <BrandIcon name="chevronDown" defaultIcon={ChevronDown} className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
             </button>
-            {open ? (
-              <>
-                <button type="button" aria-label="Close story list" className="fixed inset-0 z-40 cursor-default bg-black/20" onClick={() => setOpen(false)} />
-                <div className="absolute top-full right-0 z-50 mt-1 w-[min(420px,calc(100vw-24px))] overflow-hidden border border-black/10 bg-[#F4F0EA] shadow-[0_18px_40px_rgba(10,10,10,0.16)]">
-                  {storyIndex("story-index")}
-                </div>
-              </>
-            ) : null}
-          </div>
+          )}
         </div>
       </div>
+
+      {digest && open ? (
+        <>
+          <button type="button" aria-label="Close story list" className="fixed inset-0 z-40 cursor-default bg-black/20 lg:hidden" onClick={() => setOpen(false)} />
+          <div className="fixed inset-x-0 bottom-0 z-50 max-h-[70dvh] overflow-auto border-t border-black/10 bg-[#F4F0EA] px-4 py-4 lg:hidden">
+            <DigestRail
+              stories={stories}
+              onJump={(id) => {
+                setOpen(false);
+                jump(id);
+              }}
+              currentId={stories[index]?.id}
+            />
+          </div>
+        </>
+      ) : null}
 
       {digest ? (
         <div className={`mx-auto max-w-[1180px] ${pagePad}`}>
           <div className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-12">
-            <div className="lg:col-span-8">
+            <div className="min-w-0 lg:col-span-8">
               <BriefingDigest stories={stories} briefing={briefing} onJump={jump} />
               {stories.map((story, storyIndex) => (
-                <div key={story.id}>
+                <article key={story.id}>
                   <StoryCover story={story} index={storyIndex} edition={storyIndex === 0} locked={locked && storyIndex > 0} layout={layout} />
                   <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" />
-                </div>
+                </article>
               ))}
             </div>
-            <div className="hidden py-8 lg:col-span-4 lg:block">
-              <div className="sticky top-16">
+            <div className="relative hidden lg:col-span-4 lg:block">
+              <div className="sticky top-14 max-h-[calc(100svh-3.5rem)] overflow-y-auto overscroll-contain py-8 pr-1">
                 <DigestRail stories={stories} onJump={jump} currentId={stories[index]?.id} />
               </div>
             </div>
