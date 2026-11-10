@@ -20,28 +20,50 @@ const uiBold: CSSProperties = { fontFamily: UI, fontWeight: 700 };
 const pagePad = "px-4 sm:px-8 lg:px-8 xl:px-12 min-[1440px]:px-20 2xl:px-[177px]";
 const iconButton = "brand-icon-button inline-flex h-12 w-12 items-center justify-center rounded-full focus:outline-none focus-visible:ring-2";
 
-/** Red marker-pen highlight — Hotjar-style translucent stroke behind type. */
+/** Deep-red marker-pen swipe behind type (header only). */
 function MarkerHighlight({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <span className={`relative inline-block ${className}`}>
       <svg
         aria-hidden
-        className="pointer-events-none absolute -left-[0.08em] top-[0.46em] h-[0.52em] w-[calc(100%+0.16em)] overflow-visible"
-        viewBox="0 0 240 32"
+        className="pointer-events-none absolute -left-[0.1em] top-[0.4em] h-[0.62em] w-[calc(100%+0.2em)] overflow-visible"
+        viewBox="0 0 240 36"
         preserveAspectRatio="none"
       >
-        {/* Fat highlighter swipe: rounded ends, slight wobble, translucent Week red */}
+        <defs>
+          <filter id="marker-bleed" x="-8%" y="-40%" width="116%" height="180%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" result="noise" seed="3" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.4" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+        </defs>
+        {/* Main felt-tip swipe */}
         <path
-          d="M10 16
-             C 10 7.5, 16 4, 28 4.5
-             L 212 3
-             C 226 2.8, 232 7, 232 15.5
-             C 232 24.5, 226 29, 212 28.5
-             L 28 30
-             C 16 30.2, 10 25, 10 16
+          d="M8 20
+             C 9 9, 18 5, 32 6.5
+             C 70 9, 110 4, 150 7
+             C 180 9.5, 205 5, 228 8
+             C 236 9.5, 238 14, 236 20
+             C 234 28, 226 31, 210 30
+             C 170 28, 130 33, 90 29
+             C 55 26, 28 32, 14 29
+             C 8 27.5, 7 24, 8 20
              Z"
-          fill="#DF0A14"
-          opacity="0.42"
+          fill="#B20810"
+          opacity="0.55"
+          filter="url(#marker-bleed)"
+        />
+        {/* Second pass — darker core, like overlapping marker strokes */}
+        <path
+          d="M14 19
+             C 22 12, 48 11, 80 14
+             C 120 18, 160 12, 200 15
+             C 220 16.5, 228 18, 230 21
+             C 226 25, 210 26, 180 24
+             C 140 22, 100 27, 60 24
+             C 35 22, 20 25, 14 22
+             Z"
+          fill="#8F060C"
+          opacity="0.28"
         />
       </svg>
       <span className="relative z-[1]">{children}</span>
@@ -2135,11 +2157,9 @@ export function ReportBriefing({
       <div className="sticky top-0 z-40 bg-[var(--report-beige,#F4F0EA)]">
         <div className={`flex h-12 items-center gap-3 border-b border-[var(--brand-border-default,#e2e8f0)] bg-[var(--report-beige,#F4F0EA)] ${pagePad}`}>
           <p className="min-w-0 flex-1 truncate text-sm text-black" style={romanBold}>
-            <span>The Week · </span>
-            <MarkerHighlight>{briefing}</MarkerHighlight>
+            <span>The Week · {briefing} · </span>
             <span className="tabular-nums" aria-label={`Story ${number(index)} of ${total}`}>
-              {" "}
-              · {number(index)}/{total}
+              {number(index)}/{total}
             </span>
           </p>
           <div className="flex items-center gap-3 text-[11px] font-bold tracking-[0.1em] uppercase" style={uiBold}>
