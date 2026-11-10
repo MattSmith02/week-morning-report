@@ -2104,10 +2104,7 @@ export function ReportBriefing({
       {digest ? null : <WeekSiteHeader />}
       <div className="sticky top-0 z-40 bg-[var(--report-beige,#F4F0EA)]">
         <div className={`flex h-12 items-center gap-3 border-b border-[var(--brand-border-default,#e2e8f0)] bg-[var(--report-beige,#F4F0EA)] ${pagePad}`}>
-          <p
-            className="min-w-0 flex-1 truncate text-sm font-bold text-black"
-            style={{ fontFamily: "var(--font-brand-sans, Arial, Helvetica, sans-serif)" }}
-          >
+          <p className="min-w-0 flex-1 truncate text-sm text-black" style={romanBold}>
             <span>The Week · {briefing} · </span>
             <span className="tabular-nums" aria-label={`Story ${number(index)} of ${total}`}>
               {number(index)}/{total}
