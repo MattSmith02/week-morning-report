@@ -1256,6 +1256,7 @@ function BriefingDigest({ briefing }: { briefing: string }) {
       <h1 className="mt-2 text-[2.5rem] leading-none text-[var(--brand-text-primary,#0f172b)] sm:text-[3.15rem]" style={roman}>
         {briefing}
       </h1>
+      <div className="mt-2 h-px w-12 bg-[#DF0A14]" aria-hidden />
       <p className="brand-muted-copy mt-2 text-[13px] leading-5" style={ui}>
         {today}
       </p>
