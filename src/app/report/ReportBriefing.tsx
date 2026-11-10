@@ -20,28 +20,28 @@ const uiBold: CSSProperties = { fontFamily: UI, fontWeight: 700 };
 const pagePad = "px-4 sm:px-8 lg:px-8 xl:px-12 min-[1440px]:px-20 2xl:px-[177px]";
 const iconButton = "brand-icon-button inline-flex h-12 w-12 items-center justify-center rounded-full focus:outline-none focus-visible:ring-2";
 
-/** Red marker-pen highlight behind a word or phrase. */
+/** Red marker-pen highlight — Hotjar-style translucent stroke behind type. */
 function MarkerHighlight({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <span className={`relative inline-block px-[0.08em] ${className}`}>
+    <span className={`relative inline-block ${className}`}>
       <svg
         aria-hidden
-        className="pointer-events-none absolute inset-x-[-0.08em] top-[0.38em] h-[0.62em] w-[calc(100%+0.16em)] overflow-visible"
-        viewBox="0 0 100 12"
+        className="pointer-events-none absolute -left-[0.08em] top-[0.46em] h-[0.52em] w-[calc(100%+0.16em)] overflow-visible"
+        viewBox="0 0 240 32"
         preserveAspectRatio="none"
       >
+        {/* Fat highlighter swipe: rounded ends, slight wobble, translucent Week red */}
         <path
-          d="M1.2 7.2 C 8 3.8, 18 9.6, 28 6.1 S 48 2.4, 58 6.8 S 78 10.2, 88 5.9 S 96 3.2, 99 6.4 L 98.4 9.8 C 92 11.6, 82 8.1, 72 9.4 S 52 12.2, 42 8.6 S 22 5.2, 12 9.1 S 4 11.4, 1.6 8.8 Z"
+          d="M10 16
+             C 10 7.5, 16 4, 28 4.5
+             L 212 3
+             C 226 2.8, 232 7, 232 15.5
+             C 232 24.5, 226 29, 212 28.5
+             L 28 30
+             C 16 30.2, 10 25, 10 16
+             Z"
           fill="#DF0A14"
-          opacity="0.38"
-        />
-        <path
-          d="M2 6.4 C 12 4.2, 22 8.8, 34 5.6 S 54 3.1, 66 7.2 S 84 9.4, 97.5 5.8"
-          fill="none"
-          stroke="#DF0A14"
-          strokeWidth="5.2"
-          strokeLinecap="round"
-          opacity="0.22"
+          opacity="0.42"
         />
       </svg>
       <span className="relative z-[1]">{children}</span>
