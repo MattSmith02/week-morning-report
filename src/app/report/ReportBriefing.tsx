@@ -2022,9 +2022,9 @@ export function ReportBriefing({
 
       {digest ? (
         <div className={`mx-auto max-w-[1280px] ${pagePad}`}>
-          <div className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-10">
-            <aside className="mt-8 hidden self-start lg:col-span-3 lg:block">
-              <div className="sticky top-14 z-20 max-h-[calc(100svh-3.5rem)] overflow-y-auto overscroll-contain border-r border-black/15 bg-[#F4F0EA] py-8 pr-6">
+          <div className="lg:grid lg:grid-cols-12 lg:items-stretch lg:gap-10">
+            <aside className="mt-8 hidden min-h-0 lg:col-span-3 lg:block">
+              <div className="sticky top-12 z-20 max-h-[calc(100svh-3rem)] overflow-y-auto overscroll-contain border-r border-black/15 bg-[#F4F0EA] py-8 pr-6">
                 <InsideEdition stories={stories} onJump={jump} />
               </div>
             </aside>
@@ -2037,8 +2037,8 @@ export function ReportBriefing({
                 </article>
               ))}
             </div>
-            <aside className="hidden self-start lg:col-span-3 lg:block">
-              <div className="sticky top-14 z-20 max-h-[calc(100svh-3.5rem)] overflow-y-auto overscroll-contain border-l border-black/15 bg-[#F4F0EA] py-8 pl-6">
+            <aside className="hidden min-h-0 lg:col-span-3 lg:block">
+              <div className="sticky top-12 z-20 max-h-[calc(100svh-3rem)] overflow-y-auto overscroll-contain border-l border-black/15 bg-[#F4F0EA] py-8 pl-6">
                 <DigestRail stories={stories} onJump={jump} currentId={stories[index]?.id} />
               </div>
             </aside>
