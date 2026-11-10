@@ -498,6 +498,8 @@ function DigestPapers({ story }: { story: WeekStory }) {
 
   if (covers.length === 0) return null;
 
+  const activeCover = covers[active] ?? covers[0];
+
   return (
     <div className="pb-10">
       <div className="flex items-end justify-between gap-3 px-1">
@@ -514,18 +516,53 @@ function DigestPapers({ story }: { story: WeekStory }) {
         </p>
       </div>
 
-      <div className="relative mt-6">
+      {/* Desktop: one cover, arrows flanking the image */}
+      <div className="mt-6 hidden lg:block">
+        <div className="flex items-center justify-center gap-4">
+          <BrandScrollArrow
+            direction="left"
+            label="Previous front page"
+            disabled={active <= 0}
+            onClick={() => go(active - 1)}
+          />
+          <div className="w-full max-w-[280px]">
+            <div className="relative aspect-[3/4] overflow-hidden bg-[#111] shadow-[0_0_0_2px_#DF0A14]">
+              <Image
+                src={activeCover.src}
+                alt=""
+                fill
+                unoptimized
+                className="object-cover object-top"
+                sizes="280px"
+                priority
+              />
+            </div>
+            <p className="mt-4 text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
+              {number(active)} · {activeCover.label}
+            </p>
+            <p className="mt-2 max-w-[22ch] text-[1.45rem] leading-7 text-[var(--brand-text-primary,#0f172b)]" style={roman}>
+              {activeCover.text}
+            </p>
+          </div>
+          <BrandScrollArrow
+            direction="right"
+            label="Next front page"
+            disabled={active >= covers.length - 1}
+            onClick={() => go(active + 1)}
+          />
+        </div>
+      </div>
+
+      {/* Mobile: snap carousel with blur peeks */}
+      <div className="relative mt-6 lg:hidden">
         <ul
           ref={scrollerRef}
-          className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 [scrollbar-width:none] lg:gap-6 lg:px-[22%] [&::-webkit-scrollbar]:hidden"
+          className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {covers.map((cover, coverIndex) => {
             const focused = coverIndex === active;
             return (
-              <li
-                key={`${cover.label}-${coverIndex}`}
-                className="w-[88%] shrink-0 snap-center sm:w-[78%] lg:w-[56%]"
-              >
+              <li key={`${cover.label}-${coverIndex}`} className="w-[88%] shrink-0 snap-center sm:w-[78%]">
                 <div className="w-full">
                   <div
                     className={`relative aspect-[3/4] w-full overflow-hidden bg-[#111] transition-[filter,opacity,transform,box-shadow] duration-300 ${
@@ -547,7 +584,7 @@ function DigestPapers({ story }: { story: WeekStory }) {
                         fill
                         unoptimized
                         className="object-cover object-top"
-                        sizes="(max-width: 1023px) 88vw, 420px"
+                        sizes="88vw"
                         priority={coverIndex < 2}
                       />
                       <span
@@ -1170,34 +1207,41 @@ function DigestRail({
       <p className="border-b border-black pb-2 text-[11px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
         The latest
       </p>
-      <ul>
+      <ul className="flex flex-col gap-1 pt-2">
         {stories.map((story, storyIndex) => {
           const current = story.id === currentId;
           return (
-            <li key={story.id} className="border-b border-black/12">
+            <li key={story.id}>
               <button
                 ref={current ? activeRef : undefined}
                 type="button"
                 onClick={() => onJump(story.id)}
                 aria-current={current ? "true" : undefined}
-                className={`group w-full border-l-2 py-3 text-left transition-colors ${
+                className={`group flex w-full cursor-pointer items-start gap-2 rounded-[var(--brand-radius-control,8px)] border px-3 py-3 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#DF0A14] ${
                   current
-                    ? "border-[#DF0A14] bg-[#F0EAE1] pl-3 pr-1"
-                    : "border-transparent pl-3 pr-1 hover:bg-[#F0EAE1]/hover:border-black/20"
+                    ? "border-black/15 bg-[#F0EAE1]"
+                    : "border-transparent hover:border-black/10 hover:bg-[#F0EAE1]"
                 }`}
               >
-                <span
-                  className={`block text-[11px] font-bold tracking-[0.12em] uppercase ${current ? "text-[#DF0A14]" : "text-[#DF0A14]/group-hover:text-[#DF0A14]"}`}
-                  style={uiBold}
-                >
-                  {number(storyIndex)} · {story.chip}
+                <span className="mt-0.5 shrink-0 text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
+                  {number(storyIndex)}
                 </span>
-                <span
-                  className={`mt-1.5 block text-[15px] leading-6 ${current ? "text-black" : "text-black/65 group-hover:text-black"}`}
-                  style={current ? romanBold : roman}
-                >
-                  {story.displayTitle}
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
+                    {story.chip}
+                  </span>
+                  <span
+                    className={`mt-1.5 block text-[15px] leading-6 ${current ? "text-black" : "text-black/70 group-hover:text-black"}`}
+                    style={current ? romanBold : roman}
+                  >
+                    {story.displayTitle}
+                  </span>
                 </span>
+                <BrandIcon
+                  name="chevronRight"
+                  defaultIcon={ChevronRight}
+                  className={`mt-1 h-4 w-4 shrink-0 transition-opacity ${current ? "opacity-100 text-[#DF0A14]" : "opacity-40 group-hover:opacity-70"}`}
+                />
               </button>
             </li>
           );
