@@ -20,49 +20,6 @@ const uiBold: CSSProperties = { fontFamily: UI, fontWeight: 700 };
 const pagePad = "px-4 sm:px-8 lg:px-8 xl:px-12 min-[1440px]:px-20 2xl:px-[177px]";
 const iconButton = "brand-icon-button inline-flex h-12 w-12 items-center justify-center rounded-full focus:outline-none focus-visible:ring-2";
 
-/** Hand-sketched circle highlight in Week red (header only). */
-function MarkerHighlight({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return (
-    <span className={`relative inline-block px-[0.2em] py-[0.08em] ${className}`}>
-      <svg
-        aria-hidden
-        className="pointer-events-none absolute -inset-x-[0.15em] -inset-y-[0.18em] h-[calc(100%+0.36em)] w-[calc(100%+0.3em)] overflow-visible"
-        viewBox="0 0 200 60"
-        preserveAspectRatio="none"
-      >
-        {/* Double irregular oval — pen circling the phrase */}
-        <path
-          d="M18 30
-             C 20 8, 55 4, 100 5
-             C 150 6, 182 12, 184 30
-             C 186 48, 150 55, 100 54
-             C 50 53, 16 48, 18 30
-             Z"
-          fill="none"
-          stroke="#DF0A14"
-          strokeWidth="2.4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          opacity="0.95"
-        />
-        <path
-          d="M22 28
-             C 26 10, 60 7, 102 8
-             C 148 9, 178 14, 180 31
-             C 182 46, 148 52, 98 51
-             C 52 50, 20 44, 22 28"
-          fill="none"
-          stroke="#DF0A14"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-          opacity="0.75"
-        />
-      </svg>
-      <span className="relative z-[1]">{children}</span>
-    </span>
-  );
-}
-
 /** The Week primary CTA — red fill, Arial bold uppercase (not shop PrimaryButton). */
 const weekCta =
   "inline-flex w-fit items-center justify-center gap-2 rounded-lg bg-[#DF0A14] px-4 py-3 text-xs font-bold tracking-[0.05em] text-[#FAFAFA] uppercase transition-colors duration-200 hover:bg-[#B20810] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#DF0A14]";
@@ -1297,7 +1254,7 @@ function BriefingDigest({ briefing }: { briefing: string }) {
         The Week
       </p>
       <h1 className="mt-2 text-[2.5rem] leading-none text-[var(--brand-text-primary,#0f172b)] sm:text-[3.15rem]" style={roman}>
-        <MarkerHighlight>{briefing}</MarkerHighlight>
+        {briefing}
       </h1>
       <p className="brand-muted-copy mt-2 text-[13px] leading-5" style={ui}>
         {today}
