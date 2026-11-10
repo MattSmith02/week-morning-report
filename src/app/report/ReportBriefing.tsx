@@ -19,6 +19,35 @@ const uiBold: CSSProperties = { fontFamily: UI, fontWeight: 700 };
 
 const pagePad = "px-4 sm:px-8 lg:px-8 xl:px-12 min-[1440px]:px-20 2xl:px-[177px]";
 const iconButton = "brand-icon-button inline-flex h-12 w-12 items-center justify-center rounded-full focus:outline-none focus-visible:ring-2";
+
+/** Week-red rising sun mark for Morning Report. */
+function RisingSunMark({ className = "h-4 w-4" }: { className?: string }) {
+  return (
+    <svg
+      className={`inline-block shrink-0 text-[#DF0A14] ${className}`}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+    >
+      <path
+        d="M4 16.5h16"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+      />
+      <path
+        d="M12 15.25c-2.9 0-5.25-1.95-5.25-4.35 0-.2.02-.4.05-.6C7.45 7.7 9.5 6.1 12 6.1s4.55 1.6 5.2 4.2c.03.2.05.4.05.6 0 2.4-2.35 4.35-5.25 4.35Z"
+        fill="currentColor"
+      />
+      <path
+        d="M12 3.5v1.6M5.4 7.1l1.15 1.15M18.6 7.1l-1.15 1.15M3.75 12.25H5.4M20.25 12.25H18.6"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
 /** The Week primary CTA — red fill, Arial bold uppercase (not shop PrimaryButton). */
 const weekCta =
   "inline-flex w-fit items-center justify-center gap-2 rounded-lg bg-[#DF0A14] px-4 py-3 text-xs font-bold tracking-[0.05em] text-[#FAFAFA] uppercase transition-colors duration-200 hover:bg-[#B20810] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#DF0A14]";
@@ -1252,8 +1281,9 @@ function BriefingDigest({ briefing }: { briefing: string }) {
       <p className="brand-label-copy text-[11px] tracking-[0.22em] text-[#DF0A14]" style={romanBold}>
         The Week
       </p>
-      <h1 className="mt-2 text-[2.5rem] leading-none text-[var(--brand-text-primary,#0f172b)] sm:text-[3.15rem]" style={roman}>
-        {briefing}
+      <h1 className="mt-2 inline-flex items-center gap-3 text-[2.5rem] leading-none text-[var(--brand-text-primary,#0f172b)] sm:text-[3.15rem]" style={roman}>
+        <RisingSunMark className="h-8 w-8 sm:h-10 sm:w-10" />
+        <span>{briefing}</span>
       </h1>
       <p className="brand-muted-copy mt-2 text-[13px] leading-5" style={ui}>
         {today}
@@ -2104,10 +2134,11 @@ export function ReportBriefing({
       {digest ? null : <WeekSiteHeader />}
       <div className="sticky top-0 z-40 bg-[var(--report-beige,#F4F0EA)]">
         <div className={`flex h-12 items-center gap-3 border-b border-[var(--brand-border-default,#e2e8f0)] bg-[var(--report-beige,#F4F0EA)] ${pagePad}`}>
-          <p className="min-w-0 flex-1 truncate text-sm text-black" style={romanBold}>
-            <span>The Week · {briefing} · </span>
+          <p className="flex min-w-0 flex-1 items-center gap-1.5 truncate text-sm text-black" style={romanBold}>
+            <span className="truncate">The Week · {briefing}</span>
+            <RisingSunMark className="h-3.5 w-3.5" />
             <span className="tabular-nums" aria-label={`Story ${number(index)} of ${total}`}>
-              {number(index)}/{total}
+              · {number(index)}/{total}
             </span>
           </p>
           <div className="flex items-center gap-3 text-[11px] font-bold tracking-[0.1em] uppercase" style={uiBold}>
