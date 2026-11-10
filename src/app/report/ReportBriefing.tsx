@@ -499,7 +499,7 @@ function DigestPapers({ story }: { story: WeekStory }) {
 
       <ul
         ref={scrollerRef}
-        className="mt-6 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 lg:gap-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className={`mt-6 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3 lg:gap-4 ${brandScrollbar}`}
       >
         {covers.map((cover, coverIndex) => (
           <li key={`${cover.label}-${coverIndex}`} className="w-[88%] shrink-0 snap-start sm:w-[78%] lg:w-[72%]">
@@ -838,6 +838,7 @@ function ImagelessCover({
   );
 }
 
+/** Desktop go-to wide bars: full-bleed light/dark cream bands. */
 const DIGEST_STORY_PLATES = [
   "bg-[#F4F0EA]",
   "bg-[#E8E2D8]",
@@ -847,8 +848,9 @@ const DIGEST_STORY_PLATES = [
   "bg-[#E8E2D8]",
 ] as const;
 
-const digestBleed = "relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2";
+const digestBleed = "digest-wide-bar relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2";
 const digestRead = "mx-auto w-full max-w-[42rem] px-4 sm:px-8";
+const brandScrollbar = "brand-scrollbar";
 
 function digestPlate(index: number) {
   return DIGEST_STORY_PLATES[index % DIGEST_STORY_PLATES.length];
@@ -1255,7 +1257,7 @@ function Recirculation() {
         <ul
           ref={scrollerRef}
           onScroll={syncEdges}
-          className="flex snap-x snap-mandatory gap-[29px] overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className={`flex snap-x snap-mandatory gap-[29px] overflow-x-auto pb-3 ${brandScrollbar}`}
         >
           {ARCHIVE_CARDS.map((card) => (
             <li key={card.id} className="w-[78%] shrink-0 snap-start sm:w-[calc((100%-29px)/2.15)] lg:w-[calc((100%-87px)/4.15)] xl:w-[calc((100%-116px)/5.15)]">
@@ -1385,7 +1387,7 @@ function BriefingSources({ periods }: { periods: SourcePeriod[] }) {
           <div className="h-px min-w-8 flex-1 bg-black/12" />
         </div>
       </div>
-      <ul className="report-cards mt-4 flex gap-3 overflow-x-auto px-4 pb-1 sm:px-8">
+      <ul className={`report-cards mt-4 flex gap-3 overflow-x-auto px-4 pb-3 sm:px-8 ${brandScrollbar}`}>
         {period.uses.map((source) => (
           <li
             key={source.name}
@@ -1686,7 +1688,7 @@ export function ReportBriefing({
           </button>
         </div>
       </div>
-      <ol className="min-h-0 flex-1 overflow-y-auto">
+      <ol className={`min-h-0 flex-1 overflow-y-auto ${brandScrollbar}`}>
         {stories.map((story, storyIndex) => {
           const current = storyIndex === index;
           return (
@@ -1785,8 +1787,58 @@ export function ReportBriefing({
         }
         .report-feed { container-type: size; }
         .report-paper { height: 100cqh; }
-        .report-feed, .report-article, .report-end, .report-cards { scrollbar-width: none; }
-        .report-feed::-webkit-scrollbar, .report-article::-webkit-scrollbar, .report-end::-webkit-scrollbar, .report-cards::-webkit-scrollbar { display: none; }
+        .report-feed, .report-article, .report-end { scrollbar-width: none; }
+        .report-feed::-webkit-scrollbar, .report-article::-webkit-scrollbar, .report-end::-webkit-scrollbar { display: none; }
+
+        /* Week brand scrollbars — cream track, Week red thumb */
+        html:has(.report-digest),
+        html:has(.report-digest) body {
+          scrollbar-width: thin;
+          scrollbar-color: #DF0A14 #E8E2D8;
+        }
+        html:has(.report-digest)::-webkit-scrollbar,
+        html:has(.report-digest) body::-webkit-scrollbar,
+        .report-digest::-webkit-scrollbar,
+        .brand-scrollbar::-webkit-scrollbar {
+          -webkit-appearance: none;
+          width: 11px;
+          height: 11px;
+          background: #E8E2D8;
+        }
+        html:has(.report-digest)::-webkit-scrollbar-track,
+        html:has(.report-digest) body::-webkit-scrollbar-track,
+        .report-digest::-webkit-scrollbar-track,
+        .brand-scrollbar::-webkit-scrollbar-track {
+          background: #E8E2D8;
+        }
+        html:has(.report-digest)::-webkit-scrollbar-thumb,
+        html:has(.report-digest) body::-webkit-scrollbar-thumb,
+        .report-digest::-webkit-scrollbar-thumb,
+        .brand-scrollbar::-webkit-scrollbar-thumb {
+          background: #DF0A14;
+          border: 2px solid #E8E2D8;
+          border-radius: 0;
+          min-height: 40px;
+        }
+        html:has(.report-digest)::-webkit-scrollbar-thumb:hover,
+        html:has(.report-digest) body::-webkit-scrollbar-thumb:hover,
+        .report-digest::-webkit-scrollbar-thumb:hover,
+        .brand-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #B20810;
+        }
+        html:has(.report-digest)::-webkit-scrollbar-corner,
+        html:has(.report-digest) body::-webkit-scrollbar-corner,
+        .report-digest::-webkit-scrollbar-corner,
+        .brand-scrollbar::-webkit-scrollbar-corner {
+          background: #E8E2D8;
+        }
+        .brand-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: #DF0A14 #E8E2D8;
+        }
+        .digest-wide-bar {
+          box-shadow: none;
+        }
       `}</style>
       <div className={`report-page relative flex h-dvh flex-col ${digest ? "hidden" : "md:hidden"}`}>
         <WeekSiteHeader />
@@ -1951,7 +2003,7 @@ export function ReportBriefing({
           </>
         ) : null}
       </div>
-      <div className={`report-page ${digest ? "block" : "hidden md:block"}`}>
+      <div className={`report-page ${digest ? "report-digest block" : "hidden md:block"}`}>
       {digest ? null : <WeekSiteHeader />}
       <div className="sticky top-0 z-40 bg-[#F4F0EA]">
         <div className={`flex h-12 items-center gap-3 border-b border-black/15 bg-[#F4F0EA] ${pagePad}`}>
@@ -2021,7 +2073,7 @@ export function ReportBriefing({
       {digest && open ? (
         <>
           <button type="button" aria-label="Close story list" className="fixed inset-0 z-40 cursor-default bg-black/20" onClick={() => setOpen(false)} />
-          <div className="fixed inset-x-0 bottom-0 z-50 max-h-[70dvh] overflow-auto border-t border-black/10 bg-[#F4F0EA] px-4 py-4 sm:inset-x-auto sm:right-4 sm:bottom-auto sm:top-14 sm:max-h-[min(70dvh,640px)] sm:w-[min(360px,calc(100vw-2rem))] sm:border sm:border-black/10 sm:shadow-[0_18px_40px_rgba(10,10,10,0.12)]">
+          <div className={`fixed inset-x-0 bottom-0 z-50 max-h-[70dvh] overflow-auto border-t border-black/10 bg-[#F4F0EA] px-4 py-4 sm:inset-x-auto sm:right-4 sm:bottom-auto sm:top-14 sm:max-h-[min(70dvh,640px)] sm:w-[min(360px,calc(100vw-2rem))] sm:border sm:border-black/10 sm:shadow-[0_18px_40px_rgba(10,10,10,0.12)] ${brandScrollbar}`}>
             <DigestRail
               stories={stories}
               onJump={(id) => {
@@ -2036,10 +2088,12 @@ export function ReportBriefing({
 
       {digest ? (
         <div className="w-full overflow-x-clip bg-[#F4F0EA]">
-          <div className={digestRead}>
-            <BriefingDigest briefing={briefing} />
-            <div className="border-t border-black/12 py-8">
-              <InsideEdition stories={stories} onJump={jump} />
+          <div className={`${digestBleed} bg-[#F4F0EA]`}>
+            <div className={digestRead}>
+              <BriefingDigest briefing={briefing} />
+              <div className="border-t border-black/12 py-8">
+                <InsideEdition stories={stories} onJump={jump} />
+              </div>
             </div>
           </div>
           {stories.map((story, storyIndex) => (
@@ -2061,8 +2115,8 @@ export function ReportBriefing({
       )}
 
       <BriefingSources periods={periods} />
-      <section className="flex min-h-[40vh] items-center justify-center bg-[#F4F0EA] px-4 py-20">
-        <div className={readColumn}>
+      <section className={`${digest ? digestBleed : ""} flex min-h-[40vh] items-center justify-center bg-[#E8E2D8] px-4 py-20`}>
+        <div className={digest ? digestRead : readColumn}>
           <p className="text-[12px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
             {briefing}
           </p>
