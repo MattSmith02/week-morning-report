@@ -839,24 +839,10 @@ function ImagelessCover({
   );
 }
 
-/** Article + sidebar cream plates — light/dark pair is the desktop wide-bar look. */
-const DIGEST_STORY_PLATES = [
-  "bg-[#F4F0EA]",
-  "bg-[#E8E2D8]",
-  "bg-[#F4F0EA]",
-  "bg-[#E8E2D8]",
-  "bg-[#F4F0EA]",
-  "bg-[#E8E2D8]",
-] as const;
-
-const DIGEST_WIDE_BAR_LIGHT = "digest-wide-bar bg-[#F4F0EA]";
-const DIGEST_WIDE_BAR_DARK = "digest-wide-bar bg-[#E8E2D8]";
+const DIGEST_GROUND = "bg-[#F4F0EA]";
+const DIGEST_WIDE_BAR = "digest-wide-bar bg-[#F4F0EA]";
 const digestTextPad = "px-4 sm:px-5";
 const brandScrollbar = "brand-scrollbar";
-
-function digestPlate(index: number) {
-  return DIGEST_STORY_PLATES[index % DIGEST_STORY_PLATES.length];
-}
 
 function CompactStoryHeader({
   story,
@@ -1792,11 +1778,11 @@ export function ReportBriefing({
         .report-feed, .report-article, .report-end { scrollbar-width: none; }
         .report-feed::-webkit-scrollbar, .report-article::-webkit-scrollbar, .report-end::-webkit-scrollbar { display: none; }
 
-        /* Week brand scrollbars — cream track, Week red thumb */
+        /* Cream track, black thumb */
         html:has(.report-digest),
         html:has(.report-digest) body {
           scrollbar-width: thin;
-          scrollbar-color: #DF0A14 #E8E2D8;
+          scrollbar-color: #0A0A0A #F4F0EA;
         }
         html:has(.report-digest)::-webkit-scrollbar,
         html:has(.report-digest) body::-webkit-scrollbar,
@@ -1805,20 +1791,20 @@ export function ReportBriefing({
           -webkit-appearance: none;
           width: 11px;
           height: 11px;
-          background: #E8E2D8;
+          background: #F4F0EA;
         }
         html:has(.report-digest)::-webkit-scrollbar-track,
         html:has(.report-digest) body::-webkit-scrollbar-track,
         .report-digest::-webkit-scrollbar-track,
         .brand-scrollbar::-webkit-scrollbar-track {
-          background: #E8E2D8;
+          background: #F4F0EA;
         }
         html:has(.report-digest)::-webkit-scrollbar-thumb,
         html:has(.report-digest) body::-webkit-scrollbar-thumb,
         .report-digest::-webkit-scrollbar-thumb,
         .brand-scrollbar::-webkit-scrollbar-thumb {
-          background: #DF0A14;
-          border: 2px solid #E8E2D8;
+          background: #0A0A0A;
+          border: 2px solid #F4F0EA;
           border-radius: 0;
           min-height: 40px;
         }
@@ -1826,17 +1812,17 @@ export function ReportBriefing({
         html:has(.report-digest) body::-webkit-scrollbar-thumb:hover,
         .report-digest::-webkit-scrollbar-thumb:hover,
         .brand-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #B20810;
+          background: #000;
         }
         html:has(.report-digest)::-webkit-scrollbar-corner,
         html:has(.report-digest) body::-webkit-scrollbar-corner,
         .report-digest::-webkit-scrollbar-corner,
         .brand-scrollbar::-webkit-scrollbar-corner {
-          background: #E8E2D8;
+          background: #F4F0EA;
         }
         .brand-scrollbar {
           scrollbar-width: thin;
-          scrollbar-color: #DF0A14 #E8E2D8;
+          scrollbar-color: #0A0A0A #F4F0EA;
         }
         .digest-wide-bar {
           box-shadow: none;
@@ -2091,12 +2077,12 @@ export function ReportBriefing({
       {digest ? (
         <div className="w-full bg-[#F4F0EA]">
           <div className="mx-auto grid max-w-[1400px] lg:grid-cols-12 lg:items-stretch">
-            <aside className={`hidden min-h-0 lg:col-span-3 lg:block ${DIGEST_WIDE_BAR_LIGHT}`}>
-              <div className={`sticky top-12 z-20 max-h-[calc(100svh-3rem)] overflow-y-auto overscroll-contain border-r border-black/12 py-8 pr-6 pl-6 xl:pl-10 ${DIGEST_WIDE_BAR_LIGHT} ${brandScrollbar}`}>
+            <aside className={`hidden min-h-0 lg:col-span-3 lg:block ${DIGEST_WIDE_BAR}`}>
+              <div className={`sticky top-12 z-20 max-h-[calc(100svh-3rem)] overflow-y-auto overscroll-contain border-r border-black/12 py-8 pr-6 pl-6 xl:pl-10 ${DIGEST_WIDE_BAR} ${brandScrollbar}`}>
                 <InsideEdition stories={stories} onJump={jump} />
               </div>
             </aside>
-            <div className="min-w-0 bg-[#F4F0EA] lg:col-span-6">
+            <div className={`min-w-0 lg:col-span-6 ${DIGEST_GROUND}`}>
               <div className={digestTextPad}>
                 <BriefingDigest briefing={briefing} />
               </div>
@@ -2104,7 +2090,7 @@ export function ReportBriefing({
                 <InsideEdition stories={stories} onJump={jump} />
               </div>
               {stories.map((story, storyIndex) => (
-                <article key={story.id} className={`${digestPlate(storyIndex)} border-b border-black/10`}>
+                <article key={story.id} className={`${DIGEST_GROUND} border-b border-black/10`}>
                   <StoryCover story={story} index={storyIndex} edition={storyIndex === 0} locked={locked && storyIndex > 0} layout={layout} />
                   <div className={digestTextPad}>
                     <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" layout={layout} />
@@ -2112,8 +2098,8 @@ export function ReportBriefing({
                 </article>
               ))}
             </div>
-            <aside className={`hidden min-h-0 lg:col-span-3 lg:block ${DIGEST_WIDE_BAR_DARK}`}>
-              <div className={`sticky top-12 z-20 max-h-[calc(100svh-3rem)] overflow-y-auto overscroll-contain border-l border-black/12 py-8 pr-6 pl-6 xl:pr-10 ${DIGEST_WIDE_BAR_DARK} ${brandScrollbar}`}>
+            <aside className={`hidden min-h-0 lg:col-span-3 lg:block ${DIGEST_WIDE_BAR}`}>
+              <div className={`sticky top-12 z-20 max-h-[calc(100svh-3rem)] overflow-y-auto overscroll-contain border-l border-black/12 py-8 pr-6 pl-6 xl:pr-10 ${DIGEST_WIDE_BAR} ${brandScrollbar}`}>
                 <DigestRail stories={stories} onJump={jump} currentId={stories[index]?.id} />
               </div>
             </aside>
@@ -2129,7 +2115,7 @@ export function ReportBriefing({
       )}
 
       <BriefingSources periods={periods} />
-      <section className="flex min-h-[40vh] items-center justify-center bg-[#E8E2D8] px-4 py-20">
+      <section className="flex min-h-[40vh] items-center justify-center bg-[#F4F0EA] px-4 py-20">
         <div className={readColumn}>
           <p className="text-[12px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
             {briefing}
