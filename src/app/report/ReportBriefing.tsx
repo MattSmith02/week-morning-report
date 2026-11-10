@@ -3,6 +3,7 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { ChevronDown, ChevronLeft, ChevronRight, Lock, Play, X } from "lucide-react";
 import Chip from "@/components/atoms/Chip/Chip";
+import { BrandScrollArrow } from "@/components/atoms/BrandScrollArrow/BrandScrollArrow";
 import { BrandIcon } from "@/components/atoms/icons/BrandIcon";
 import Image from "next/image";
 import Link from "next/link";
@@ -502,53 +503,12 @@ function DigestPapers({ story }: { story: WeekStory }) {
             Front pages
           </h3>
         </div>
-        <div className="flex items-center gap-2 lg:hidden">
-          <p className="brand-muted-copy text-[12px] tabular-nums" style={ui}>
-            {number(active)} / {number(Math.max(covers.length - 1, 0))}
-          </p>
-          <button
-            type="button"
-            aria-label="Previous front page"
-            disabled={active <= 0}
-            onClick={() => go(active - 1)}
-            className="brand-icon-button brand-scroll-arrow inline-flex h-9 w-9 items-center justify-center disabled:pointer-events-none disabled:opacity-30"
-          >
-            <BrandIcon name="chevronLeft" defaultIcon={ChevronLeft} className="h-5 w-5" />
-          </button>
-          <button
-            type="button"
-            aria-label="Next front page"
-            disabled={active >= covers.length - 1}
-            onClick={() => go(active + 1)}
-            className="brand-icon-button brand-scroll-arrow inline-flex h-9 w-9 items-center justify-center disabled:pointer-events-none disabled:opacity-30"
-          >
-            <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-5 w-5" />
-          </button>
-        </div>
-        <p className="brand-muted-copy hidden text-[12px] tabular-nums lg:block" style={ui}>
+        <p className="brand-muted-copy text-[12px] tabular-nums" style={ui}>
           {number(active)} / {number(Math.max(covers.length - 1, 0))}
         </p>
       </div>
 
       <div className="relative mt-6">
-        <button
-          type="button"
-          aria-label="Previous front page"
-          disabled={active <= 0}
-          onClick={() => go(active - 1)}
-          className="brand-icon-button brand-scroll-arrow absolute top-[28%] left-0 z-10 hidden -translate-y-1/2 lg:inline-flex disabled:pointer-events-none disabled:opacity-30"
-        >
-          <BrandIcon name="chevronLeft" defaultIcon={ChevronLeft} className="h-6 w-6" />
-        </button>
-        <button
-          type="button"
-          aria-label="Next front page"
-          disabled={active >= covers.length - 1}
-          onClick={() => go(active + 1)}
-          className="brand-icon-button brand-scroll-arrow absolute top-[28%] right-0 z-10 hidden -translate-y-1/2 lg:inline-flex disabled:pointer-events-none disabled:opacity-30"
-        >
-          <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-6 w-6" />
-        </button>
         <ul
           ref={scrollerRef}
           className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 [scrollbar-width:none] lg:gap-6 lg:px-[12%] [&::-webkit-scrollbar]:hidden"
@@ -610,6 +570,26 @@ function DigestPapers({ story }: { story: WeekStory }) {
             );
           })}
         </ul>
+
+        {/* Overlay matches centered cover image size; chevrons vertically centered on that frame */}
+        <div className="pointer-events-none absolute top-0 left-1/2 z-10 aspect-[3/4] w-[88%] -translate-x-1/2 sm:w-[78%] lg:w-[56%]">
+          <div className="pointer-events-auto absolute inset-y-0 left-1 flex items-center sm:left-2">
+            <BrandScrollArrow
+              direction="left"
+              label="Previous front page"
+              disabled={active <= 0}
+              onClick={() => go(active - 1)}
+            />
+          </div>
+          <div className="pointer-events-auto absolute inset-y-0 right-1 flex items-center sm:right-2">
+            <BrandScrollArrow
+              direction="right"
+              label="Next front page"
+              disabled={active >= covers.length - 1}
+              onClick={() => go(active + 1)}
+            />
+          </div>
+        </div>
       </div>
 
       <div className="mt-4 flex items-center justify-center gap-1.5">
@@ -1825,18 +1805,6 @@ export function ReportBriefing({
         .report-page .brand-icon-button:focus {
           background-color: #F0EAE1;
           color: #DF0A14;
-        }
-        .report-page .brand-scroll-arrow {
-          border-radius: var(--brand-radius-control, 8px);
-          border: 1px solid rgb(10 10 10 / 0.15);
-          background-color: rgb(255 255 255 / 0.92);
-          color: #0A0A0A;
-          backdrop-filter: blur(2px);
-        }
-        .report-page .brand-scroll-arrow:hover {
-          background-color: #F0EAE1;
-          color: #0A0A0A;
-          border-color: #0A0A0A;
         }
         .report-page .brand-scroll-arrow--hero {
           border-radius: 9999px;
