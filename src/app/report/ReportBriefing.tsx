@@ -2120,10 +2120,11 @@ export function ReportBriefing({
       {digest ? null : <WeekSiteHeader />}
       <div className="sticky top-0 z-40 bg-[var(--report-beige,#F4F0EA)]">
         <div className={`flex h-12 items-center gap-3 border-b border-[var(--brand-border-default,#e2e8f0)] bg-[var(--report-beige,#F4F0EA)] ${pagePad}`}>
-          <p className="min-w-0 flex-1 truncate text-sm text-black" style={romanBold}>
-            <span>The Week · {briefing} · </span>
+          <p className="flex min-w-0 flex-1 items-center gap-1.5 truncate text-sm text-black" style={romanBold}>
+            <span className="truncate">The Week · {briefing}</span>
+            <RisingSunMark className="h-4 w-4" />
             <span className="tabular-nums" aria-label={`Story ${number(index)} of ${total}`}>
-              {number(index)}/{total}
+              · {number(index)}/{total}
             </span>
           </p>
           <div className="flex items-center gap-3 text-[11px] font-bold tracking-[0.1em] uppercase" style={uiBold}>
@@ -2175,7 +2176,6 @@ export function ReportBriefing({
               <BrandIcon name="chevronDown" defaultIcon={ChevronDown} className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
             </button>
           )}
-          <RisingSunMark className="h-6 w-6" />
         </div>
         {digest ? (
           <div
