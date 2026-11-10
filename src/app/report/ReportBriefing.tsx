@@ -297,10 +297,10 @@ function StoryReading({
   const rest = part !== "hook";
   const framed = part !== "rest";
   const digest = layout === "digest";
-  const readWidth = digest ? "relative flex w-full flex-col gap-10 sm:gap-12" : "relative flex max-w-[65ch] flex-col gap-10 sm:gap-12";
+  const readWidth = digest ? "relative flex w-full flex-col gap-8" : "relative flex max-w-[65ch] flex-col gap-10 sm:gap-12";
 
   return (
-    <div className={framed ? "relative py-8 sm:py-10" : ""}>
+    <div className={framed ? `relative ${digest ? "py-8" : "py-8 sm:py-10"}` : ""}>
       <div className={framed ? readWidth : "flex flex-col gap-6"}>
         {hook && story.format !== "quote" && story.whatHappened ? (
           <section>
@@ -352,12 +352,12 @@ function StoryReading({
             </section>
           ) : null}
           {story.whoSaidWhat ? (
-            <section className={`border-t pt-10 ${hairline}`}>
+            <section className={`border-t ${digest ? "pt-8" : "pt-10"} ${hairline}`}>
               <div>
-                <h3 className="text-[2rem] leading-10 text-black" style={roman}>
+                <h3 className={`${digest ? "text-[1.65rem] leading-9 sm:text-[1.85rem] sm:leading-10" : "text-[2rem] leading-10"} text-black`} style={roman}>
                   Who said what
                 </h3>
-                <div className="mt-2 h-[3px] w-16 bg-[#DF0A14]" />
+                <div className="mt-2 h-px w-12 bg-[#DF0A14]" />
               </div>
               <p className="mt-6 text-base leading-6 text-black/70" style={roman}>
                 {story.whoSaidWhat}
@@ -365,12 +365,12 @@ function StoryReading({
             </section>
           ) : null}
           {story.whatsNext ? (
-            <section className={`border-t pt-10 ${hairline}`}>
+            <section className={`border-t ${digest ? "pt-8" : "pt-10"} ${hairline}`}>
               <div>
-                <h3 className="text-[2rem] leading-10 text-black" style={roman}>
+                <h3 className={`${digest ? "text-[1.65rem] leading-9 sm:text-[1.85rem] sm:leading-10" : "text-[2rem] leading-10"} text-black`} style={roman}>
                   What’s next?
                 </h3>
-                <div className="mt-2 h-[3px] w-16 bg-[#DF0A14]" />
+                <div className="mt-2 h-px w-12 bg-[#DF0A14]" />
               </div>
               <p className="mt-6 text-base leading-6 text-black/70" style={roman}>
                 {story.whatsNext}
@@ -1089,6 +1089,12 @@ function DigestRail({
   onJump: (id: string) => void;
   currentId?: string;
 }) {
+  const activeRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    activeRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [currentId]);
+
   return (
     <nav aria-label="The latest">
       <p className="border-b border-black pb-2 text-[11px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
@@ -1100,25 +1106,28 @@ function DigestRail({
           return (
             <li key={story.id} className="border-b border-black/12">
               <button
+                ref={current ? activeRef : undefined}
                 type="button"
                 onClick={() => onJump(story.id)}
                 aria-current={current ? "true" : undefined}
-                className="group w-full py-3.5 text-left"
+                className={`group w-full border-l-2 py-3 text-left transition-colors ${
+                  current
+                    ? "border-[#DF0A14] bg-[#F0EAE1] pl-3 pr-1"
+                    : "border-transparent pl-3 pr-1 hover:bg-[#F0EAE1]/hover:border-black/20"
+                }`}
               >
-                <span className="block text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
+                <span
+                  className={`block text-[11px] font-bold tracking-[0.12em] uppercase ${current ? "text-[#DF0A14]" : "text-[#DF0A14]/group-hover:text-[#DF0A14]"}`}
+                  style={uiBold}
+                >
                   {number(storyIndex)} · {story.chip}
                 </span>
                 <span
-                  className={`mt-1.5 block text-[15px] leading-6 ${current ? "text-black" : "text-black/70 group-hover:text-black"}`}
+                  className={`mt-1.5 block text-[15px] leading-6 ${current ? "text-black" : "text-black/65 group-hover:text-black"}`}
                   style={current ? romanBold : roman}
                 >
                   {story.displayTitle}
                 </span>
-                {story.dek && story.dek !== story.displayTitle && storyIndex >= 8 ? (
-                  <span className="mt-1 line-clamp-1 block text-[13px] leading-5 text-black/50" style={roman}>
-                    {story.dek}
-                  </span>
-                ) : null}
               </button>
             </li>
           );
@@ -1132,7 +1141,7 @@ function BriefingDigest({ briefing }: { briefing: string }) {
   const today = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date());
 
   return (
-    <header className="border-b border-black/20 bg-transparent pb-10 pt-8">
+    <header className="border-b border-black/15 bg-transparent py-8">
       <p className="text-[11px] font-bold tracking-[0.22em] text-[#DF0A14] uppercase" style={romanBold}>
         The Week
       </p>
@@ -1534,20 +1543,23 @@ export function ReportBriefing({
 
   useEffect(() => {
     const onScroll = () => {
-      if (window.matchMedia("(max-width: 767px)").matches) return;
-      const line = window.innerHeight * 0.4;
+      if (!digest && window.matchMedia("(max-width: 767px)").matches) return;
+      const line = window.innerHeight * 0.28;
       let current = 0;
-      document.querySelectorAll<HTMLElement>("[data-story]").forEach((section, storyIndex) => {
-        if (section.getClientRects().length === 0) return;
-        if (section.getBoundingClientRect().top < line) current = storyIndex;
+      const nodes = digest
+        ? [...document.querySelectorAll<HTMLElement>("[data-story-article]")].filter((el) => el.getClientRects().length > 0)
+        : [...document.querySelectorAll<HTMLElement>("[data-story]")].filter((el) => el.getClientRects().length > 0 && el.id);
+      nodes.forEach((section, storyIndex) => {
+        if (section.getBoundingClientRect().top <= line) current = storyIndex;
       });
+      if (current === indexRef.current) return;
       indexRef.current = current;
       setIndex(current);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [digest, stories]);
 
   useEffect(() => {
     const rail = railRef.current;
@@ -2077,8 +2089,8 @@ export function ReportBriefing({
       {digest ? (
         <div className="w-full bg-[#F4F0EA]">
           <div className="mx-auto grid max-w-[1400px] lg:grid-cols-12 lg:items-stretch">
-            <aside className={`hidden min-h-0 lg:col-span-3 lg:block ${DIGEST_WIDE_BAR}`}>
-              <div className={`sticky top-12 z-20 max-h-[calc(100svh-3rem)] overflow-y-auto overscroll-contain border-r border-black/12 py-8 pr-6 pl-6 xl:pl-10 ${DIGEST_WIDE_BAR} ${brandScrollbar}`}>
+            <aside className={`hidden min-h-0 border-r border-black/15 lg:col-span-3 lg:block ${DIGEST_WIDE_BAR}`}>
+              <div className={`py-8 pr-6 pl-6 xl:pl-10 ${DIGEST_WIDE_BAR}`}>
                 <InsideEdition stories={stories} onJump={jump} />
               </div>
             </aside>
@@ -2086,11 +2098,11 @@ export function ReportBriefing({
               <div className={digestTextPad}>
                 <BriefingDigest briefing={briefing} />
               </div>
-              <div className={`border-t border-black/12 py-8 lg:hidden ${digestTextPad}`}>
+              <div className={`border-t border-black/15 py-8 lg:hidden ${digestTextPad}`}>
                 <InsideEdition stories={stories} onJump={jump} />
               </div>
               {stories.map((story, storyIndex) => (
-                <article key={story.id} className={`${DIGEST_GROUND} border-b border-black/10`}>
+                <article key={story.id} data-story-article={story.id} className={`${DIGEST_GROUND} border-b border-black/10`}>
                   <StoryCover story={story} index={storyIndex} edition={storyIndex === 0} locked={locked && storyIndex > 0} layout={layout} />
                   <div className={digestTextPad}>
                     <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" layout={layout} />
@@ -2098,8 +2110,8 @@ export function ReportBriefing({
                 </article>
               ))}
             </div>
-            <aside className={`hidden min-h-0 lg:col-span-3 lg:block ${DIGEST_WIDE_BAR}`}>
-              <div className={`sticky top-12 z-20 max-h-[calc(100svh-3rem)] overflow-y-auto overscroll-contain border-l border-black/12 py-8 pr-6 pl-6 xl:pr-10 ${DIGEST_WIDE_BAR} ${brandScrollbar}`}>
+            <aside className={`hidden min-h-0 border-l border-black/15 lg:col-span-3 lg:block ${DIGEST_WIDE_BAR}`}>
+              <div className={`sticky top-12 z-20 max-h-[calc(100svh-3rem)] overflow-y-auto overscroll-contain py-8 pr-6 pl-6 xl:pr-10 ${DIGEST_WIDE_BAR} ${brandScrollbar}`}>
                 <DigestRail stories={stories} onJump={jump} currentId={stories[index]?.id} />
               </div>
             </aside>

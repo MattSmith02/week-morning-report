@@ -66,22 +66,6 @@ export default async function ReportPage({
 
   const edition = EDITIONS.find((item) => item.id === "morning");
   const sudoku = EDITIONS.find((item) => item.id === "evening")?.stories.find((story) => story.id === "sudoku");
-  const videoStory: WeekStory = {
-    id: "video-example",
-    chip: "Video",
-    format: "video",
-    kicker: "Video",
-    displayTitle: "The clip",
-    dek: "A short video story",
-    menuTitle: "A short video story",
-    imageGradient: "linear-gradient(160deg, #1a2330 0%, #3d4a5c 42%, #11161c 100%)",
-    imageCaption: "Example clip",
-    videoSrc: "/the-week/example-video.mp4",
-    whatHappened: "This story is a video. The picture above is the cover. Press play to watch the clip.",
-    statsHeading: "",
-    stats: [],
-    statsNote: "",
-  };
   const puzzleStory: WeekStory | null = sudoku
     ? {
         ...sudoku,
@@ -93,7 +77,9 @@ export default async function ReportPage({
     : null;
   const morning = edition?.stories ?? [];
   const week = EDITIONS.filter((item) => item.id !== "all").flatMap((item) => item.stories);
-  const stories = [...morning, videoStory, ...(puzzleStory ? [puzzleStory] : [])].map((story) => {
+  const stories = [...morning, ...(puzzleStory ? [puzzleStory] : [])]
+    .filter((story) => story.format !== "video")
+    .map((story) => {
     const stock = STOCK_COVERS[story.id];
     const base = {
       ...(stock ? { ...story, ...stock, imageFit: "cover" as const } : story),
