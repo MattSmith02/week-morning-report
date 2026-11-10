@@ -847,7 +847,8 @@ const DIGEST_STORY_PLATES = [
   "bg-[#E8E2D8]",
 ] as const;
 
-const DIGEST_COLUMN = "bg-[#E8E8E6]";
+const digestBleed = "relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2";
+const digestRead = "mx-auto w-full max-w-[42rem] px-4 sm:px-8";
 
 function digestPlate(index: number) {
   return DIGEST_STORY_PLATES[index % DIGEST_STORY_PLATES.length];
@@ -858,7 +859,7 @@ function CompactStoryHeader({
   index,
   locked = false,
   lead = false,
-  plateClass = "bg-[#F4F0EA]",
+  plateClass = "bg-transparent",
 }: {
   story: WeekStory;
   index: number;
@@ -868,45 +869,43 @@ function CompactStoryHeader({
 }) {
   const hasImage = Boolean(story.imageSrc);
   return (
-    <section id={story.id} data-story className={`relative scroll-mt-12 border-b border-black/15 ${plateClass}`}>
+    <section id={story.id} data-story className={`relative scroll-mt-12 ${plateClass}`}>
       {locked ? <CoverLock /> : null}
-      <div className="pt-0 pb-8 sm:py-10">
-        {hasImage ? (
-          <figure className="relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2 overflow-hidden bg-[#111] lg:left-0 lg:w-full lg:max-w-none lg:translate-x-0">
-            <div className={`relative w-full overflow-hidden ${lead ? "aspect-[16/10]" : "aspect-[16/10] sm:aspect-[16/9]"}`}>
-              <Image
-                src={story.imageSrc!}
-                alt=""
-                fill
-                priority={lead}
-                unoptimized={story.imageSrc!.startsWith("/") || story.imageSrc!.startsWith("http")}
-                className="object-cover object-center"
-                sizes="(max-width: 1023px) 100vw, 50vw"
-              />
-            </div>
-            {story.imageCaption ? (
-              <figcaption className="mt-2 px-4 text-[13px] leading-5 text-black/50 lg:px-0" style={ui}>
-                {story.imageCaption}
-              </figcaption>
-            ) : null}
-          </figure>
-        ) : null}
-        <div className={`px-4 lg:px-0 ${hasImage ? "mt-5" : "pt-8 sm:pt-0"}`}>
-          <p className="text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
-            {story.chip}
+      {hasImage ? (
+        <figure className="overflow-hidden bg-[#111]">
+          <div className={`relative w-full overflow-hidden ${lead ? "aspect-[16/10]" : "aspect-[16/10] sm:aspect-[16/9]"}`}>
+            <Image
+              src={story.imageSrc!}
+              alt=""
+              fill
+              priority={lead}
+              unoptimized={story.imageSrc!.startsWith("/") || story.imageSrc!.startsWith("http")}
+              className="object-cover object-center"
+              sizes="100vw"
+            />
+          </div>
+        </figure>
+      ) : null}
+      <div className={`${digestRead} ${hasImage ? "pt-5 pb-8 sm:pb-10" : "py-8 sm:py-10"}`}>
+        {hasImage && story.imageCaption ? (
+          <p className="mb-4 text-[13px] leading-5 text-black/50" style={ui}>
+            {story.imageCaption}
           </p>
-          <h2
-            className={`mt-2 max-w-[28ch] leading-[1.12] text-black ${lead ? "text-[2rem] sm:text-[2.6rem]" : "text-[1.7rem] sm:text-[2.05rem]"}`}
-            style={roman}
-          >
-            {story.displayTitle}
-          </h2>
-          {story.dek && story.dek !== story.displayTitle ? (
-            <p className="mt-3 max-w-[46ch] text-[1.05rem] leading-7 text-black/75" style={roman}>
-              {story.dek}
-            </p>
-          ) : null}
-        </div>
+        ) : null}
+        <p className="text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
+          {story.chip}
+        </p>
+        <h2
+          className={`mt-2 max-w-[28ch] leading-[1.12] text-black ${lead ? "text-[2rem] sm:text-[2.6rem]" : "text-[1.7rem] sm:text-[2.05rem]"}`}
+          style={roman}
+        >
+          {story.displayTitle}
+        </h2>
+        {story.dek && story.dek !== story.displayTitle ? (
+          <p className="mt-3 max-w-[46ch] text-[1.05rem] leading-7 text-black/75" style={roman}>
+            {story.dek}
+          </p>
+        ) : null}
       </div>
     </section>
   );
@@ -2009,7 +2008,7 @@ export function ReportBriefing({
               aria-expanded={open}
               aria-controls="story-index"
               onClick={() => setOpen((value) => !value)}
-              className="inline-flex h-10 items-center gap-1.5 px-1 text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase lg:hidden"
+              className="inline-flex h-10 items-center gap-1.5 px-1 text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase"
               style={uiBold}
             >
               Latest
@@ -2021,8 +2020,8 @@ export function ReportBriefing({
 
       {digest && open ? (
         <>
-          <button type="button" aria-label="Close story list" className="fixed inset-0 z-40 cursor-default bg-black/20 lg:hidden" onClick={() => setOpen(false)} />
-          <div className="fixed inset-x-0 bottom-0 z-50 max-h-[70dvh] overflow-auto border-t border-black/10 bg-[#F4F0EA] px-4 py-4 lg:hidden">
+          <button type="button" aria-label="Close story list" className="fixed inset-0 z-40 cursor-default bg-black/20" onClick={() => setOpen(false)} />
+          <div className="fixed inset-x-0 bottom-0 z-50 max-h-[70dvh] overflow-auto border-t border-black/10 bg-[#F4F0EA] px-4 py-4 sm:inset-x-auto sm:right-4 sm:bottom-auto sm:top-14 sm:max-h-[min(70dvh,640px)] sm:w-[min(360px,calc(100vw-2rem))] sm:border sm:border-black/10 sm:shadow-[0_18px_40px_rgba(10,10,10,0.12)]">
             <DigestRail
               stories={stories}
               onJump={(id) => {
@@ -2036,32 +2035,21 @@ export function ReportBriefing({
       ) : null}
 
       {digest ? (
-        <div className={`w-full ${DIGEST_COLUMN}`}>
-          <div className="mx-auto grid max-w-[1400px] lg:grid-cols-12 lg:items-stretch">
-            <aside className={`hidden min-h-0 lg:col-span-3 lg:block ${DIGEST_COLUMN}`}>
-              <div className={`sticky top-12 z-20 max-h-[calc(100svh-3rem)] overflow-y-auto overscroll-contain border-r border-black/12 py-8 pr-6 pl-6 xl:pl-10 ${DIGEST_COLUMN}`}>
-                <InsideEdition stories={stories} onJump={jump} />
-              </div>
-            </aside>
-            <div className="min-w-0 bg-[#F4F0EA] lg:col-span-6 lg:px-8">
-              <div className="px-4 lg:px-0">
-                <BriefingDigest briefing={briefing} />
-              </div>
-              {stories.map((story, storyIndex) => (
-                <article key={story.id} className={`${digestPlate(storyIndex)} border-b border-black/10`}>
-                  <StoryCover story={story} index={storyIndex} edition={storyIndex === 0} locked={locked && storyIndex > 0} layout={layout} />
-                  <div className="px-4 lg:px-0">
-                    <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" layout={layout} />
-                  </div>
-                </article>
-              ))}
+        <div className="w-full overflow-x-clip bg-[#F4F0EA]">
+          <div className={digestRead}>
+            <BriefingDigest briefing={briefing} />
+            <div className="border-t border-black/12 py-8">
+              <InsideEdition stories={stories} onJump={jump} />
             </div>
-            <aside className={`hidden min-h-0 lg:col-span-3 lg:block ${DIGEST_COLUMN}`}>
-              <div className={`sticky top-12 z-20 max-h-[calc(100svh-3rem)] overflow-y-auto overscroll-contain border-l border-black/12 py-8 pr-6 pl-6 xl:pr-10 ${DIGEST_COLUMN}`}>
-                <DigestRail stories={stories} onJump={jump} currentId={stories[index]?.id} />
-              </div>
-            </aside>
           </div>
+          {stories.map((story, storyIndex) => (
+            <article key={story.id} className={`${digestBleed} border-b border-black/10 ${digestPlate(storyIndex)}`}>
+              <StoryCover story={story} index={storyIndex} edition={storyIndex === 0} locked={locked && storyIndex > 0} layout={layout} />
+              <div className={digestRead}>
+                <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" layout={layout} />
+              </div>
+            </article>
+          ))}
         </div>
       ) : (
         stories.map((story, storyIndex) => (
