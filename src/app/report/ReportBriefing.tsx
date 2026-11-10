@@ -900,16 +900,19 @@ function DigestRail({
                 type="button"
                 onClick={() => onJump(story.id)}
                 aria-current={current ? "true" : undefined}
-                className={`group w-full py-3.5 text-left transition-colors ${current ? "bg-black/[0.03]" : "hover:bg-black/[0.02]"}`}
+                className="group w-full py-3.5 text-left"
               >
                 <span className="block text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
                   {number(storyIndex)} · {story.chip}
                 </span>
-                <span className={`mt-1.5 block text-[15px] leading-6 ${current ? "text-black" : "text-black/80 group-hover:text-black"}`} style={roman}>
+                <span
+                  className={`mt-1.5 block text-[15px] leading-6 transition-colors ${current ? "text-black" : "text-black/70 group-hover:text-black"}`}
+                  style={current ? romanBold : roman}
+                >
                   {story.displayTitle}
                 </span>
                 {story.dek && story.dek !== story.displayTitle ? (
-                  <span className="mt-1 line-clamp-2 block text-[13px] leading-5 text-black/55" style={roman}>
+                  <span className="mt-1 line-clamp-2 block text-[13px] leading-5 text-black/50" style={roman}>
                     {story.dek}
                   </span>
                 ) : null}
@@ -1956,7 +1959,7 @@ export function ReportBriefing({
               ))}
             </div>
             <aside className="hidden self-start lg:col-span-4 lg:block">
-              <div className="sticky top-14 z-20 max-h-[calc(100svh-3.5rem)] overflow-y-auto overscroll-contain border-l border-black/15 bg-[#F4F0EA]/95 py-8 pl-8 backdrop-blur-[2px]">
+              <div className="sticky top-14 z-20 max-h-[calc(100svh-3.5rem)] overflow-y-auto overscroll-contain border-l border-black/15 bg-[#F4F0EA] py-8 pl-8">
                 <DigestRail stories={stories} onJump={jump} currentId={stories[index]?.id} />
               </div>
             </aside>
