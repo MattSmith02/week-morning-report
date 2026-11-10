@@ -56,6 +56,11 @@ function outletLogo(name: string) {
 
 const PAPER_COVERS = [
   {
+    src: "/the-week/sources/nyt-morning.jpg",
+    name: "The New York Times",
+    headline: "Trump’s push to war turns into retreat",
+  },
+  {
     src: "/the-week/sources/guardian-front.jpg",
     name: "The Guardian",
     headline: "Alarm as MI5 names China spy suspects targeting MPs",
@@ -63,12 +68,32 @@ const PAPER_COVERS = [
   {
     src: "/the-week/sources/ft-2021.jpg",
     name: "Financial Times",
-    headline: "HSBC steps up pivot to Asia with Hong Kong job moves and US exit",
+    headline: "Tension, turnover, unmet goals bedevil Treasury under Bessent",
+  },
+  {
+    src: "/the-week/sources/bloomberg-2026.jpg",
+    name: "USA Today",
+    headline: "Consumer sentiment down despite positive reports",
+  },
+  {
+    src: "/the-week/sources/atlantic-2026.jpg",
+    name: "The Washington Post",
+    headline: "B-1 pullout shows wily tactics of a weaker foe",
   },
   {
     src: "/the-week/sources/week-2024.jpg",
     name: "The Week",
     headline: "England’s dirty water",
+  },
+  {
+    src: "/the-week/sources/economist-cover.jpg",
+    name: "The Philadelphia Inquirer",
+    headline: "Ukraine claws back land in the Donbas",
+  },
+  {
+    src: "/the-week/sources/time-2026.jpg",
+    name: "Houston Chronicle",
+    headline: "Israelis mourn those lost on the anniversary of the Oct. 7 attacks",
   },
 ];
 
@@ -401,6 +426,120 @@ function itemIndexFor(coverIndex: number, itemCount: number) {
   return Math.min(itemCount - 1, Math.ceil((coverIndex * itemCount) / PAPER_COVERS.length));
 }
 
+function DigestPapers({ story }: { story: WeekStory }) {
+  const items = story.items ?? [];
+  const covers = items.map((item, index) => ({
+    label: item.label,
+    text: item.text,
+    src: PAPER_COVERS[index % PAPER_COVERS.length]?.src ?? PAPER_COVERS[0].src,
+  }));
+  const [active, setActive] = useState(0);
+  const scrollerRef = useRef<HTMLUListElement>(null);
+  const shown = covers[active] ?? covers[0];
+
+  useEffect(() => {
+    const root = scrollerRef.current;
+    if (!root || covers.length === 0) return;
+    const onScroll = () => {
+      const card = root.querySelector("li");
+      const width = Math.max(card?.getBoundingClientRect().width ?? root.clientWidth, 1) + 12;
+      setActive(Math.min(covers.length - 1, Math.max(0, Math.round(root.scrollLeft / width))));
+    };
+    root.addEventListener("scroll", onScroll, { passive: true });
+    return () => root.removeEventListener("scroll", onScroll);
+  }, [covers.length]);
+
+  const go = (index: number) => {
+    const root = scrollerRef.current;
+    const card = root?.querySelector("li");
+    if (!root || !card) return;
+    setActive(index);
+    root.scrollTo({ left: index * (card.getBoundingClientRect().width + 12), behavior: "smooth" });
+  };
+
+  if (!shown) return null;
+
+  return (
+    <div className="border-b border-black/15 px-0 pb-10">
+      <div className="flex items-end justify-between gap-3 px-1">
+        <div>
+          <p className="text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
+            Today&apos;s newspapers
+          </p>
+          <h3 className="mt-2 text-[1.65rem] leading-8 text-black sm:text-[1.85rem]" style={roman}>
+            Front pages
+          </h3>
+        </div>
+        <p className="text-[12px] text-black/45" style={ui}>
+          {number(active)} / {number(Math.max(covers.length - 1, 0))}
+        </p>
+      </div>
+
+      <ul
+        ref={scrollerRef}
+        className="mt-5 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {covers.map((cover, coverIndex) => (
+          <li key={`${cover.label}-${coverIndex}`} className="w-[42%] shrink-0 snap-start sm:w-[36%]">
+            <button type="button" onClick={() => go(coverIndex)} className="group w-full text-left" aria-current={coverIndex === active ? "true" : undefined}>
+              <span
+                className={`relative block aspect-[3/4] overflow-hidden bg-[#111] transition-[box-shadow] ${
+                  coverIndex === active ? "shadow-[0_0_0_2px_#DF0A14]" : "opacity-80 group-hover:opacity-100"
+                }`}
+              >
+                <Image
+                  src={cover.src}
+                  alt=""
+                  fill
+                  unoptimized
+                  className="object-cover object-top"
+                  sizes="180px"
+                />
+              </span>
+              <span className="mt-2 block text-[10px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
+                {cover.label}
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <div className="mt-5 border-t border-black/12 pt-5">
+        <p className="text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
+          {shown.label}
+        </p>
+        <p className="mt-2 max-w-[28ch] text-[1.45rem] leading-7 text-black sm:text-[1.7rem] sm:leading-8" style={roman}>
+          {shown.text}
+        </p>
+      </div>
+
+      <ol className="mt-6 border-t border-black/12">
+        {covers.map((cover, coverIndex) => (
+          <li key={`row-${cover.label}`} className="border-b border-black/12">
+            <button
+              type="button"
+              onClick={() => go(coverIndex)}
+              className={`flex w-full items-start gap-3 py-3.5 text-left transition-colors ${coverIndex === active ? "text-black" : "text-black/65 hover:text-black"}`}
+            >
+              <span className="w-8 shrink-0 text-[11px] font-bold tracking-[0.1em] text-[#DF0A14]" style={uiBold}>
+                {number(coverIndex)}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[10px] font-bold tracking-[0.12em] text-[#DF0A14]/80 uppercase" style={uiBold}>
+                  {cover.label}
+                </span>
+                <span className="mt-1 block text-[15px] leading-6" style={coverIndex === active ? romanBold : roman}>
+                  {cover.text}
+                </span>
+              </span>
+            </button>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
 function PapersSpread({ story, place = "none" }: { story: WeekStory; place?: "none" | "sides" | "inline" }) {
   const items = story.items ?? [];
   const [active, setActive] = useState(0);
@@ -649,7 +788,7 @@ function ImagelessCover({
 }) {
   const dark = tone === "dark";
   if (compact) {
-    return <CompactStoryHeader story={story} index={index} locked={locked} plateClass={digestPlate(index)} />;
+    return <CompactStoryHeader story={story} index={index} locked={locked} plateClass="bg-transparent" />;
   }
 
   return (
@@ -690,11 +829,11 @@ function ImagelessCover({
 
 const DIGEST_STORY_PLATES = [
   "bg-[#F4F0EA]",
+  "bg-[#E8E4DA]",
   "bg-[#F7F1EA]",
-  "bg-[#F3EEE6]",
-  "bg-[#F4F0EA]",
-  "bg-[#F7F1EA]",
-  "bg-[#F3EEE6]",
+  "bg-[#E3EEF2]",
+  "bg-[#F0E6E4]",
+  "bg-[#EDE7DF]",
 ] as const;
 
 function digestPlate(index: number) {
@@ -773,6 +912,9 @@ function StoryCover({
 }) {
   const classic = layout === "classic";
   const imageless = imagelessFor(story);
+  if (!classic && story.format === "papers") {
+    return <section id={story.id} data-story className="scroll-mt-12" />;
+  }
   if (imageless) {
     return (
       <ImagelessCover
@@ -786,7 +928,7 @@ function StoryCover({
   }
 
   if (!classic && !isHeroStory(story, index, layout)) {
-    return <CompactStoryHeader story={story} index={index} locked={locked} lead={index === 0} plateClass={digestPlate(index)} />;
+    return <CompactStoryHeader story={story} index={index} locked={locked} lead={index === 0} plateClass="bg-transparent" />;
   }
 
   const hasMedia = Boolean(story.imageSrc) || (story.format === "video" && Boolean(story.videoSrc));
@@ -1319,7 +1461,19 @@ function SourcesChart({ periods }: { periods: SourcePeriod[] }) {
   );
 }
 
-function StoryBody({ story, locked = false, lead = false, place = "none" }: { story: WeekStory; locked?: boolean; lead?: boolean; place?: "none" | "sides" | "inline" }) {
+function StoryBody({
+  story,
+  locked = false,
+  lead = false,
+  place = "none",
+  layout = "classic",
+}: {
+  story: WeekStory;
+  locked?: boolean;
+  lead?: boolean;
+  place?: "none" | "sides" | "inline";
+  layout?: ReportLayout;
+}) {
   if (locked && lead && story.format !== "papers" && story.format !== "video" && story.format !== "puzzle") {
     return (
       <>
@@ -1338,7 +1492,9 @@ function StoryBody({ story, locked = false, lead = false, place = "none" }: { st
       </CaptureGate>
     );
   }
-  if (story.format === "papers") return <PapersSpread story={story} place={place} />;
+  if (story.format === "papers") {
+    return layout === "digest" ? <DigestPapers story={story} /> : <PapersSpread story={story} place={place} />;
+  }
   if (story.format === "video") return <VideoStory story={story} place={place} />;
   if (story.format === "puzzle") return <PuzzleStory story={story} place={place} />;
   return <StoryReading story={story} place={place} />;
@@ -1866,18 +2022,18 @@ export function ReportBriefing({
 
       {digest ? (
         <div className={`mx-auto max-w-[1280px] ${pagePad}`}>
-          <div className="relative lg:grid lg:grid-cols-12 lg:items-start lg:gap-10">
-            <aside className="mt-8 hidden self-start border-r border-black/15 pr-6 lg:col-span-3 lg:block">
-              <div className="sticky top-14 max-h-[calc(100svh-3.5rem)] overflow-y-auto overscroll-contain py-8">
+          <div className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-10">
+            <aside className="mt-8 hidden self-start lg:col-span-3 lg:block">
+              <div className="sticky top-14 z-20 max-h-[calc(100svh-3.5rem)] overflow-y-auto overscroll-contain border-r border-black/15 bg-[#F4F0EA] py-8 pr-6">
                 <InsideEdition stories={stories} onJump={jump} />
               </div>
             </aside>
             <div className="min-w-0 lg:col-span-6">
               <BriefingDigest briefing={briefing} />
               {stories.map((story, storyIndex) => (
-                <article key={story.id} className={digestPlate(storyIndex)}>
+                <article key={story.id} className={`${digestPlate(storyIndex)} border-b border-black/10`}>
                   <StoryCover story={story} index={storyIndex} edition={storyIndex === 0} locked={locked && storyIndex > 0} layout={layout} />
-                  <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" />
+                  <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" layout={layout} />
                 </article>
               ))}
             </div>
