@@ -305,7 +305,7 @@ function StoryReading({
         {hook && story.format !== "quote" && story.whatHappened ? (
           <section>
             <div>
-              <h3 className="text-[1.65rem] leading-9 text-black sm:text-[1.85rem] sm:leading-10" style={roman}>
+              <h3 className={digest ? digestSectionTitle : "text-[1.65rem] leading-9 text-black sm:text-[1.85rem] sm:leading-10"} style={roman}>
                 {happenedLabel}
               </h3>
               <div className="mt-2 h-px w-12 bg-[#DF0A14]" />
@@ -315,7 +315,7 @@ function StoryReading({
                 {story.whatHappened}
               </p>
             ) : (
-              <p className="mt-6 text-base leading-6 text-black/70" style={roman}>
+              <p className="mt-6 text-base leading-6 text-[var(--brand-text-secondary,#45556c)]" style={roman}>
                 {story.whatHappened}
               </p>
             )}
@@ -354,12 +354,12 @@ function StoryReading({
           {story.whoSaidWhat ? (
             <section className={`border-t ${digest ? "pt-8" : "pt-10"} ${hairline}`}>
               <div>
-                <h3 className={`${digest ? "text-[1.65rem] leading-9 sm:text-[1.85rem] sm:leading-10" : "text-[2rem] leading-10"} text-black`} style={roman}>
+                <h3 className={digest ? digestSectionTitle : "text-[2rem] leading-10 text-black"} style={roman}>
                   Who said what
                 </h3>
                 <div className="mt-2 h-px w-12 bg-[#DF0A14]" />
               </div>
-              <p className="mt-6 text-base leading-6 text-black/70" style={roman}>
+              <p className="mt-6 text-base leading-6 text-[var(--brand-text-secondary,#45556c)]" style={roman}>
                 {story.whoSaidWhat}
               </p>
             </section>
@@ -367,12 +367,12 @@ function StoryReading({
           {story.whatsNext ? (
             <section className={`border-t ${digest ? "pt-8" : "pt-10"} ${hairline}`}>
               <div>
-                <h3 className={`${digest ? "text-[1.65rem] leading-9 sm:text-[1.85rem] sm:leading-10" : "text-[2rem] leading-10"} text-black`} style={roman}>
+                <h3 className={digest ? digestSectionTitle : "text-[2rem] leading-10 text-black"} style={roman}>
                   What’s next?
                 </h3>
                 <div className="mt-2 h-px w-12 bg-[#DF0A14]" />
               </div>
-              <p className="mt-6 text-base leading-6 text-black/70" style={roman}>
+              <p className="mt-6 text-base leading-6 text-[var(--brand-text-secondary,#45556c)]" style={roman}>
                 {story.whatsNext}
               </p>
             </section>
@@ -839,10 +839,13 @@ function ImagelessCover({
   );
 }
 
-const DIGEST_GROUND = "bg-[#F4F0EA]";
-const DIGEST_WIDE_BAR = "digest-wide-bar bg-[#F4F0EA]";
+const DIGEST_GROUND = "bg-[var(--report-beige,#F4F0EA)]";
+const DIGEST_WIDE_BAR = "digest-wide-bar bg-[var(--report-beige,#F4F0EA)]";
 const digestTextPad = "px-4 sm:px-5";
 const brandScrollbar = "brand-scrollbar";
+const digestArticleTitle = "text-[2rem] leading-[1.12] sm:text-[2.35rem]";
+const digestArticleTitleLead = "text-[2.35rem] leading-[1.1] sm:text-[2.75rem]";
+const digestSectionTitle = "text-[1.35rem] leading-8 text-[var(--brand-text-primary,#0f172b)] sm:text-[1.5rem] sm:leading-9";
 
 function CompactStoryHeader({
   story,
@@ -882,17 +885,17 @@ function CompactStoryHeader({
             {story.imageCaption}
           </p>
         ) : null}
-        <p className="text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
+        <p className="brand-label-copy text-[11px] tracking-[0.14em] text-[#DF0A14]" style={uiBold}>
           {story.chip}
         </p>
         <h2
-          className={`mt-2 max-w-[28ch] leading-[1.12] text-black ${lead ? "text-[2rem] sm:text-[2.6rem]" : "text-[1.7rem] sm:text-[2.05rem]"}`}
+          className={`mt-2 max-w-[28ch] text-[var(--brand-text-primary,#0f172b)] ${lead ? digestArticleTitleLead : digestArticleTitle}`}
           style={roman}
         >
           {story.displayTitle}
         </h2>
         {story.dek && story.dek !== story.displayTitle ? (
-          <p className="mt-3 max-w-[46ch] text-[1.05rem] leading-7 text-black/75" style={roman}>
+          <p className="mt-3 max-w-[46ch] text-[1.05rem] leading-7 text-[var(--brand-text-secondary,#45556c)]" style={roman}>
             {story.dek}
           </p>
         ) : null}
@@ -1141,17 +1144,17 @@ function BriefingDigest({ briefing }: { briefing: string }) {
   const today = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date());
 
   return (
-    <header className="border-b border-black/15 bg-transparent py-8">
-      <p className="text-[11px] font-bold tracking-[0.22em] text-[#DF0A14] uppercase" style={romanBold}>
+    <header className="border-b border-[var(--brand-border-default,#e2e8f0)] bg-transparent py-8">
+      <p className="brand-label-copy text-[11px] tracking-[0.22em] text-[#DF0A14]" style={romanBold}>
         The Week
       </p>
-      <h1 className="mt-2 text-[2.35rem] leading-none text-black sm:text-[3.15rem]" style={roman}>
+      <h1 className="mt-2 text-[2.5rem] leading-none text-[var(--brand-text-primary,#0f172b)] sm:text-[3.15rem]" style={roman}>
         {briefing}
       </h1>
-      <p className="mt-2 text-[13px] leading-5 text-black/60" style={ui}>
+      <p className="brand-muted-copy mt-2 text-[13px] leading-5" style={ui}>
         {today}
       </p>
-      <p className="mt-4 max-w-[46ch] text-[15px] leading-6 text-black/75" style={roman}>
+      <p className="mt-4 max-w-[46ch] text-[15px] leading-6 text-[var(--brand-text-secondary,#45556c)]" style={roman}>
         Good morning. Browse the front page, then jump from The latest.
       </p>
     </header>
@@ -2005,29 +2008,25 @@ export function ReportBriefing({
       </div>
       <div className={`report-page ${digest ? "report-digest block" : "hidden md:block"}`}>
       {digest ? null : <WeekSiteHeader />}
-      <div className="sticky top-0 z-40 bg-[#F4F0EA]">
-        <div className={`flex h-12 items-center gap-3 border-b border-black/15 bg-[#F4F0EA] ${pagePad}`}>
-          <p className="min-w-0 flex-1 truncate text-sm" style={romanBold}>
+      <div className="sticky top-0 z-40 bg-[var(--report-beige,#F4F0EA)]">
+        <div className={`flex h-12 items-center gap-3 border-b border-[var(--brand-border-default,#e2e8f0)] bg-[var(--report-beige,#F4F0EA)] ${pagePad}`}>
+          <p className="min-w-0 flex-1 truncate text-sm text-[var(--brand-text-primary,#0f172b)]" style={romanBold}>
             <span className="text-[#DF0A14]">The Week · {briefing} ·</span>
-            {!digest ? (
-              <>
-                <span className="text-black/40"> </span>
-                <span className="font-normal text-[#DF0A14]" style={roman}>
-                  {number(index)}/{total}
-                </span>
-              </>
-            ) : null}
+            <span className="text-black/35"> </span>
+            <span className="font-normal text-[#DF0A14] tabular-nums" style={roman} aria-label={`Story ${number(index)} of ${total}`}>
+              {number(index)}/{total}
+            </span>
           </p>
           <div className="flex items-center gap-3 text-[11px] font-bold tracking-[0.1em] uppercase" style={uiBold}>
             <Link
               href={layoutHref("digest", locked, ads)}
-              className={digest ? "text-[#DF0A14]" : "text-black/45 hover:text-[#DF0A14]"}
+              className={digest ? "text-[#DF0A14]" : "text-[var(--brand-text-secondary,#45556c)] hover:text-[#DF0A14]"}
             >
               Digest
             </Link>
             <Link
               href={layoutHref("classic", locked, ads)}
-              className={!digest ? "text-[#DF0A14]" : "text-black/45 hover:text-[#DF0A14]"}
+              className={!digest ? "text-[#DF0A14]" : "text-[var(--brand-text-secondary,#45556c)] hover:text-[#DF0A14]"}
             >
               Classic
             </Link>
@@ -2039,7 +2038,7 @@ export function ReportBriefing({
                 aria-expanded={open}
                 aria-controls="story-index"
                 onClick={() => setOpen((value) => !value)}
-                className="brand-icon-button inline-flex h-10 items-center gap-1.5 px-2 text-xs font-bold tracking-[0.08em] text-black uppercase transition-colors hover:text-[#DF0A14]"
+                className="brand-icon-button inline-flex h-10 items-center gap-1.5 rounded-[var(--brand-radius-control,8px)] px-2 text-xs font-bold tracking-[0.08em] text-[var(--brand-text-primary,#0f172b)] uppercase transition-colors hover:text-[#DF0A14]"
                 style={uiBold}
               >
                 Index
@@ -2048,7 +2047,7 @@ export function ReportBriefing({
               {open ? (
                 <>
                   <button type="button" aria-label="Close story list" className="fixed inset-0 z-40 cursor-default bg-black/20" onClick={() => setOpen(false)} />
-                  <div className="absolute top-full right-0 z-50 mt-1 w-[min(420px,calc(100vw-24px))] overflow-hidden border border-black/10 bg-[#F4F0EA] shadow-[0_18px_40px_rgba(10,10,10,0.16)]">
+                  <div className="absolute top-full right-0 z-50 mt-1 w-[min(420px,calc(100vw-24px))] overflow-hidden border border-[var(--brand-border-default,#e2e8f0)] bg-[var(--report-beige,#F4F0EA)] shadow-[0_18px_40px_rgba(10,10,10,0.16)]">
                     {storyIndex("story-index")}
                   </div>
                 </>
@@ -2060,7 +2059,7 @@ export function ReportBriefing({
               aria-expanded={open}
               aria-controls="story-index"
               onClick={() => setOpen((value) => !value)}
-              className="inline-flex h-10 items-center gap-1.5 px-1 text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase lg:hidden"
+              className="inline-flex h-10 items-center gap-1.5 rounded-[var(--brand-radius-control,8px)] px-1 text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase lg:hidden"
               style={uiBold}
             >
               Latest
@@ -2068,6 +2067,21 @@ export function ReportBriefing({
             </button>
           )}
         </div>
+        {digest ? (
+          <div
+            className="h-0.5 w-full bg-black/10 lg:hidden"
+            role="progressbar"
+            aria-valuemin={1}
+            aria-valuemax={stories.length}
+            aria-valuenow={index + 1}
+            aria-label="Briefing progress"
+          >
+            <div
+              className="h-full bg-[#0A0A0A] transition-[width] duration-300 ease-out"
+              style={{ width: `${Math.max(4, ((index + 1) / Math.max(stories.length, 1)) * 100)}%` }}
+            />
+          </div>
+        ) : null}
       </div>
 
       {digest && open ? (
