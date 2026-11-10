@@ -244,7 +244,7 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
   const framed = part !== "rest";
 
   return (
-    <div className={framed ? "relative bg-[#F4F0EA] py-8 sm:py-10" : ""}>
+    <div className={framed ? "relative py-8 sm:py-10" : ""}>
       <div className={framed ? "relative flex max-w-[65ch] flex-col gap-10 sm:gap-12" : "flex flex-col gap-6"}>
         {hook && story.format !== "quote" && story.whatHappened ? (
           <section>
@@ -649,7 +649,7 @@ function ImagelessCover({
 }) {
   const dark = tone === "dark";
   if (compact) {
-    return <CompactStoryHeader story={story} index={index} locked={locked} />;
+    return <CompactStoryHeader story={story} index={index} locked={locked} plateClass={digestPlate(index)} />;
   }
 
   return (
@@ -688,25 +688,40 @@ function ImagelessCover({
   );
 }
 
+const DIGEST_STORY_PLATES = [
+  "bg-[#F4F0EA]",
+  "bg-[#EFE8DC]",
+  "bg-[#F7F1EA]",
+  "bg-[#E8E4DA]",
+  "bg-[#F3EEE6]",
+  "bg-[#EDE7DF]",
+] as const;
+
+function digestPlate(index: number) {
+  return DIGEST_STORY_PLATES[index % DIGEST_STORY_PLATES.length];
+}
+
 function CompactStoryHeader({
   story,
   index,
   locked = false,
   lead = false,
+  plateClass = "bg-[#F4F0EA]",
 }: {
   story: WeekStory;
   index: number;
   locked?: boolean;
   lead?: boolean;
+  plateClass?: string;
 }) {
   const hasImage = Boolean(story.imageSrc);
   return (
-    <section id={story.id} data-story className="relative scroll-mt-12 border-b border-black/15 bg-[#F4F0EA]">
+    <section id={story.id} data-story className={`relative scroll-mt-12 border-b border-black/15 ${plateClass}`}>
       {locked ? <CoverLock /> : null}
       <div className="py-8 sm:py-10">
         {hasImage ? (
-          <figure className="overflow-clip bg-[#111]">
-            <div className={`relative w-full ${lead ? "aspect-[16/10]" : "aspect-[16/10] sm:aspect-[16/9]"}`}>
+          <figure className="overflow-hidden bg-[#111]">
+            <div className={`relative w-full overflow-hidden ${lead ? "aspect-[16/10]" : "aspect-[16/10] sm:aspect-[16/9]"}`}>
               <Image
                 src={story.imageSrc!}
                 alt=""
@@ -771,7 +786,7 @@ function StoryCover({
   }
 
   if (!classic && !isHeroStory(story, index, layout)) {
-    return <CompactStoryHeader story={story} index={index} locked={locked} lead={index === 0} />;
+    return <CompactStoryHeader story={story} index={index} locked={locked} lead={index === 0} plateClass={digestPlate(index)} />;
   }
 
   const hasMedia = Boolean(story.imageSrc) || (story.format === "video" && Boolean(story.videoSrc));
@@ -872,7 +887,7 @@ function DigestRail({
   currentId?: string;
 }) {
   return (
-    <nav aria-label="The latest" className="border-black/15 lg:border-l lg:pl-8">
+    <nav aria-label="The latest">
       <p className="border-b border-black pb-2 text-[11px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
         The latest
       </p>
@@ -907,6 +922,113 @@ function DigestRail({
   );
 }
 
+function FrontCarousel({
+  stories,
+  onJump,
+}: {
+  stories: WeekStory[];
+  onJump: (id: string) => void;
+}) {
+  const slides = stories.filter((story) => Boolean(story.imageSrc)).slice(0, 8);
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    const root = scrollerRef.current;
+    if (!root || slides.length === 0) return;
+    const onScroll = () => {
+      const width = Math.max(root.clientWidth, 1);
+      setActive(Math.min(slides.length - 1, Math.max(0, Math.round(root.scrollLeft / width))));
+    };
+    root.addEventListener("scroll", onScroll, { passive: true });
+    return () => root.removeEventListener("scroll", onScroll);
+  }, [slides.length]);
+
+  const go = (direction: -1 | 1) => {
+    const root = scrollerRef.current;
+    if (!root) return;
+    const width = Math.max(root.clientWidth, 1);
+    const next = Math.min(slides.length - 1, Math.max(0, active + direction));
+    root.scrollTo({ left: next * width, behavior: "smooth" });
+  };
+
+  if (slides.length === 0) return null;
+
+  return (
+    <div className="relative mt-6 overflow-hidden">
+      <div
+        ref={scrollerRef}
+        className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain"
+        style={{ scrollbarWidth: "none" }}
+      >
+        {slides.map((story, slideIndex) => (
+          <button
+            key={story.id}
+            type="button"
+            onClick={() => onJump(story.id)}
+            className="relative aspect-[16/10] w-full min-w-full shrink-0 snap-start overflow-hidden bg-[#111] text-left"
+          >
+            <Image
+              src={story.imageSrc!}
+              alt=""
+              fill
+              priority={slideIndex === 0}
+              unoptimized={story.imageSrc!.startsWith("/") || story.imageSrc!.startsWith("http")}
+              className="object-cover object-center"
+              sizes="(max-width: 1024px) 100vw, 65vw"
+            />
+            <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" aria-hidden />
+            <span className="absolute inset-x-0 bottom-0 z-10 p-4 sm:p-6">
+              <span className="block text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
+                {number(stories.findIndex((item) => item.id === story.id))} · {story.chip}
+              </span>
+              <span className="mt-2 block max-w-[22ch] text-[1.5rem] leading-[1.1] text-white sm:text-[2rem]" style={roman}>
+                {story.displayTitle}
+              </span>
+            </span>
+          </button>
+        ))}
+      </div>
+      {slides.length > 1 ? (
+        <>
+          <button
+            type="button"
+            aria-label="Previous slide"
+            onClick={() => go(-1)}
+            className={`${iconButton} absolute top-1/2 left-2 z-10 hidden -translate-y-1/2 bg-white/90 text-black sm:inline-flex`}
+          >
+            <BrandIcon name="chevronLeft" defaultIcon={ChevronLeft} className="h-5 w-5" />
+          </button>
+          <button
+            type="button"
+            aria-label="Next slide"
+            onClick={() => go(1)}
+            className={`${iconButton} absolute top-1/2 right-2 z-10 hidden -translate-y-1/2 bg-white/90 text-black sm:inline-flex`}
+          >
+            <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-5 w-5" />
+          </button>
+          <div className="mt-3 flex items-center justify-center gap-1.5">
+            {slides.map((story, slideIndex) => (
+              <button
+                key={story.id}
+                type="button"
+                aria-label={`Go to slide ${slideIndex + 1}`}
+                aria-current={slideIndex === active ? "true" : undefined}
+                onClick={() => {
+                  const root = scrollerRef.current;
+                  if (!root) return;
+                  root.scrollTo({ left: slideIndex * root.clientWidth, behavior: "smooth" });
+                }}
+                className={`h-1.5 rounded-full transition-all ${slideIndex === active ? "w-5 bg-[#DF0A14]" : "w-1.5 bg-black/25"}`}
+              />
+            ))}
+          </div>
+        </>
+      ) : null}
+    </div>
+  );
+}
+
 function BriefingDigest({
   stories,
   briefing,
@@ -916,8 +1038,6 @@ function BriefingDigest({
   briefing: string;
   onJump: (id: string) => void;
 }) {
-  const lead = stories[0];
-  if (!lead) return null;
   const today = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date());
 
   return (
@@ -932,8 +1052,9 @@ function BriefingDigest({
         {today}
       </p>
       <p className="mt-4 max-w-[46ch] text-[15px] leading-6 text-black/75" style={roman}>
-        Good morning. Here’s what’s worth your time today — start with the lead, or jump from The latest.
+        Good morning. Browse the front page, then jump from The latest.
       </p>
+      <FrontCarousel stories={stories} onJump={onJump} />
     </header>
   );
 }
@@ -1824,21 +1945,21 @@ export function ReportBriefing({
 
       {digest ? (
         <div className={`mx-auto max-w-[1180px] ${pagePad}`}>
-          <div className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-12">
+          <div className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-10">
             <div className="min-w-0 lg:col-span-8">
               <BriefingDigest stories={stories} briefing={briefing} onJump={jump} />
               {stories.map((story, storyIndex) => (
-                <article key={story.id}>
+                <article key={story.id} className={digestPlate(storyIndex)}>
                   <StoryCover story={story} index={storyIndex} edition={storyIndex === 0} locked={locked && storyIndex > 0} layout={layout} />
                   <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" />
                 </article>
               ))}
             </div>
-            <div className="relative hidden lg:col-span-4 lg:block">
-              <div className="sticky top-14 max-h-[calc(100svh-3.5rem)] overflow-y-auto overscroll-contain py-8 pr-1">
+            <aside className="hidden self-start lg:col-span-4 lg:block">
+              <div className="sticky top-14 z-20 max-h-[calc(100svh-3.5rem)] overflow-y-auto overscroll-contain border-l border-black/15 bg-[#F4F0EA]/95 py-8 pl-8 backdrop-blur-[2px]">
                 <DigestRail stories={stories} onJump={jump} currentId={stories[index]?.id} />
               </div>
-            </div>
+            </aside>
           </div>
         </div>
       ) : (
