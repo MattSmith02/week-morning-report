@@ -463,10 +463,18 @@ function DigestPapers({ story }: { story: WeekStory }) {
     const root = scrollerRef.current;
     if (!root || covers.length === 0) return;
     const onScroll = () => {
-      const card = root.querySelector("li");
-      const gap = 16;
-      const width = Math.max(card?.getBoundingClientRect().width ?? root.clientWidth, 1) + gap;
-      setActive(Math.min(covers.length - 1, Math.max(0, Math.round(root.scrollLeft / width))));
+      const mid = root.scrollLeft + root.clientWidth / 2;
+      let nearest = 0;
+      let best = Number.POSITIVE_INFINITY;
+      [...root.querySelectorAll<HTMLElement>(":scope > li")].forEach((card, cardIndex) => {
+        const center = card.offsetLeft + card.offsetWidth / 2;
+        const distance = Math.abs(center - mid);
+        if (distance < best) {
+          best = distance;
+          nearest = cardIndex;
+        }
+      });
+      setActive(nearest);
     };
     root.addEventListener("scroll", onScroll, { passive: true });
     return () => root.removeEventListener("scroll", onScroll);
@@ -474,11 +482,11 @@ function DigestPapers({ story }: { story: WeekStory }) {
 
   const go = (next: number) => {
     const root = scrollerRef.current;
-    const card = root?.querySelector("li");
-    if (!root || !card) return;
+    if (!root) return;
     const clamped = Math.min(covers.length - 1, Math.max(0, next));
     setActive(clamped);
-    root.scrollTo({ left: clamped * (card.getBoundingClientRect().width + 16), behavior: "smooth" });
+    const item = root.children[clamped] as HTMLElement | undefined;
+    item?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
   };
 
   if (covers.length === 0) return null;
@@ -494,7 +502,7 @@ function DigestPapers({ story }: { story: WeekStory }) {
             Front pages
           </h3>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 lg:hidden">
           <p className="brand-muted-copy text-[12px] tabular-nums" style={ui}>
             {number(active)} / {number(Math.max(covers.length - 1, 0))}
           </p>
@@ -503,7 +511,7 @@ function DigestPapers({ story }: { story: WeekStory }) {
             aria-label="Previous front page"
             disabled={active <= 0}
             onClick={() => go(active - 1)}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--brand-radius-control,8px)] border border-black/20 bg-white text-[var(--brand-text-primary,#0f172b)] transition-colors hover:border-black hover:bg-[#F0EAE1] disabled:pointer-events-none disabled:opacity-30"
+            className="brand-icon-button brand-scroll-arrow inline-flex h-9 w-9 items-center justify-center disabled:pointer-events-none disabled:opacity-30"
           >
             <BrandIcon name="chevronLeft" defaultIcon={ChevronLeft} className="h-5 w-5" />
           </button>
@@ -512,22 +520,46 @@ function DigestPapers({ story }: { story: WeekStory }) {
             aria-label="Next front page"
             disabled={active >= covers.length - 1}
             onClick={() => go(active + 1)}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--brand-radius-control,8px)] border border-black/20 bg-white text-[var(--brand-text-primary,#0f172b)] transition-colors hover:border-black hover:bg-[#F0EAE1] disabled:pointer-events-none disabled:opacity-30"
+            className="brand-icon-button brand-scroll-arrow inline-flex h-9 w-9 items-center justify-center disabled:pointer-events-none disabled:opacity-30"
           >
             <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-5 w-5" />
           </button>
         </div>
+        <p className="brand-muted-copy hidden text-[12px] tabular-nums lg:block" style={ui}>
+          {number(active)} / {number(Math.max(covers.length - 1, 0))}
+        </p>
       </div>
 
       <div className="relative mt-6">
+        <button
+          type="button"
+          aria-label="Previous front page"
+          disabled={active <= 0}
+          onClick={() => go(active - 1)}
+          className="brand-icon-button brand-scroll-arrow absolute top-[28%] left-0 z-10 hidden -translate-y-1/2 lg:inline-flex disabled:pointer-events-none disabled:opacity-30"
+        >
+          <BrandIcon name="chevronLeft" defaultIcon={ChevronLeft} className="h-6 w-6" />
+        </button>
+        <button
+          type="button"
+          aria-label="Next front page"
+          disabled={active >= covers.length - 1}
+          onClick={() => go(active + 1)}
+          className="brand-icon-button brand-scroll-arrow absolute top-[28%] right-0 z-10 hidden -translate-y-1/2 lg:inline-flex disabled:pointer-events-none disabled:opacity-30"
+        >
+          <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-6 w-6" />
+        </button>
         <ul
           ref={scrollerRef}
-          className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 [scrollbar-width:none] lg:gap-4 [&::-webkit-scrollbar]:hidden"
+          className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 [scrollbar-width:none] lg:gap-6 lg:px-[12%] [&::-webkit-scrollbar]:hidden"
         >
           {covers.map((cover, coverIndex) => {
             const focused = coverIndex === active;
             return (
-              <li key={`${cover.label}-${coverIndex}`} className="w-[88%] shrink-0 snap-start sm:w-[78%] lg:w-[72%]">
+              <li
+                key={`${cover.label}-${coverIndex}`}
+                className="w-[88%] shrink-0 snap-center sm:w-[78%] lg:w-[56%]"
+              >
                 <button
                   type="button"
                   onClick={() => go(coverIndex)}
@@ -1795,14 +1827,16 @@ export function ReportBriefing({
           color: #DF0A14;
         }
         .report-page .brand-scroll-arrow {
-          border-radius: 9999px;
-          background-color: rgb(255 255 255 / 0.4);
-          color: #1F2937;
+          border-radius: var(--brand-radius-control, 8px);
+          border: 1px solid rgb(10 10 10 / 0.15);
+          background-color: rgb(255 255 255 / 0.92);
+          color: #0A0A0A;
           backdrop-filter: blur(2px);
         }
         .report-page .brand-scroll-arrow:hover {
-          background-color: rgb(255 255 255 / 0.62);
+          background-color: #F0EAE1;
           color: #0A0A0A;
+          border-color: #0A0A0A;
         }
         .report-page .brand-scroll-arrow--hero {
           border-radius: 9999px;
@@ -2054,10 +2088,12 @@ export function ReportBriefing({
       {digest ? null : <WeekSiteHeader />}
       <div className="sticky top-0 z-40 bg-[var(--report-beige,#F4F0EA)]">
         <div className={`flex h-12 items-center gap-3 border-b border-[var(--brand-border-default,#e2e8f0)] bg-[var(--report-beige,#F4F0EA)] ${pagePad}`}>
-          <p className="min-w-0 flex-1 truncate text-sm text-[var(--brand-text-primary,#0f172b)]" style={romanBold}>
-            <span className="text-[#DF0A14]">The Week · {briefing} ·</span>
-            <span className="text-black/35"> </span>
-            <span className="font-normal text-[#DF0A14] tabular-nums" style={roman} aria-label={`Story ${number(index)} of ${total}`}>
+          <p
+            className="min-w-0 flex-1 truncate text-sm font-bold text-black"
+            style={{ fontFamily: "var(--font-brand-sans, Arial, Helvetica, sans-serif)" }}
+          >
+            <span>The Week · {briefing} · </span>
+            <span className="tabular-nums" aria-label={`Story ${number(index)} of ${total}`}>
               {number(index)}/{total}
             </span>
           </p>
