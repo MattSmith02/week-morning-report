@@ -244,8 +244,8 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
   const framed = part !== "rest";
 
   return (
-    <div className={framed ? "relative bg-[#F4F0EA] py-8 sm:py-10 xl:py-12" : ""}>
-      <div className={framed ? `relative mx-auto flex max-w-[720px] flex-col gap-10 px-4 sm:gap-12 xl:gap-14 ${readColumn}` : "flex flex-col gap-6"}>
+    <div className={framed ? "relative bg-[#F4F0EA] py-8 sm:py-10" : ""}>
+      <div className={framed ? "relative flex max-w-[65ch] flex-col gap-10 sm:gap-12" : "flex flex-col gap-6"}>
         {hook && story.format !== "quote" && story.whatHappened ? (
           <section>
             <div>
@@ -652,16 +652,10 @@ function ImagelessCover({
     return (
       <section id={story.id} data-story className={`relative scroll-mt-12 border-b border-black/10 ${imagelessPlateClass(tone)}`}>
         {locked ? <CoverLock /> : null}
-        <div className={`mx-auto max-w-[720px] py-10 sm:py-12 ${pagePad}`}>
-          <p
-            className={`text-[11px] font-bold tracking-[0.14em] uppercase ${dark ? "text-white/70" : "text-black/55"}`}
-            style={uiBold}
-          >
-            <span className="text-[#DF0A14]">{number(index)}</span>
-            <span> · {story.chip}</span>
-          </p>
+        <div className="py-9 sm:py-11">
+          <Chip label={`${number(index)} · ${story.chip}`} className="min-w-0" />
           <div className="mt-3 h-px w-10 bg-[#DF0A14]" aria-hidden />
-          <h2 className={`mt-4 text-[1.875rem] leading-[1.12] sm:text-[2.35rem] ${dark ? "text-white" : "text-black"}`} style={roman}>
+          <h2 className={`mt-4 text-[1.875rem] leading-[1.12] sm:text-[2.25rem] ${dark ? "text-white" : "text-black"}`} style={roman}>
             {story.displayTitle}
           </h2>
           {story.dek && story.dek !== story.displayTitle ? (
@@ -725,10 +719,10 @@ function CompactStoryHeader({
   return (
     <section id={story.id} data-story className="relative scroll-mt-12 border-b border-black/15 bg-[#F4F0EA]">
       {locked ? <CoverLock /> : null}
-      <div className={`mx-auto max-w-[720px] py-8 sm:py-11 ${pagePad}`}>
+      <div className="py-8 sm:py-10">
         {hasImage ? (
           <figure className="overflow-clip bg-[#111]">
-            <div className={`relative w-full ${lead ? "aspect-[16/10] sm:aspect-[2/1]" : "aspect-[16/10] sm:aspect-[16/9]"}`}>
+            <div className={`relative w-full ${lead ? "aspect-[16/10]" : "aspect-[16/10] sm:aspect-[16/9]"}`}>
               <Image
                 src={story.imageSrc!}
                 alt=""
@@ -736,7 +730,7 @@ function CompactStoryHeader({
                 priority={lead}
                 unoptimized={story.imageSrc!.startsWith("/") || story.imageSrc!.startsWith("http")}
                 className="object-cover object-center"
-                sizes="(max-width: 720px) 100vw, 720px"
+                sizes="(max-width: 1024px) 100vw, 65vw"
               />
             </div>
             {story.imageCaption ? (
@@ -746,11 +740,11 @@ function CompactStoryHeader({
             ) : null}
           </figure>
         ) : null}
-        <p className={`text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase ${hasImage ? "mt-5" : ""}`} style={uiBold}>
-          {story.chip}
-        </p>
+        <div className={hasImage ? "mt-5" : ""}>
+          <Chip label={story.chip} className="min-w-0" />
+        </div>
         <h2
-          className={`mt-2 max-w-[22ch] leading-[1.12] text-black ${lead ? "text-[2rem] sm:text-[2.75rem]" : "text-[1.75rem] sm:text-[2.15rem]"}`}
+          className={`mt-3 max-w-[24ch] leading-[1.12] text-black ${lead ? "text-[2rem] sm:text-[2.6rem]" : "text-[1.7rem] sm:text-[2.05rem]"}`}
           style={roman}
         >
           {story.displayTitle}
@@ -884,6 +878,39 @@ function StoryCover({
   );
 }
 
+function DigestRail({
+  stories,
+  onJump,
+  currentId,
+}: {
+  stories: WeekStory[];
+  onJump: (id: string) => void;
+  currentId?: string;
+}) {
+  return (
+    <aside aria-label="The latest" className="border-black/15 lg:border-l lg:pl-8">
+      <p className="border-b border-black pb-2 text-[12px] font-bold tracking-[0.12em] text-black uppercase" style={uiBold}>
+        The latest
+      </p>
+      <ul>
+        {stories.map((story) => {
+          const current = story.id === currentId;
+          return (
+            <li key={story.id} className={`border-b border-black/15 ${current ? "bg-black/[0.03]" : ""}`}>
+              <button type="button" onClick={() => onJump(story.id)} className="group w-full py-3.5 text-left">
+                <Chip label={story.chip} selected={current} className="mb-2 min-w-0" />
+                <span className={`block text-[15px] leading-6 ${current ? "text-[#DF0A14]" : "text-black group-hover:text-[#DF0A14]"}`} style={roman}>
+                  {story.dek && story.dek !== story.displayTitle ? story.dek : story.displayTitle}
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </aside>
+  );
+}
+
 function BriefingDigest({
   stories,
   briefing,
@@ -894,84 +921,27 @@ function BriefingDigest({
   onJump: (id: string) => void;
 }) {
   const lead = stories[0];
-  const latest = stories.slice(1);
   if (!lead) return null;
   const today = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date());
 
   return (
-    <section aria-label={`${briefing} overview`} className="border-b border-black/20 bg-[#F4F0EA]">
-      <div className={`mx-auto max-w-[980px] py-8 sm:py-12 ${pagePad}`}>
-        <header className="border-b border-black pb-5 text-center">
-          <p className="text-[11px] font-bold tracking-[0.28em] text-[#DF0A14] uppercase" style={romanBold}>
-            The Week
-          </p>
-          <h1 className="mt-2 text-[2.5rem] leading-none text-black sm:text-[3.5rem]" style={roman}>
-            {briefing}
-          </h1>
-          <p className="mt-3 text-[13px] leading-5 text-black/60" style={ui}>
-            {today}
-          </p>
-        </header>
-
-        <div className="mt-8 grid gap-10 lg:mt-10 lg:grid-cols-12 lg:gap-14">
-          <div className="lg:col-span-7">
-            <button type="button" onClick={() => onJump(lead.id)} className="group w-full text-left">
-              {lead.imageSrc ? (
-                <span className="relative block aspect-[16/10] overflow-clip bg-[#111]">
-                  <Image
-                    src={lead.imageSrc}
-                    alt=""
-                    fill
-                    priority
-                    unoptimized={lead.imageSrc.startsWith("/") || lead.imageSrc.startsWith("http")}
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 100vw, 560px"
-                  />
-                </span>
-              ) : null}
-              <span className="mt-4 block text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
-                {lead.chip}
-              </span>
-              <span className="mt-2 block text-[1.85rem] leading-[1.12] text-black group-hover:underline sm:text-[2.35rem]" style={roman}>
-                {lead.displayTitle}
-              </span>
-              <span className="mt-3 block max-w-[38ch] text-[1.05rem] leading-7 text-black/75" style={roman}>
-                {lead.dek}
-              </span>
-            </button>
-            {lead.whatHappened ? (
-              <p className="mt-5 max-w-[42ch] text-[15px] leading-6 text-black/80" style={roman}>
-                {lead.whatHappened.slice(0, 220)}
-                {lead.whatHappened.length > 220 ? "…" : ""}{" "}
-                <button type="button" onClick={() => onJump(lead.id)} className="font-bold text-[#DF0A14] hover:underline" style={uiBold}>
-                  Continue reading
-                </button>
-              </p>
-            ) : null}
-          </div>
-
-          <aside className="lg:col-span-5">
-            <p className="border-b border-black pb-2 text-[12px] font-bold tracking-[0.12em] text-black uppercase" style={uiBold}>
-              The latest
-            </p>
-            <ul>
-              {latest.map((story) => (
-                <li key={story.id} className="border-b border-black/15 py-3.5">
-                  <button type="button" onClick={() => onJump(story.id)} className="group w-full text-left">
-                    <span className="text-[15px] leading-6 text-black" style={roman}>
-                      <span className="font-bold text-black group-hover:text-[#DF0A14]" style={romanBold}>
-                        {story.chip}:
-                      </span>{" "}
-                      {story.dek && story.dek !== story.displayTitle ? story.dek : story.displayTitle}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </aside>
-        </div>
+    <header className="border-b border-black/20 bg-[#F4F0EA] pb-8 pt-6 sm:pb-10 sm:pt-8">
+      <p className="text-[11px] font-bold tracking-[0.22em] text-[#DF0A14] uppercase" style={romanBold}>
+        The Week
+      </p>
+      <h1 className="mt-2 text-[2.35rem] leading-none text-black sm:text-[3.15rem]" style={roman}>
+        {briefing}
+      </h1>
+      <p className="mt-2 text-[13px] leading-5 text-black/60" style={ui}>
+        {today}
+      </p>
+      <p className="mt-4 max-w-[46ch] text-[15px] leading-6 text-black/75" style={roman}>
+        Good morning. Here’s what’s worth your time today — start with the lead, or jump from The latest.
+      </p>
+      <div className="mt-6 lg:hidden">
+        <DigestRail stories={stories} onJump={onJump} />
       </div>
-    </section>
+    </header>
   );
 }
 
@@ -1758,94 +1728,98 @@ export function ReportBriefing({
         ) : null}
       </div>
       <div className={`report-page ${digest ? "block" : "hidden md:block"}`}>
-      <WeekSiteHeader />
+      {digest ? null : <WeekSiteHeader />}
+      {digest ? null : (
       <div className="flex items-center justify-between gap-6 border-b border-black/10 bg-[#F4F0EA] px-5 py-2">
         <p className="text-[12px] leading-none text-[#6B7280]" style={ui}>
           Version
         </p>
         <nav aria-label="Version" className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[12px] leading-none text-[#9CA3AF]" style={ui}>
-          {digest ? (
-            <span className="text-[#6B7280]">Digest</span>
-          ) : (
-            <Link href={layoutHref("digest", locked, ads)} className="hover:text-[#374151] hover:underline">
-              Digest
-            </Link>
-          )}
+          <Link href={layoutHref("digest", locked, ads)} className="hover:text-[#374151] hover:underline">
+            Digest
+          </Link>
           <span aria-hidden>·</span>
-          {digest ? (
-            <Link href={layoutHref("classic", locked, ads)} className="hover:text-[#374151] hover:underline">
-              Classic
-            </Link>
-          ) : (
-            <span className="text-[#6B7280]">Classic</span>
-          )}
+          <span className="text-[#6B7280]">Classic</span>
           <span aria-hidden>·</span>
           {locked ? <Link href={layoutHref(layout, false, ads)} className="hover:text-[#374151] hover:underline">Report</Link> : <span className="text-[#6B7280]">Report</span>}
           <span aria-hidden>·</span>
           {locked ? <span className="text-[#6B7280]">Locked</span> : <Link href={layoutHref(layout, true, ads)} className="hover:text-[#374151] hover:underline">Locked</Link>}
-          <span aria-hidden>·</span>
-          {ads ? <span className="text-[#6B7280]">Ads</span> : <Link href={layoutHref(layout, locked, true)} className="hover:text-[#374151] hover:underline">Ads</Link>}
         </nav>
       </div>
+      )}
       <div className="sticky top-0 z-40 bg-[#F4F0EA]">
         <div className="h-[3px] bg-black/10" aria-hidden>
           <div className="h-full bg-[#DF0A14]" style={{ width: `${progress * 100}%` }} />
         </div>
-        <div className={`brand-soft-border flex h-11 items-center gap-3 border-b bg-[#F4F0EA] ${pagePad}`} style={roman}>
-          <nav aria-label="Place in the briefing" className="report-crumbs brand-breadcrumbs min-w-0 flex-1 text-xs">
-            <ol className="flex min-w-0 items-center gap-1">
-              <li className="shrink-0">
-                <a href={`#${stories[0]?.id ?? ""}`} className="brand-breadcrumb-link">
-                  The Week
-                </a>
-              </li>
-              <li className="inline-flex shrink-0 items-center gap-1">
-                <span className="brand-breadcrumb-separator" aria-hidden>
-                  /
-                </span>
-                <span>{briefing}</span>
-              </li>
-              <li className="inline-flex min-w-0 items-center gap-1">
-                <span className="brand-breadcrumb-separator" aria-hidden>
-                  /
-                </span>
-                <span className="brand-breadcrumb-current truncate">
-                  {number(index)}/{total}
-                </span>
-              </li>
-            </ol>
-          </nav>
+        <div className={`flex h-12 items-center gap-3 border-b border-black/15 bg-[#F4F0EA] ${pagePad}`}>
+          <p className="min-w-0 flex-1 truncate text-sm text-black" style={roman}>
+            <span className="font-bold text-[#DF0A14]" style={romanBold}>
+              The Week
+            </span>
+            <span className="text-black/40"> · </span>
+            <span>{briefing}</span>
+            <span className="text-black/40"> · </span>
+            <span className="text-[#DF0A14]">{number(index)}/{total}</span>
+          </p>
+          <div className="hidden items-center gap-2 sm:flex">
+            <Link href={layoutHref("digest", locked, ads)} className="inline-flex">
+              <Chip label="Digest" selected={digest} className="min-w-0 px-3" />
+            </Link>
+            <Link href={layoutHref("classic", locked, ads)} className="inline-flex">
+              <Chip label="Classic" selected={!digest} className="min-w-0 px-3" />
+            </Link>
+          </div>
           <div className="relative">
-          <button
-            type="button"
-            aria-expanded={open}
-            aria-controls="story-index"
-            onClick={() => setOpen((value) => !value)}
-            className="brand-label-copy relative z-50 inline-flex min-h-11 items-center gap-2 px-2 text-xs transition-colors duration-200 hover:text-[#DF0A14]"
-          >
-            In this report
-            <span aria-hidden className={`text-[10px] transition-transform ${open ? "rotate-180" : ""}`}>▾</span>
-          </button>
-          {open ? (
-            <>
-              <button type="button" aria-label="Close story list" className="fixed inset-0 z-40 cursor-default bg-black/20" onClick={() => setOpen(false)} />
-              <div className="absolute top-full right-0 z-50 mt-1 w-[min(420px,calc(100vw-24px))] overflow-hidden border border-black/10 bg-[#F4F0EA] shadow-[0_18px_40px_rgba(10,10,10,0.16)]">
-                {storyIndex("story-index")}
-              </div>
-            </>
-          ) : null}
+            <button
+              type="button"
+              aria-expanded={open}
+              aria-controls="story-index"
+              onClick={() => setOpen((value) => !value)}
+              className="brand-icon-button inline-flex h-10 items-center gap-1.5 px-2 text-xs font-bold tracking-[0.08em] text-black uppercase transition-colors hover:text-[#DF0A14]"
+              style={uiBold}
+            >
+              Index
+              <BrandIcon name="chevronDown" defaultIcon={ChevronDown} className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
+            </button>
+            {open ? (
+              <>
+                <button type="button" aria-label="Close story list" className="fixed inset-0 z-40 cursor-default bg-black/20" onClick={() => setOpen(false)} />
+                <div className="absolute top-full right-0 z-50 mt-1 w-[min(420px,calc(100vw-24px))] overflow-hidden border border-black/10 bg-[#F4F0EA] shadow-[0_18px_40px_rgba(10,10,10,0.16)]">
+                  {storyIndex("story-index")}
+                </div>
+              </>
+            ) : null}
           </div>
         </div>
       </div>
 
-      {digest ? <BriefingDigest stories={stories} briefing={briefing} onJump={jump} /> : null}
-
-      {stories.map((story, storyIndex) => (
-        <div key={story.id}>
-          <StoryCover story={story} index={storyIndex} edition={storyIndex === 0} locked={locked && storyIndex > 0} layout={layout} />
-          <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" />
+      {digest ? (
+        <div className={`mx-auto max-w-[1180px] ${pagePad}`}>
+          <div className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-12">
+            <div className="lg:col-span-8">
+              <BriefingDigest stories={stories} briefing={briefing} onJump={jump} />
+              {stories.map((story, storyIndex) => (
+                <div key={story.id}>
+                  <StoryCover story={story} index={storyIndex} edition={storyIndex === 0} locked={locked && storyIndex > 0} layout={layout} />
+                  <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" />
+                </div>
+              ))}
+            </div>
+            <div className="hidden py-8 lg:col-span-4 lg:block">
+              <div className="sticky top-16">
+                <DigestRail stories={stories} onJump={jump} currentId={stories[index]?.id} />
+              </div>
+            </div>
+          </div>
         </div>
-      ))}
+      ) : (
+        stories.map((story, storyIndex) => (
+          <div key={story.id}>
+            <StoryCover story={story} index={storyIndex} edition={storyIndex === 0} locked={locked && storyIndex > 0} layout={layout} />
+            <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" />
+          </div>
+        ))
+      )}
 
       <BriefingSources periods={periods} />
       <section className="flex min-h-[40vh] items-center justify-center bg-[#F4F0EA] px-4 py-20">
