@@ -460,9 +460,18 @@ function DigestPapers({ story }: { story: WeekStory }) {
   const [active, setActive] = useState(0);
   const scrollerRef = useRef<HTMLUListElement>(null);
 
+  const scrollToIndex = (index: number, behavior: ScrollBehavior = "smooth") => {
+    const root = scrollerRef.current;
+    const item = root?.children[index] as HTMLElement | undefined;
+    if (!root || !item) return;
+    const left = item.offsetLeft - (root.clientWidth - item.offsetWidth) / 2;
+    root.scrollTo({ left: Math.max(0, left), behavior });
+  };
+
   useEffect(() => {
     const root = scrollerRef.current;
     if (!root || covers.length === 0) return;
+    scrollToIndex(0, "auto");
     const onScroll = () => {
       const mid = root.scrollLeft + root.clientWidth / 2;
       let nearest = 0;
@@ -482,12 +491,9 @@ function DigestPapers({ story }: { story: WeekStory }) {
   }, [covers.length]);
 
   const go = (next: number) => {
-    const root = scrollerRef.current;
-    if (!root) return;
     const clamped = Math.min(covers.length - 1, Math.max(0, next));
     setActive(clamped);
-    const item = root.children[clamped] as HTMLElement | undefined;
-    item?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    scrollToIndex(clamped);
   };
 
   if (covers.length === 0) return null;
@@ -511,7 +517,7 @@ function DigestPapers({ story }: { story: WeekStory }) {
       <div className="relative mt-6">
         <ul
           ref={scrollerRef}
-          className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 [scrollbar-width:none] lg:gap-6 lg:px-[12%] [&::-webkit-scrollbar]:hidden"
+          className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 [scrollbar-width:none] lg:gap-6 lg:px-[22%] [&::-webkit-scrollbar]:hidden"
         >
           {covers.map((cover, coverIndex) => {
             const focused = coverIndex === active;
@@ -520,76 +526,81 @@ function DigestPapers({ story }: { story: WeekStory }) {
                 key={`${cover.label}-${coverIndex}`}
                 className="w-[88%] shrink-0 snap-center sm:w-[78%] lg:w-[56%]"
               >
-                <button
-                  type="button"
-                  onClick={() => go(coverIndex)}
-                  className="group w-full text-left"
-                  aria-current={focused ? "true" : undefined}
-                >
-                  <span
-                    className={`relative block aspect-[3/4] w-full overflow-hidden bg-[#111] transition-[filter,opacity,transform,box-shadow] duration-300 ${
+                <div className="w-full">
+                  <div
+                    className={`relative aspect-[3/4] w-full overflow-hidden bg-[#111] transition-[filter,opacity,transform,box-shadow] duration-300 ${
                       focused
                         ? "scale-100 shadow-[0_0_0_2px_#DF0A14] opacity-100 blur-0"
                         : "scale-[0.98] opacity-70 blur-[2px] saturate-75"
                     }`}
                   >
-                    <Image
-                      src={cover.src}
-                      alt=""
-                      fill
-                      unoptimized
-                      className="object-cover object-top"
-                      sizes="(max-width: 1023px) 88vw, 420px"
-                      priority={coverIndex < 2}
-                    />
+                    <button
+                      type="button"
+                      onClick={() => go(coverIndex)}
+                      className="absolute inset-0 block"
+                      aria-label={`Open ${cover.label}`}
+                      aria-current={focused ? "true" : undefined}
+                    >
+                      <Image
+                        src={cover.src}
+                        alt=""
+                        fill
+                        unoptimized
+                        className="object-cover object-top"
+                        sizes="(max-width: 1023px) 88vw, 420px"
+                        priority={coverIndex < 2}
+                      />
+                      <span
+                        aria-hidden
+                        className={`pointer-events-none absolute inset-0 bg-black transition-opacity duration-300 ${
+                          focused ? "opacity-0" : "opacity-35"
+                        }`}
+                      />
+                    </button>
+                    {focused ? (
+                      <>
+                        <div className="absolute inset-y-0 left-2 z-20 flex items-center">
+                          <BrandScrollArrow
+                            direction="left"
+                            label="Previous front page"
+                            disabled={active <= 0}
+                            onClick={() => go(active - 1)}
+                          />
+                        </div>
+                        <div className="absolute inset-y-0 right-2 z-20 flex items-center">
+                          <BrandScrollArrow
+                            direction="right"
+                            label="Next front page"
+                            disabled={active >= covers.length - 1}
+                            onClick={() => go(active + 1)}
+                          />
+                        </div>
+                      </>
+                    ) : null}
+                  </div>
+                  <button type="button" onClick={() => go(coverIndex)} className="mt-4 w-full text-left">
                     <span
-                      aria-hidden
-                      className={`pointer-events-none absolute inset-0 bg-black transition-opacity duration-300 ${
-                        focused ? "opacity-0" : "opacity-35"
+                      className={`block text-[11px] font-bold tracking-[0.14em] uppercase transition-opacity duration-300 ${
+                        focused ? "text-[#DF0A14] opacity-100" : "text-[#DF0A14] opacity-55"
                       }`}
-                    />
-                  </span>
-                  <span
-                    className={`mt-4 block px-0 text-[11px] font-bold tracking-[0.14em] uppercase transition-opacity duration-300 ${
-                      focused ? "text-[#DF0A14] opacity-100" : "text-[#DF0A14] opacity-55"
-                    }`}
-                    style={uiBold}
-                  >
-                    {number(coverIndex)} · {cover.label}
-                  </span>
-                  <span
-                    className={`mt-2 block max-w-[22ch] text-[1.45rem] leading-7 transition-opacity duration-300 sm:text-[1.7rem] sm:leading-8 ${
-                      focused ? "text-[var(--brand-text-primary,#0f172b)] opacity-100" : "text-[var(--brand-text-primary,#0f172b)] opacity-50"
-                    }`}
-                    style={roman}
-                  >
-                    {cover.text}
-                  </span>
-                </button>
+                      style={uiBold}
+                    >
+                      {number(coverIndex)} · {cover.label}
+                    </span>
+                    <span
+                      className={`mt-2 block max-w-[22ch] text-[1.45rem] leading-7 transition-opacity duration-300 sm:text-[1.7rem] sm:leading-8 ${
+                        focused ? "text-[var(--brand-text-primary,#0f172b)] opacity-100" : "text-[var(--brand-text-primary,#0f172b)] opacity-50"
+                      }`}
+                      style={roman}
+                    >
+                      {cover.text}
+                    </span>
+                  </button>
+                </div>
               </li>
             );
           })}
         </ul>
-
-        {/* Overlay matches centered cover image size; chevrons vertically centered on that frame */}
-        <div className="pointer-events-none absolute top-0 left-1/2 z-10 aspect-[3/4] w-[88%] -translate-x-1/2 sm:w-[78%] lg:w-[56%]">
-          <div className="pointer-events-auto absolute inset-y-0 left-1 flex items-center sm:left-2">
-            <BrandScrollArrow
-              direction="left"
-              label="Previous front page"
-              disabled={active <= 0}
-              onClick={() => go(active - 1)}
-            />
-          </div>
-          <div className="pointer-events-auto absolute inset-y-0 right-1 flex items-center sm:right-2">
-            <BrandScrollArrow
-              direction="right"
-              label="Next front page"
-              disabled={active >= covers.length - 1}
-              onClick={() => go(active + 1)}
-            />
-          </div>
-        </div>
       </div>
 
       <div className="mt-4 flex items-center justify-center gap-1.5">
