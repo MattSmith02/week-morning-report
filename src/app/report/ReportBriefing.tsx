@@ -457,14 +457,14 @@ function DigestPapers({ story }: { story: WeekStory }) {
   }));
   const [active, setActive] = useState(0);
   const scrollerRef = useRef<HTMLUListElement>(null);
-  const shown = covers[active] ?? covers[0];
 
   useEffect(() => {
     const root = scrollerRef.current;
     if (!root || covers.length === 0) return;
     const onScroll = () => {
       const card = root.querySelector("li");
-      const width = Math.max(card?.getBoundingClientRect().width ?? root.clientWidth, 1) + 12;
+      const gap = 16;
+      const width = Math.max(card?.getBoundingClientRect().width ?? root.clientWidth, 1) + gap;
       setActive(Math.min(covers.length - 1, Math.max(0, Math.round(root.scrollLeft / width))));
     };
     root.addEventListener("scroll", onScroll, { passive: true });
@@ -476,13 +476,13 @@ function DigestPapers({ story }: { story: WeekStory }) {
     const card = root?.querySelector("li");
     if (!root || !card) return;
     setActive(index);
-    root.scrollTo({ left: index * (card.getBoundingClientRect().width + 12), behavior: "smooth" });
+    root.scrollTo({ left: index * (card.getBoundingClientRect().width + 16), behavior: "smooth" });
   };
 
-  if (!shown) return null;
+  if (covers.length === 0) return null;
 
   return (
-    <div className="border-b border-black/15 px-0 pb-10">
+    <div className="pb-10">
       <div className="flex items-end justify-between gap-3 px-1">
         <div>
           <p className="text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
@@ -499,14 +499,19 @@ function DigestPapers({ story }: { story: WeekStory }) {
 
       <ul
         ref={scrollerRef}
-        className="mt-5 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {covers.map((cover, coverIndex) => (
-          <li key={`${cover.label}-${coverIndex}`} className="w-[42%] shrink-0 snap-start sm:w-[36%]">
-            <button type="button" onClick={() => go(coverIndex)} className="group w-full text-left" aria-current={coverIndex === active ? "true" : undefined}>
+          <li key={`${cover.label}-${coverIndex}`} className="w-[82%] shrink-0 snap-start sm:w-[72%]">
+            <button
+              type="button"
+              onClick={() => go(coverIndex)}
+              className="group w-full text-left"
+              aria-current={coverIndex === active ? "true" : undefined}
+            >
               <span
-                className={`relative block aspect-[3/4] overflow-hidden bg-[#111] transition-[box-shadow] ${
-                  coverIndex === active ? "shadow-[0_0_0_2px_#DF0A14]" : "opacity-80 group-hover:opacity-100"
+                className={`relative block aspect-[3/4] overflow-hidden bg-[#111] transition-[box-shadow,opacity] ${
+                  coverIndex === active ? "shadow-[0_0_0_2px_#DF0A14]" : "opacity-85 group-hover:opacity-100"
                 }`}
               >
                 <Image
@@ -515,49 +520,33 @@ function DigestPapers({ story }: { story: WeekStory }) {
                   fill
                   unoptimized
                   className="object-cover object-top"
-                  sizes="180px"
+                  sizes="(max-width: 1024px) 82vw, 420px"
+                  priority={coverIndex < 2}
                 />
               </span>
-              <span className="mt-2 block text-[10px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
-                {cover.label}
+              <span className="mt-4 block text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
+                {number(coverIndex)} · {cover.label}
+              </span>
+              <span className="mt-2 block max-w-[22ch] text-[1.45rem] leading-7 text-black sm:text-[1.7rem] sm:leading-8" style={roman}>
+                {cover.text}
               </span>
             </button>
           </li>
         ))}
       </ul>
 
-      <div className="mt-5 border-t border-black/12 pt-5">
-        <p className="text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
-          {shown.label}
-        </p>
-        <p className="mt-2 max-w-[28ch] text-[1.45rem] leading-7 text-black sm:text-[1.7rem] sm:leading-8" style={roman}>
-          {shown.text}
-        </p>
-      </div>
-
-      <ol className="mt-6 border-t border-black/12">
+      <div className="mt-4 flex items-center justify-center gap-1.5">
         {covers.map((cover, coverIndex) => (
-          <li key={`row-${cover.label}`} className="border-b border-black/12">
-            <button
-              type="button"
-              onClick={() => go(coverIndex)}
-              className={`flex w-full items-start gap-3 py-3.5 text-left transition-colors ${coverIndex === active ? "text-black" : "text-black/65 hover:text-black"}`}
-            >
-              <span className="w-8 shrink-0 text-[11px] font-bold tracking-[0.1em] text-[#DF0A14]" style={uiBold}>
-                {number(coverIndex)}
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-[10px] font-bold tracking-[0.12em] text-[#DF0A14]/80 uppercase" style={uiBold}>
-                  {cover.label}
-                </span>
-                <span className="mt-1 block text-[15px] leading-6" style={coverIndex === active ? romanBold : roman}>
-                  {cover.text}
-                </span>
-              </span>
-            </button>
-          </li>
+          <button
+            key={`dot-${cover.label}`}
+            type="button"
+            aria-label={`Go to ${cover.label}`}
+            aria-current={coverIndex === active ? "true" : undefined}
+            onClick={() => go(coverIndex)}
+            className={`h-1.5 rounded-full transition-all ${coverIndex === active ? "w-5 bg-[#DF0A14]" : "w-1.5 bg-black/25"}`}
+          />
         ))}
-      </ol>
+      </div>
     </div>
   );
 }
@@ -850,15 +839,15 @@ function ImagelessCover({
 }
 
 const DIGEST_STORY_PLATES = [
-  "bg-[#F5F5F3]",
-  "bg-[#EBEBE9]",
-  "bg-[#F2F2F0]",
-  "bg-[#E6E6E4]",
-  "bg-[#F0F0EE]",
-  "bg-[#E9E9E7]",
+  "bg-[#F4F0EA]",
+  "bg-[#E8E2D8]",
+  "bg-[#F4F0EA]",
+  "bg-[#E8E2D8]",
+  "bg-[#F4F0EA]",
+  "bg-[#E8E2D8]",
 ] as const;
 
-const DIGEST_COLUMN = "bg-[#E8E8E6]";
+const DIGEST_COLUMN = "bg-[#F4F0EA]";
 
 function digestPlate(index: number) {
   return DIGEST_STORY_PLATES[index % DIGEST_STORY_PLATES.length];
@@ -2052,7 +2041,7 @@ export function ReportBriefing({
                 <InsideEdition stories={stories} onJump={jump} />
               </div>
             </aside>
-            <div className="min-w-0 bg-[#F5F5F3] lg:col-span-6 lg:px-8">
+            <div className="min-w-0 bg-[#F4F0EA] lg:col-span-6 lg:px-8">
               <BriefingDigest briefing={briefing} />
               {stories.map((story, storyIndex) => (
                 <article key={story.id} className={`${digestPlate(storyIndex)} border-b border-black/10`}>
