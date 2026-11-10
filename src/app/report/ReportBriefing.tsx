@@ -48,11 +48,11 @@ function MarkerHighlight({ children, className = "" }: { children: ReactNode; cl
              C 55 26, 28 32, 14 29
              C 8 27.5, 7 24, 8 20
              Z"
-          fill="#B20810"
-          opacity="0.55"
+          fill="#DF0A14"
+          opacity="0.5"
           filter="url(#marker-bleed)"
         />
-        {/* Second pass — darker core, like overlapping marker strokes */}
+        {/* Second pass — overlapping marker stroke */}
         <path
           d="M14 19
              C 22 12, 48 11, 80 14
@@ -62,8 +62,8 @@ function MarkerHighlight({ children, className = "" }: { children: ReactNode; cl
              C 140 22, 100 27, 60 24
              C 35 22, 20 25, 14 22
              Z"
-          fill="#8F060C"
-          opacity="0.28"
+          fill="#DF0A14"
+          opacity="0.22"
         />
       </svg>
       <span className="relative z-[1]">{children}</span>
