@@ -472,12 +472,13 @@ function DigestPapers({ story }: { story: WeekStory }) {
     return () => root.removeEventListener("scroll", onScroll);
   }, [covers.length]);
 
-  const go = (index: number) => {
+  const go = (next: number) => {
     const root = scrollerRef.current;
     const card = root?.querySelector("li");
     if (!root || !card) return;
-    setActive(index);
-    root.scrollTo({ left: index * (card.getBoundingClientRect().width + 16), behavior: "smooth" });
+    const clamped = Math.min(covers.length - 1, Math.max(0, next));
+    setActive(clamped);
+    root.scrollTo({ left: clamped * (card.getBoundingClientRect().width + 16), behavior: "smooth" });
   };
 
   if (covers.length === 0) return null;
@@ -486,55 +487,98 @@ function DigestPapers({ story }: { story: WeekStory }) {
     <div className="pb-10">
       <div className="flex items-end justify-between gap-3 px-1">
         <div>
-          <p className="text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
+          <p className="brand-label-copy text-[11px] tracking-[0.14em] text-[#DF0A14]" style={uiBold}>
             Today&apos;s newspapers
           </p>
-          <h3 className="mt-2 text-[1.65rem] leading-8 text-black sm:text-[1.85rem]" style={roman}>
+          <h3 className="mt-2 text-[1.65rem] leading-8 text-[var(--brand-text-primary,#0f172b)] sm:text-[1.85rem]" style={roman}>
             Front pages
           </h3>
         </div>
-        <p className="text-[12px] text-black/45" style={ui}>
-          {number(active)} / {number(Math.max(covers.length - 1, 0))}
-        </p>
+        <div className="flex items-center gap-2">
+          <p className="brand-muted-copy text-[12px] tabular-nums" style={ui}>
+            {number(active)} / {number(Math.max(covers.length - 1, 0))}
+          </p>
+          <button
+            type="button"
+            aria-label="Previous front page"
+            disabled={active <= 0}
+            onClick={() => go(active - 1)}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--brand-radius-control,8px)] border border-black/20 bg-white text-[var(--brand-text-primary,#0f172b)] transition-colors hover:border-black hover:bg-[#F0EAE1] disabled:pointer-events-none disabled:opacity-30"
+          >
+            <BrandIcon name="chevronLeft" defaultIcon={ChevronLeft} className="h-5 w-5" />
+          </button>
+          <button
+            type="button"
+            aria-label="Next front page"
+            disabled={active >= covers.length - 1}
+            onClick={() => go(active + 1)}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--brand-radius-control,8px)] border border-black/20 bg-white text-[var(--brand-text-primary,#0f172b)] transition-colors hover:border-black hover:bg-[#F0EAE1] disabled:pointer-events-none disabled:opacity-30"
+          >
+            <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-5 w-5" />
+          </button>
+        </div>
       </div>
 
-      <ul
-        ref={scrollerRef}
-        className={`mt-6 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3 lg:gap-4 ${brandScrollbar}`}
-      >
-        {covers.map((cover, coverIndex) => (
-          <li key={`${cover.label}-${coverIndex}`} className="w-[88%] shrink-0 snap-start sm:w-[78%] lg:w-[72%]">
-            <button
-              type="button"
-              onClick={() => go(coverIndex)}
-              className="group w-full text-left"
-              aria-current={coverIndex === active ? "true" : undefined}
-            >
-              <span
-                className={`relative block aspect-[3/4] w-full overflow-hidden bg-[#111] transition-[box-shadow,opacity] ${
-                  coverIndex === active ? "shadow-[0_0_0_2px_#DF0A14]" : "opacity-85 group-hover:opacity-100"
-                }`}
-              >
-                <Image
-                  src={cover.src}
-                  alt=""
-                  fill
-                  unoptimized
-                  className="object-cover object-top"
-                  sizes="(max-width: 1023px) 88vw, 420px"
-                  priority={coverIndex < 2}
-                />
-              </span>
-              <span className="mt-4 block px-0 text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
-                {number(coverIndex)} · {cover.label}
-              </span>
-              <span className="mt-2 block max-w-[22ch] text-[1.45rem] leading-7 text-black sm:text-[1.7rem] sm:leading-8" style={roman}>
-                {cover.text}
-              </span>
-            </button>
-          </li>
-        ))}
-      </ul>
+      <div className="relative mt-6">
+        <ul
+          ref={scrollerRef}
+          className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 [scrollbar-width:none] lg:gap-4 [&::-webkit-scrollbar]:hidden"
+        >
+          {covers.map((cover, coverIndex) => {
+            const focused = coverIndex === active;
+            return (
+              <li key={`${cover.label}-${coverIndex}`} className="w-[88%] shrink-0 snap-start sm:w-[78%] lg:w-[72%]">
+                <button
+                  type="button"
+                  onClick={() => go(coverIndex)}
+                  className="group w-full text-left"
+                  aria-current={focused ? "true" : undefined}
+                >
+                  <span
+                    className={`relative block aspect-[3/4] w-full overflow-hidden bg-[#111] transition-[filter,opacity,transform,box-shadow] duration-300 ${
+                      focused
+                        ? "scale-100 shadow-[0_0_0_2px_#DF0A14] opacity-100 blur-0"
+                        : "scale-[0.98] opacity-70 blur-[2px] saturate-75"
+                    }`}
+                  >
+                    <Image
+                      src={cover.src}
+                      alt=""
+                      fill
+                      unoptimized
+                      className="object-cover object-top"
+                      sizes="(max-width: 1023px) 88vw, 420px"
+                      priority={coverIndex < 2}
+                    />
+                    <span
+                      aria-hidden
+                      className={`pointer-events-none absolute inset-0 bg-black transition-opacity duration-300 ${
+                        focused ? "opacity-0" : "opacity-35"
+                      }`}
+                    />
+                  </span>
+                  <span
+                    className={`mt-4 block px-0 text-[11px] font-bold tracking-[0.14em] uppercase transition-opacity duration-300 ${
+                      focused ? "text-[#DF0A14] opacity-100" : "text-[#DF0A14] opacity-55"
+                    }`}
+                    style={uiBold}
+                  >
+                    {number(coverIndex)} · {cover.label}
+                  </span>
+                  <span
+                    className={`mt-2 block max-w-[22ch] text-[1.45rem] leading-7 transition-opacity duration-300 sm:text-[1.7rem] sm:leading-8 ${
+                      focused ? "text-[var(--brand-text-primary,#0f172b)] opacity-100" : "text-[var(--brand-text-primary,#0f172b)] opacity-50"
+                    }`}
+                    style={roman}
+                  >
+                    {cover.text}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
 
       <div className="mt-4 flex items-center justify-center gap-1.5">
         {covers.map((cover, coverIndex) => (
