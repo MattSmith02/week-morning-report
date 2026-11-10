@@ -54,6 +54,15 @@ body {
   color: var(--foreground);
 }
 
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 @layer utilities {
   .brand-soft-border {
     border-color: var(--ui-soft-border-border-color, rgb(226 232 240));
