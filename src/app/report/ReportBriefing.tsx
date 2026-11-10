@@ -877,6 +877,82 @@ function StoryCover({
   );
 }
 
+function InsideEdition({ stories, onJump }: { stories: WeekStory[]; onJump: (id: string) => void }) {
+  const big = stories.find((story) => /big question/i.test(story.chip) || /big question/i.test(story.kicker ?? ""));
+  const quote = stories.find((story) => story.format === "quote" || /quote/i.test(story.chip));
+  const stat = stories.find((story) => story.format === "stat" || /statistic/i.test(story.chip));
+  const modules = [
+    big
+      ? {
+          id: big.id,
+          label: "Today's big question",
+          title: big.dek && big.dek !== big.displayTitle ? big.dek.replace(/\?$/, "") + (big.dek.includes("?") ? "?" : "") : big.displayTitle,
+          body: big.whatHappened,
+        }
+      : null,
+    quote
+      ? {
+          id: quote.id,
+          label: "Quote of the day",
+          title: quote.quote ? `“${quote.quote}”` : quote.displayTitle,
+          body: quote.quoteAttribution || quote.dek,
+          isQuote: true,
+        }
+      : null,
+    stat
+      ? {
+          id: stat.id,
+          label: "Statistics",
+          title: stat.stats?.[0]?.value || stat.dek || "—",
+          body: stat.stats?.[0]?.label || stat.displayTitle,
+          isStat: true,
+        }
+      : null,
+  ].filter(Boolean) as Array<{ id: string; label: string; title: string; body?: string; isQuote?: boolean; isStat?: boolean }>;
+
+  if (modules.length === 0) return null;
+
+  return (
+    <aside aria-label="Inside this edition" className="border border-black/15 bg-[#F4F0EA]">
+      <div className="flex items-center gap-2 border-b border-black/15 px-4 py-3">
+        <span className="inline-flex h-5 w-5 items-center justify-center bg-[#DF0A14] text-[10px] font-bold text-white" style={uiBold} aria-hidden>
+          W
+        </span>
+        <p className="text-[11px] font-bold tracking-[0.16em] text-black uppercase" style={uiBold}>
+          Inside this edition
+        </p>
+      </div>
+      <ul>
+        {modules.map((item, itemIndex) => (
+          <li key={item.id} className={itemIndex > 0 ? "border-t border-black/12" : undefined}>
+            <button type="button" onClick={() => onJump(item.id)} className="group w-full px-4 py-5 text-left">
+              <span className="block text-[10px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
+                {item.label}
+              </span>
+              {item.isQuote ? (
+                <span className="mt-3 block text-[28px] leading-none text-black" style={roman} aria-hidden>
+                  “
+                </span>
+              ) : null}
+              <span
+                className={`mt-2 block text-black transition-colors group-hover:text-[#DF0A14] ${item.isStat ? "text-[2.35rem] leading-none" : item.isQuote ? "line-clamp-5 text-[15px] leading-6" : "text-[17px] leading-6"}`}
+                style={roman}
+              >
+                {item.title}
+              </span>
+              {item.body ? (
+                <span className={`mt-2 block text-[13px] leading-5 text-black/60 ${item.isQuote || item.isStat ? "" : "line-clamp-3"}`} style={roman}>
+                  {item.body}
+                </span>
+              ) : null}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </aside>
+  );
+}
+
 function DigestRail({
   stories,
   onJump,
@@ -1425,7 +1501,6 @@ export function ReportBriefing({
 }) {
   const digest = layout === "digest";
   const [index, setIndex] = useState(0);
-  const [progress, setProgress] = useState(0);
   const [open, setOpen] = useState(false);
   const [down, setDown] = useState(false);
   const railRef = useRef<HTMLDivElement>(null);
@@ -1435,9 +1510,6 @@ export function ReportBriefing({
   useEffect(() => {
     const onScroll = () => {
       if (window.matchMedia("(max-width: 767px)").matches) return;
-      const root = document.documentElement;
-      const max = root.scrollHeight - root.clientHeight;
-      setProgress(max > 0 ? Math.min(1, root.scrollTop / max) : 0);
       const line = window.innerHeight * 0.4;
       let current = 0;
       document.querySelectorAll<HTMLElement>("[data-story]").forEach((section, storyIndex) => {
@@ -1865,9 +1937,6 @@ export function ReportBriefing({
       </div>
       )}
       <div className="sticky top-0 z-40 bg-[#F4F0EA]">
-        <div className="h-[3px] bg-black/10" aria-hidden>
-          <div className="h-full bg-[#DF0A14]" style={{ width: `${progress * 100}%` }} />
-        </div>
         <div className={`flex h-12 items-center gap-3 border-b border-black/15 bg-[#F4F0EA] ${pagePad}`}>
           <p className="min-w-0 flex-1 truncate text-sm text-black" style={roman}>
             <span className="font-bold text-[#DF0A14]" style={romanBold}>
@@ -1947,9 +2016,14 @@ export function ReportBriefing({
       ) : null}
 
       {digest ? (
-        <div className={`mx-auto max-w-[1180px] ${pagePad}`}>
-          <div className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-10">
-            <div className="min-w-0 lg:col-span-8">
+        <div className={`mx-auto max-w-[1280px] ${pagePad}`}>
+          <div className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-8 xl:gap-10">
+            <aside className="mt-6 self-start lg:col-span-3 lg:mt-8">
+              <div className="lg:sticky lg:top-14 lg:max-h-[calc(100svh-3.5rem)] lg:overflow-y-auto lg:overscroll-contain">
+                <InsideEdition stories={stories} onJump={jump} />
+              </div>
+            </aside>
+            <div className="min-w-0 lg:col-span-5 xl:col-span-6">
               <BriefingDigest stories={stories} briefing={briefing} onJump={jump} />
               {stories.map((story, storyIndex) => (
                 <article key={story.id} className={digestPlate(storyIndex)}>
@@ -1958,8 +2032,8 @@ export function ReportBriefing({
                 </article>
               ))}
             </div>
-            <aside className="hidden self-start lg:col-span-4 lg:block">
-              <div className="sticky top-14 z-20 max-h-[calc(100svh-3.5rem)] overflow-y-auto overscroll-contain border-l border-black/15 bg-[#F4F0EA] py-8 pl-8">
+            <aside className="hidden self-start lg:col-span-4 xl:col-span-3 lg:block">
+              <div className="sticky top-14 z-20 max-h-[calc(100svh-3.5rem)] overflow-y-auto overscroll-contain border-l border-black/15 bg-[#F4F0EA] py-8 pl-6 xl:pl-8">
                 <DigestRail stories={stories} onJump={jump} currentId={stories[index]?.id} />
               </div>
             </aside>
