@@ -297,10 +297,11 @@ function StoryReading({
   const rest = part !== "hook";
   const framed = part !== "rest";
   const digest = layout === "digest";
+  const readWidth = digest ? "relative flex w-full flex-col gap-10 sm:gap-12" : "relative flex max-w-[65ch] flex-col gap-10 sm:gap-12";
 
   return (
     <div className={framed ? "relative py-8 sm:py-10" : ""}>
-      <div className={framed ? "relative flex max-w-[65ch] flex-col gap-10 sm:gap-12" : "flex flex-col gap-6"}>
+      <div className={framed ? readWidth : "flex flex-col gap-6"}>
         {hook && story.format !== "quote" && story.whatHappened ? (
           <section>
             <div>
@@ -321,7 +322,7 @@ function StoryReading({
           </section>
         ) : null}
         {rest && story.items && story.items.length > 0 ? (
-          <ul className={`max-w-[635px] border-t ${hairline}`}>
+          <ul className={`${digest ? "w-full" : "max-w-[635px]"} border-t ${hairline}`}>
             {story.items.map((item) => (
               <li key={item.label} className={`border-b py-5 ${hairline}`}>
                 <p className={subInfo} style={uiBold}>
@@ -850,6 +851,7 @@ const DIGEST_STORY_PLATES = [
 
 const DIGEST_WIDE_BAR_LIGHT = "digest-wide-bar bg-[#F4F0EA]";
 const DIGEST_WIDE_BAR_DARK = "digest-wide-bar bg-[#E8E2D8]";
+const digestTextPad = "px-4 sm:px-5";
 const brandScrollbar = "brand-scrollbar";
 
 function digestPlate(index: number) {
@@ -874,7 +876,7 @@ function CompactStoryHeader({
     <section id={story.id} data-story className={`relative scroll-mt-12 ${plateClass}`}>
       {locked ? <CoverLock /> : null}
       {hasImage ? (
-        <figure className="overflow-hidden bg-[#111]">
+        <figure className="w-full overflow-hidden bg-[#111]">
           <div className={`relative w-full overflow-hidden ${lead ? "aspect-[16/10]" : "aspect-[16/10] sm:aspect-[16/9]"}`}>
             <Image
               src={story.imageSrc!}
@@ -883,12 +885,12 @@ function CompactStoryHeader({
               priority={lead}
               unoptimized={story.imageSrc!.startsWith("/") || story.imageSrc!.startsWith("http")}
               className="object-cover object-center"
-              sizes="100vw"
+              sizes="(max-width: 1023px) 100vw, 50vw"
             />
           </div>
         </figure>
       ) : null}
-      <div className={`${hasImage ? "pt-5 pb-8 sm:pb-10" : "py-8 sm:py-10"}`}>
+      <div className={`${digestTextPad} ${hasImage ? "pt-5 pb-8 sm:pb-10" : "py-8 sm:py-10"}`}>
         {hasImage && story.imageCaption ? (
           <p className="mb-4 text-[13px] leading-5 text-black/50" style={ui}>
             {story.imageCaption}
@@ -2094,17 +2096,17 @@ export function ReportBriefing({
                 <InsideEdition stories={stories} onJump={jump} />
               </div>
             </aside>
-            <div className="min-w-0 bg-[#F4F0EA] lg:col-span-6 lg:px-8">
-              <div className="px-4 lg:px-0">
+            <div className="min-w-0 bg-[#F4F0EA] lg:col-span-6">
+              <div className={digestTextPad}>
                 <BriefingDigest briefing={briefing} />
               </div>
-              <div className="border-t border-black/12 px-4 py-8 lg:hidden">
+              <div className={`border-t border-black/12 py-8 lg:hidden ${digestTextPad}`}>
                 <InsideEdition stories={stories} onJump={jump} />
               </div>
               {stories.map((story, storyIndex) => (
                 <article key={story.id} className={`${digestPlate(storyIndex)} border-b border-black/10`}>
                   <StoryCover story={story} index={storyIndex} edition={storyIndex === 0} locked={locked && storyIndex > 0} layout={layout} />
-                  <div className="px-4 lg:px-0">
+                  <div className={digestTextPad}>
                     <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" layout={layout} />
                   </div>
                 </article>
