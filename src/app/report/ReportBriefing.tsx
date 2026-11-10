@@ -20,50 +20,42 @@ const uiBold: CSSProperties = { fontFamily: UI, fontWeight: 700 };
 const pagePad = "px-4 sm:px-8 lg:px-8 xl:px-12 min-[1440px]:px-20 2xl:px-[177px]";
 const iconButton = "brand-icon-button inline-flex h-12 w-12 items-center justify-center rounded-full focus:outline-none focus-visible:ring-2";
 
-/** Deep-red marker-pen swipe behind type (header only). */
+/** Hand-sketched circle highlight in Week red (header only). */
 function MarkerHighlight({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <span className={`relative inline-block ${className}`}>
+    <span className={`relative inline-block px-[0.2em] py-[0.08em] ${className}`}>
       <svg
         aria-hidden
-        className="pointer-events-none absolute -left-[0.1em] top-[0.4em] h-[0.62em] w-[calc(100%+0.2em)] overflow-visible"
-        viewBox="0 0 240 36"
+        className="pointer-events-none absolute -inset-x-[0.15em] -inset-y-[0.18em] h-[calc(100%+0.36em)] w-[calc(100%+0.3em)] overflow-visible"
+        viewBox="0 0 200 60"
         preserveAspectRatio="none"
       >
-        <defs>
-          <filter id="marker-bleed" x="-8%" y="-40%" width="116%" height="180%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" result="noise" seed="3" />
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.4" xChannelSelector="R" yChannelSelector="G" />
-          </filter>
-        </defs>
-        {/* Main felt-tip swipe */}
+        {/* Double irregular oval — pen circling the phrase */}
         <path
-          d="M8 20
-             C 9 9, 18 5, 32 6.5
-             C 70 9, 110 4, 150 7
-             C 180 9.5, 205 5, 228 8
-             C 236 9.5, 238 14, 236 20
-             C 234 28, 226 31, 210 30
-             C 170 28, 130 33, 90 29
-             C 55 26, 28 32, 14 29
-             C 8 27.5, 7 24, 8 20
+          d="M18 30
+             C 20 8, 55 4, 100 5
+             C 150 6, 182 12, 184 30
+             C 186 48, 150 55, 100 54
+             C 50 53, 16 48, 18 30
              Z"
-          fill="#DF0A14"
-          opacity="0.5"
-          filter="url(#marker-bleed)"
+          fill="none"
+          stroke="#DF0A14"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          opacity="0.95"
         />
-        {/* Second pass — overlapping marker stroke */}
         <path
-          d="M14 19
-             C 22 12, 48 11, 80 14
-             C 120 18, 160 12, 200 15
-             C 220 16.5, 228 18, 230 21
-             C 226 25, 210 26, 180 24
-             C 140 22, 100 27, 60 24
-             C 35 22, 20 25, 14 22
-             Z"
-          fill="#DF0A14"
-          opacity="0.22"
+          d="M22 28
+             C 26 10, 60 7, 102 8
+             C 148 9, 178 14, 180 31
+             C 182 46, 148 52, 98 51
+             C 52 50, 20 44, 22 28"
+          fill="none"
+          stroke="#DF0A14"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          opacity="0.75"
         />
       </svg>
       <span className="relative z-[1]">{children}</span>
