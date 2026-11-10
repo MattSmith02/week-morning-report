@@ -262,11 +262,41 @@ function FullBleedBrand({ children }: { children: ReactNode }) {
   );
 }
 
-function StoryReading({ story, part = "all", place = "none" }: { story: WeekStory; part?: "all" | "hook" | "rest"; place?: "none" | "sides" | "inline" }) {
+function QuoteBlock({ story }: { story: WeekStory }) {
+  if (!story.quote) return null;
+  return (
+    <figure>
+      <div className="flex items-start gap-4">
+        <QuoteMark />
+        <div>
+          <blockquote className="text-[1.75rem] italic leading-9 text-black" style={roman}>
+            {story.quote}
+          </blockquote>
+          <p className={`mt-3 ${subInfo}`} style={ui}>
+            Quote{story.quoteAttribution ? ` · ${story.quoteAttribution}` : ""}
+          </p>
+        </div>
+      </div>
+    </figure>
+  );
+}
+
+function StoryReading({
+  story,
+  part = "all",
+  place = "none",
+  layout = "classic",
+}: {
+  story: WeekStory;
+  part?: "all" | "hook" | "rest";
+  place?: "none" | "sides" | "inline";
+  layout?: ReportLayout;
+}) {
   const happenedLabel = story.format === "tale" ? "The tale" : story.format === "quote" ? "" : "What happened";
   const hook = part !== "rest";
   const rest = part !== "hook";
   const framed = part !== "rest";
+  const digest = layout === "digest";
 
   return (
     <div className={framed ? "relative py-8 sm:py-10" : ""}>
@@ -305,21 +335,13 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
           </ul>
         ) : null}
         {rest && story.quote ? (
-          <FullBleedBrand>
-            <figure>
-              <div className="flex items-start gap-4">
-                <QuoteMark />
-                <div>
-                  <blockquote className="text-[1.75rem] italic leading-9 text-black" style={roman}>
-                    {story.quote}
-                  </blockquote>
-                  <p className={`mt-3 ${subInfo}`} style={ui}>
-                    Quote{story.quoteAttribution ? ` · ${story.quoteAttribution}` : ""}
-                  </p>
-                </div>
-              </div>
-            </figure>
-          </FullBleedBrand>
+          digest ? (
+            <QuoteBlock story={story} />
+          ) : (
+            <FullBleedBrand>
+              <QuoteBlock story={story} />
+            </FullBleedBrand>
+          )
         ) : null}
         {rest ? <div className="contents">
           {story.format === "quote" && story.whatHappened ? (
@@ -828,13 +850,15 @@ function ImagelessCover({
 }
 
 const DIGEST_STORY_PLATES = [
-  "bg-[#F4F0EA]",
-  "bg-[#E8E4DA]",
-  "bg-[#F7F1EA]",
-  "bg-[#E3EEF2]",
-  "bg-[#F0E6E4]",
-  "bg-[#EDE7DF]",
+  "bg-[#F5F5F3]",
+  "bg-[#EBEBE9]",
+  "bg-[#F2F2F0]",
+  "bg-[#E6E6E4]",
+  "bg-[#F0F0EE]",
+  "bg-[#E9E9E7]",
 ] as const;
+
+const DIGEST_COLUMN = "bg-[#E8E8E6]";
 
 function digestPlate(index: number) {
   return DIGEST_STORY_PLATES[index % DIGEST_STORY_PLATES.length];
@@ -1128,7 +1152,7 @@ function BriefingDigest({ briefing }: { briefing: string }) {
   const today = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date());
 
   return (
-    <header className="border-b border-black/20 bg-[#F4F0EA] pb-10 pt-8">
+    <header className="border-b border-black/20 bg-transparent pb-10 pt-8">
       <p className="text-[11px] font-bold tracking-[0.22em] text-[#DF0A14] uppercase" style={romanBold}>
         The Week
       </p>
@@ -1477,9 +1501,9 @@ function StoryBody({
   if (locked && lead && story.format !== "papers" && story.format !== "video" && story.format !== "puzzle") {
     return (
       <>
-        <StoryReading story={story} part="hook" place={place} />
+        <StoryReading story={story} part="hook" place={place} layout={layout} />
         <CaptureGate>
-          <StoryReading story={story} part="rest" />
+          <StoryReading story={story} part="rest" layout={layout} />
         </CaptureGate>
       </>
     );
@@ -1497,7 +1521,7 @@ function StoryBody({
   }
   if (story.format === "video") return <VideoStory story={story} place={place} />;
   if (story.format === "puzzle") return <PuzzleStory story={story} place={place} />;
-  return <StoryReading story={story} place={place} />;
+  return <StoryReading story={story} place={place} layout={layout} />;
 }
 
 
@@ -2022,13 +2046,13 @@ export function ReportBriefing({
 
       {digest ? (
         <div className={`mx-auto max-w-[1280px] ${pagePad}`}>
-          <div className="lg:grid lg:grid-cols-12 lg:items-stretch lg:gap-10">
-            <aside className="mt-8 hidden min-h-0 lg:col-span-3 lg:block">
-              <div className="sticky top-12 z-20 max-h-[calc(100svh-3rem)] overflow-y-auto overscroll-contain border-r border-black/15 bg-[#F4F0EA] py-8 pr-6">
+          <div className="lg:grid lg:grid-cols-12 lg:items-stretch lg:gap-0">
+            <aside className={`mt-8 hidden min-h-0 lg:col-span-3 lg:mt-0 lg:block ${DIGEST_COLUMN}`}>
+              <div className={`sticky top-12 z-20 max-h-[calc(100svh-3rem)] overflow-y-auto overscroll-contain border-r border-black/15 py-8 pr-6 pl-1 ${DIGEST_COLUMN}`}>
                 <InsideEdition stories={stories} onJump={jump} />
               </div>
             </aside>
-            <div className="min-w-0 lg:col-span-6">
+            <div className="min-w-0 bg-[#F5F5F3] lg:col-span-6 lg:px-8">
               <BriefingDigest briefing={briefing} />
               {stories.map((story, storyIndex) => (
                 <article key={story.id} className={`${digestPlate(storyIndex)} border-b border-black/10`}>
@@ -2037,8 +2061,8 @@ export function ReportBriefing({
                 </article>
               ))}
             </div>
-            <aside className="hidden min-h-0 lg:col-span-3 lg:block">
-              <div className="sticky top-12 z-20 max-h-[calc(100svh-3rem)] overflow-y-auto overscroll-contain border-l border-black/15 bg-[#F4F0EA] py-8 pl-6">
+            <aside className={`hidden min-h-0 lg:col-span-3 lg:block ${DIGEST_COLUMN}`}>
+              <div className={`sticky top-12 z-20 max-h-[calc(100svh-3rem)] overflow-y-auto overscroll-contain border-l border-black/15 py-8 pr-1 pl-6 ${DIGEST_COLUMN}`}>
                 <DigestRail stories={stories} onJump={jump} currentId={stories[index]?.id} />
               </div>
             </aside>
