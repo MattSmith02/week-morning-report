@@ -244,15 +244,15 @@ function StoryReading({ story, part = "all", place = "none" }: { story: WeekStor
   const framed = part !== "rest";
 
   return (
-    <div className={framed ? "relative bg-[#F4F0EA] py-10 xl:py-14" : ""}>
-      <div className={framed ? `relative mx-auto flex flex-col gap-12 px-4 xl:gap-16 ${readColumn}` : "flex flex-col gap-6"}>
+    <div className={framed ? "relative bg-[#F4F0EA] py-8 sm:py-10 xl:py-12" : ""}>
+      <div className={framed ? `relative mx-auto flex max-w-[720px] flex-col gap-10 px-4 sm:gap-12 xl:gap-14 ${readColumn}` : "flex flex-col gap-6"}>
         {hook && story.format !== "quote" && story.whatHappened ? (
           <section>
             <div>
-              <h3 className="text-[2rem] leading-10 text-black" style={roman}>
+              <h3 className="text-[1.65rem] leading-9 text-black sm:text-[1.85rem] sm:leading-10" style={roman}>
                 {happenedLabel}
               </h3>
-              <div className="mt-2 h-[3px] w-16 bg-[#DF0A14]" />
+              <div className="mt-2 h-px w-12 bg-[#DF0A14]" />
             </div>
             {story.format === "tale" ? (
               <p className="mt-6 border-l-2 border-[#DF0A14] pl-4 text-2xl italic leading-8 text-black" style={roman}>
@@ -626,9 +626,12 @@ function CoverWatermark({
   );
 }
 
-/** Full-bleed hero only for the lead and video — other stories stay compact. */
-function isHeroStory(story: WeekStory, index: number) {
-  return index === 0 || story.format === "video";
+type ReportLayout = "classic" | "digest";
+
+/** Classic keeps full-bleed heroes; digest only keeps cinema for video. */
+function isHeroStory(story: WeekStory, index: number, layout: ReportLayout = "digest") {
+  if (layout === "classic") return true;
+  return story.format === "video";
 }
 
 function ImagelessCover({
@@ -645,21 +648,43 @@ function ImagelessCover({
   compact?: boolean;
 }) {
   const dark = tone === "dark";
+  if (compact) {
+    return (
+      <section id={story.id} data-story className={`relative scroll-mt-12 border-b border-black/10 ${imagelessPlateClass(tone)}`}>
+        {locked ? <CoverLock /> : null}
+        <div className={`mx-auto max-w-[720px] py-10 sm:py-12 ${pagePad}`}>
+          <p
+            className={`text-[11px] font-bold tracking-[0.14em] uppercase ${dark ? "text-white/70" : "text-black/55"}`}
+            style={uiBold}
+          >
+            <span className="text-[#DF0A14]">{number(index)}</span>
+            <span> · {story.chip}</span>
+          </p>
+          <div className="mt-3 h-px w-10 bg-[#DF0A14]" aria-hidden />
+          <h2 className={`mt-4 text-[1.875rem] leading-[1.12] sm:text-[2.35rem] ${dark ? "text-white" : "text-black"}`} style={roman}>
+            {story.displayTitle}
+          </h2>
+          {story.dek && story.dek !== story.displayTitle ? (
+            <p className={`mt-3 max-w-[40ch] text-base leading-6 sm:text-lg sm:leading-7 ${dark ? "text-white/75" : "text-black/70"}`} style={roman}>
+              {story.dek}
+            </p>
+          ) : null}
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section
       id={story.id}
       data-story
-      className={`relative flex scroll-mt-12 flex-col items-center justify-center overflow-clip px-4 text-center sm:px-8 ${imagelessPlateClass(tone)} ${
-        compact ? "min-h-0 py-14 md:py-16" : "h-[calc(100svh-48px)] min-h-[520px] py-24"
-      }`}
+      className={`relative flex h-[calc(100svh-48px)] min-h-[520px] scroll-mt-12 flex-col items-center justify-center overflow-clip px-4 py-24 text-center sm:px-8 ${imagelessPlateClass(tone)}`}
     >
       {locked ? <CoverLock /> : null}
-      <div className={`relative z-10 flex w-full max-w-[40rem] flex-col items-center ${compact ? "pt-10" : "pt-16 sm:pt-20"}`}>
+      <div className="relative z-10 flex w-full max-w-[40rem] flex-col items-center pt-16 sm:pt-20">
         <CoverWatermark
           index={index}
-          className={`top-0 -translate-y-[18%] ${compact ? "text-[min(28vw,160px)]" : "text-[min(36vw,220px)]"} ${
-            dark ? "text-white/12" : "text-black/10"
-          }`}
+          className={`top-0 -translate-y-[18%] text-[min(36vw,220px)] ${dark ? "text-white/12" : "text-black/10"}`}
         />
         <p
           className={`relative z-10 inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.16em] uppercase ${
@@ -672,16 +697,11 @@ function ImagelessCover({
           <span className={dark ? "text-white/70" : "text-black/55"}>· {story.chip}</span>
         </p>
         <div className="relative z-10 mt-3 h-px w-14 bg-[#DF0A14]" aria-hidden />
-        <h2
-          className={`relative z-10 mt-5 leading-[1.05] ${compact ? "text-[2.25rem] sm:text-[2.75rem]" : "text-[2.75rem] sm:text-[3.5rem]"} ${
-            dark ? "text-white" : "text-black"
-          }`}
-          style={roman}
-        >
+        <h2 className={`relative z-10 mt-5 text-[2.75rem] leading-[1.05] sm:text-[3.5rem] ${dark ? "text-white" : "text-black"}`} style={roman}>
           {story.displayTitle}
         </h2>
         {story.dek && story.dek !== story.displayTitle ? (
-          <p className={`relative z-10 mt-3 max-w-[34ch] leading-7 ${compact ? "text-base sm:text-lg" : "text-lg sm:text-xl"} ${dark ? "text-white/80" : "text-black/70"}`} style={roman}>
+          <p className={`relative z-10 mt-3 max-w-[34ch] text-lg leading-7 sm:text-xl ${dark ? "text-white/80" : "text-black/70"}`} style={roman}>
             {story.dek}
           </p>
         ) : null}
@@ -694,56 +714,56 @@ function CompactStoryHeader({
   story,
   index,
   locked = false,
+  lead = false,
 }: {
   story: WeekStory;
   index: number;
   locked?: boolean;
+  lead?: boolean;
 }) {
   const hasImage = Boolean(story.imageSrc);
   return (
-    <section id={story.id} data-story className="relative scroll-mt-12 border-b border-black/10 bg-[#F4F0EA]">
+    <section id={story.id} data-story className="relative scroll-mt-12 border-b border-black/15 bg-[#F4F0EA]">
       {locked ? <CoverLock /> : null}
-      <div className={`mx-auto max-w-[1180px] py-8 sm:py-10 ${pagePad}`}>
-        <div className={hasImage ? "lg:grid lg:grid-cols-12 lg:items-end lg:gap-10" : ""}>
-          <div className={hasImage ? "lg:col-span-5" : ""}>
-            <p className="text-[11px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
-              {number(index)} · {story.chip}
-            </p>
-            <h2 className="mt-3 max-w-[22ch] text-[1.875rem] leading-[1.1] text-black sm:text-[2.5rem]" style={roman}>
-              {story.displayTitle}
-            </h2>
-            {story.dek && story.dek !== story.displayTitle ? (
-              <p className="mt-3 max-w-[42ch] text-base leading-6 text-black/70 sm:text-lg sm:leading-7" style={roman}>
-                {story.dek}
-              </p>
+      <div className={`mx-auto max-w-[720px] py-8 sm:py-11 ${pagePad}`}>
+        {hasImage ? (
+          <figure className="overflow-clip bg-[#111]">
+            <div className={`relative w-full ${lead ? "aspect-[16/10] sm:aspect-[2/1]" : "aspect-[16/10] sm:aspect-[16/9]"}`}>
+              <Image
+                src={story.imageSrc!}
+                alt=""
+                fill
+                priority={lead}
+                unoptimized={story.imageSrc!.startsWith("/") || story.imageSrc!.startsWith("http")}
+                className="object-cover object-center"
+                sizes="(max-width: 720px) 100vw, 720px"
+              />
+            </div>
+            {story.imageCaption ? (
+              <figcaption className="mt-2 text-[13px] leading-5 text-black/50" style={ui}>
+                {story.imageCaption}
+              </figcaption>
             ) : null}
-          </div>
-          {hasImage ? (
-            <figure className="relative mt-6 overflow-clip bg-[#111] lg:col-span-7 lg:mt-0">
-              <div className="relative aspect-[4/3] w-full sm:aspect-[16/9] lg:max-h-[320px]">
-                <Image
-                  src={story.imageSrc!}
-                  alt=""
-                  fill
-                  unoptimized={story.imageSrc!.startsWith("/") || story.imageSrc!.startsWith("http")}
-                  className="object-cover object-center"
-                  sizes="(max-width: 1024px) 100vw, 55vw"
-                />
-              </div>
-              {story.imageCaption ? (
-                <figcaption className="mt-2 text-sm leading-5 text-black/50" style={ui}>
-                  {story.imageCaption}
-                </figcaption>
-              ) : null}
-            </figure>
-          ) : null}
-        </div>
+          </figure>
+        ) : null}
+        <p className={`text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase ${hasImage ? "mt-5" : ""}`} style={uiBold}>
+          {story.chip}
+        </p>
+        <h2
+          className={`mt-2 max-w-[22ch] leading-[1.12] text-black ${lead ? "text-[2rem] sm:text-[2.75rem]" : "text-[1.75rem] sm:text-[2.15rem]"}`}
+          style={roman}
+        >
+          {story.displayTitle}
+        </h2>
+        {story.dek && story.dek !== story.displayTitle ? (
+          <p className="mt-3 max-w-[46ch] text-[1.05rem] leading-7 text-black/75" style={roman}>
+            {story.dek}
+          </p>
+        ) : null}
       </div>
     </section>
   );
 }
-
-type ReportLayout = "classic" | "digest";
 
 function StoryCover({
   story,
@@ -761,11 +781,19 @@ function StoryCover({
   const classic = layout === "classic";
   const imageless = imagelessFor(story);
   if (imageless) {
-    return <ImagelessCover story={story} index={index} tone={imageless.tone} locked={locked} compact={!classic && !isHeroStory(story, index)} />;
+    return (
+      <ImagelessCover
+        story={story}
+        index={index}
+        tone={imageless.tone}
+        locked={locked}
+        compact={!classic && !isHeroStory(story, index, layout)}
+      />
+    );
   }
 
-  if (!classic && !isHeroStory(story, index)) {
-    return <CompactStoryHeader story={story} index={index} locked={locked} />;
+  if (!classic && !isHeroStory(story, index, layout)) {
+    return <CompactStoryHeader story={story} index={index} locked={locked} lead={index === 0} />;
   }
 
   const hasMedia = Boolean(story.imageSrc) || (story.format === "video" && Boolean(story.videoSrc));
@@ -866,133 +894,82 @@ function BriefingDigest({
   onJump: (id: string) => void;
 }) {
   const lead = stories[0];
-  const rail = stories.slice(1, 5);
-  const rest = stories.slice(5);
+  const latest = stories.slice(1);
   if (!lead) return null;
+  const today = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date());
 
   return (
-    <section aria-label={`${briefing} overview`} className={`border-b border-black/10 ${softPanel}`}>
-      <div className={`mx-auto max-w-[1180px] py-8 sm:py-10 ${pagePad}`}>
-        <p className="text-center text-[11px] font-bold tracking-[0.28em] text-[#DF0A14] uppercase sm:text-[12px]" style={romanBold}>
-          The Week
-        </p>
-        <h1 className="mt-2 text-center text-[2.25rem] leading-none text-black sm:mt-3 sm:text-[3.25rem]" style={roman}>
-          {briefing}
-        </h1>
-        <p className="mx-auto mt-3 max-w-[42ch] text-center text-sm leading-5 text-black/65 sm:text-base sm:leading-6" style={roman}>
-          Scan the report, jump to a story, or keep scrolling.
-        </p>
+    <section aria-label={`${briefing} overview`} className="border-b border-black/20 bg-[#F4F0EA]">
+      <div className={`mx-auto max-w-[980px] py-8 sm:py-12 ${pagePad}`}>
+        <header className="border-b border-black pb-5 text-center">
+          <p className="text-[11px] font-bold tracking-[0.28em] text-[#DF0A14] uppercase" style={romanBold}>
+            The Week
+          </p>
+          <h1 className="mt-2 text-[2.5rem] leading-none text-black sm:text-[3.5rem]" style={roman}>
+            {briefing}
+          </h1>
+          <p className="mt-3 text-[13px] leading-5 text-black/60" style={ui}>
+            {today}
+          </p>
+        </header>
 
-        {/* Mobile: horizontal story chips for quick jumps */}
-        <div className="-mx-4 mt-6 overflow-x-auto px-4 sm:mx-0 sm:hidden">
-          <ul className="flex w-max gap-2 pb-1">
-            {stories.map((story, i) => (
-              <li key={story.id}>
-                <button
-                  type="button"
-                  onClick={() => onJump(story.id)}
-                  className="inline-flex max-w-[11rem] flex-col rounded border border-black/10 bg-[#F4F0EA] px-3 py-2 text-left"
-                >
-                  <span className="text-[10px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
-                    {number(i)} · {story.chip}
-                  </span>
-                  <span className="mt-1 line-clamp-2 text-sm leading-4 text-black" style={roman}>
-                    {story.displayTitle}
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="mt-8 grid gap-8 lg:mt-10 lg:grid-cols-12 lg:gap-12">
-          <button type="button" onClick={() => onJump(lead.id)} className="group text-left lg:col-span-7">
-            {lead.imageSrc ? (
-              <span className="relative block aspect-[4/3] overflow-clip bg-[#111] sm:aspect-[16/10]">
-                <Image
-                  src={lead.imageSrc}
-                  alt=""
-                  fill
-                  priority
-                  unoptimized={lead.imageSrc.startsWith("/") || lead.imageSrc.startsWith("http")}
-                  className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-                  sizes="(max-width: 1024px) 100vw, 60vw"
-                />
+        <div className="mt-8 grid gap-10 lg:mt-10 lg:grid-cols-12 lg:gap-14">
+          <div className="lg:col-span-7">
+            <button type="button" onClick={() => onJump(lead.id)} className="group w-full text-left">
+              {lead.imageSrc ? (
+                <span className="relative block aspect-[16/10] overflow-clip bg-[#111]">
+                  <Image
+                    src={lead.imageSrc}
+                    alt=""
+                    fill
+                    priority
+                    unoptimized={lead.imageSrc.startsWith("/") || lead.imageSrc.startsWith("http")}
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 560px"
+                  />
+                </span>
+              ) : null}
+              <span className="mt-4 block text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
+                {lead.chip}
               </span>
+              <span className="mt-2 block text-[1.85rem] leading-[1.12] text-black group-hover:underline sm:text-[2.35rem]" style={roman}>
+                {lead.displayTitle}
+              </span>
+              <span className="mt-3 block max-w-[38ch] text-[1.05rem] leading-7 text-black/75" style={roman}>
+                {lead.dek}
+              </span>
+            </button>
+            {lead.whatHappened ? (
+              <p className="mt-5 max-w-[42ch] text-[15px] leading-6 text-black/80" style={roman}>
+                {lead.whatHappened.slice(0, 220)}
+                {lead.whatHappened.length > 220 ? "…" : ""}{" "}
+                <button type="button" onClick={() => onJump(lead.id)} className="font-bold text-[#DF0A14] hover:underline" style={uiBold}>
+                  Continue reading
+                </button>
+              </p>
             ) : null}
-            <span className="mt-4 block text-[11px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
-              {number(0)} · {lead.chip}
-            </span>
-            <span className="mt-2 block text-[1.75rem] leading-[1.1] text-black group-hover:text-[#DF0A14] sm:text-[2.5rem]" style={roman}>
-              {lead.displayTitle}
-            </span>
-            <span className="mt-2 block max-w-[40ch] text-base leading-6 text-black/70" style={roman}>
-              {lead.dek}
-            </span>
-          </button>
+          </div>
 
-          <div className="hidden sm:block lg:col-span-5">
-            <p className="border-b border-black text-[12px] font-bold tracking-[0.14em] text-black uppercase" style={uiBold}>
-              In this report
+          <aside className="lg:col-span-5">
+            <p className="border-b border-black pb-2 text-[12px] font-bold tracking-[0.12em] text-black uppercase" style={uiBold}>
+              The latest
             </p>
             <ul>
-              {rail.map((story, i) => {
-                const plate = imagelessFor(story);
-                return (
-                  <li key={story.id} className="border-b border-black/15">
-                    <button type="button" onClick={() => onJump(story.id)} className="group flex w-full gap-4 py-4 text-left">
-                      <span className="w-8 shrink-0 text-[12px] font-bold text-[#DF0A14]" style={uiBold}>
-                        {number(i + 1)}
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-[11px] font-bold tracking-[0.12em] text-black/45 uppercase" style={uiBold}>
-                          {story.chip}
-                        </span>
-                        <span className="mt-1 block text-lg leading-6 text-black group-hover:text-[#DF0A14] lg:text-xl" style={roman}>
-                          {story.displayTitle}
-                        </span>
-                        {story.dek && story.dek !== story.displayTitle ? (
-                          <span className="mt-1 line-clamp-2 block text-sm leading-5 text-black/60" style={roman}>
-                            {story.dek}
-                          </span>
-                        ) : null}
-                      </span>
-                      {story.imageSrc && !plate ? (
-                        <span className="relative hidden h-16 w-16 shrink-0 overflow-clip md:block">
-                          <Image
-                            src={story.imageSrc}
-                            alt=""
-                            fill
-                            unoptimized={story.imageSrc.startsWith("/") || story.imageSrc.startsWith("http")}
-                            className="object-cover"
-                            sizes="64px"
-                          />
-                        </span>
-                      ) : plate ? (
-                        <span className={`hidden h-16 w-16 shrink-0 md:block ${imagelessPlateClass(plate.tone)}`} aria-hidden />
-                      ) : null}
-                    </button>
-                  </li>
-                );
-              })}
+              {latest.map((story) => (
+                <li key={story.id} className="border-b border-black/15 py-3.5">
+                  <button type="button" onClick={() => onJump(story.id)} className="group w-full text-left">
+                    <span className="text-[15px] leading-6 text-black" style={roman}>
+                      <span className="font-bold text-black group-hover:text-[#DF0A14]" style={romanBold}>
+                        {story.chip}:
+                      </span>{" "}
+                      {story.dek && story.dek !== story.displayTitle ? story.dek : story.displayTitle}
+                    </span>
+                  </button>
+                </li>
+              ))}
             </ul>
-          </div>
+          </aside>
         </div>
-
-        {rest.length > 0 ? (
-          <div className="mt-8 hidden gap-5 border-t border-black/15 pt-8 sm:grid sm:grid-cols-2 lg:grid-cols-4">
-            {rest.map((story, i) => (
-              <button key={story.id} type="button" onClick={() => onJump(story.id)} className="group border-t border-black pt-3 text-left">
-                <span className="block text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
-                  {number(i + 5)} · {story.chip}
-                </span>
-                <span className="mt-2 block text-lg leading-6 text-black group-hover:text-[#DF0A14]" style={roman}>
-                  {story.displayTitle}
-                </span>
-              </button>
-            ))}
-          </div>
-        ) : null}
       </div>
     </section>
   );
