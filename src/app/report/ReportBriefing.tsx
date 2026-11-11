@@ -131,6 +131,8 @@ const WEEK_SUBSCRIBE =
   "https://subscribe.theweek.com/pubs/W0/TWE/self1023_3formats_Dlink.jsp?cds_mag_code=TWE&cds_page_id=275740";
 const WEEK_NAV = ["Home", "The Explainer", "Talking Points", "The Week Recommends", "Podcasts", "Newsletters", "From the Magazine", "More", "The Week Junior"];
 
+type ReportLayout = "classic" | "digest";
+
 function WeekSiteHeader() {
   return (
     <header className="relative z-30 hidden shrink-0 bg-white lg:block">
@@ -248,23 +250,77 @@ function Body({ children }: { children: string }) {
   );
 }
 
-function CaptureGate({ children }: { children: ReactNode }) {
+const SUBSCRIPTION_BENEFITS = [
+  { n: "01", title: "Daily Editions", text: "Morning, evening and weekend reports that matter." },
+  { n: "02", title: "Unlimited website access", text: "Explore unlimited news, analysis and perspectives." },
+  { n: "03", title: "Puzzles & daily features", text: "Enjoy puzzles, quizzes and daily features." },
+  { n: "04", title: "Wherever you read", text: "Stay informed across website, app and newsletters." },
+];
+
+function GateFile() {
   return (
-    <div className="flex justify-center bg-[#F4F0EA] px-4 pt-8 pb-12">
-      <div className={`border-l-2 border-dashed border-[#DF0A14] pl-4 ${readColumn}`}>
-        <a href={WEEK_SUBSCRIBE} target="_blank" rel="noreferrer" className={weekCta}>
+    <div className="bg-[#F0EAE1] px-4 py-4">
+      <p className="text-[16px] leading-6 text-[#1B1B1B]" style={roman}>
+        The rest of this article is locked. Sign up for the coverage: news and opinion from over 200 sources, gathered in one place.
+      </p>
+      <ol className="mt-4">
+        {SUBSCRIPTION_BENEFITS.map((benefit) => (
+          <li key={benefit.n} className="flex gap-3 border-t border-black/15 py-3">
+            <span className="w-7 shrink-0 text-[15px] leading-5 text-[#374151]" style={roman}>
+              {benefit.n}
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[16px] leading-5 text-black" style={romanBold}>
+                {benefit.title}
+              </span>
+              <span className="mt-0.5 block text-[14px] leading-5 text-[#374151]" style={roman}>
+                {benefit.text}
+              </span>
+            </span>
+          </li>
+        ))}
+      </ol>
+      <div className="mt-4 flex flex-wrap gap-3">
+        <a href={WEEK_SUBSCRIBE} target="_blank" rel="noreferrer" className={weekCta} style={uiBold}>
+          Explore subscriptions
+        </a>
+        <a
+          href="https://theweek.com/"
+          className="inline-flex w-fit items-center justify-center gap-2 rounded-lg border border-[#0A0A0A] px-4 py-3 text-xs font-bold tracking-[0.05em] text-[#0A0A0A] uppercase transition-opacity hover:opacity-80"
+          style={uiBold}
+        >
+          Create a free account
+        </a>
+      </div>
+      <p className="mt-4 text-[14px] leading-5 text-[#374151]" style={roman}>
+        Already a subscriber?{" "}
+        <a href="https://theweek.com/" className="font-bold text-black underline">
+          Sign in
+        </a>{" "}
+        with the same email.
+      </p>
+    </div>
+  );
+}
+
+function CaptureGate({ children, layout = "classic" }: { children: ReactNode; layout?: ReportLayout }) {
+  const digest = layout === "digest";
+  return (
+    <div className={digest ? "pt-4 pb-10" : "flex justify-center bg-[#F4F0EA] px-4 pt-8 pb-12"}>
+      <div className={`border-l-2 border-dashed border-[#DF0A14] pl-4 ${digest ? "w-full" : readColumn}`}>
+        <a href={WEEK_SUBSCRIBE} target="_blank" rel="noreferrer" className={weekCta} style={uiBold}>
           <Lock size={12} strokeWidth={2.4} aria-hidden />
           Sign up to unlock
         </a>
-        <div className="relative mt-5 max-h-64 overflow-hidden">
+        <div className="relative mt-5 max-h-[22rem] overflow-hidden">
           <div inert aria-hidden className="pointer-events-none flex flex-col gap-3 blur-[6px] select-none">
             {children}
           </div>
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-b from-transparent to-[#F4F0EA]" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-b from-transparent to-[#F4F0EA]" />
         </div>
-        <p className="mt-4 text-base leading-6" style={roman}>
-          The rest of this article is locked. Sign up for the coverage: news and opinion from over 200 sources, gathered in one place.
-        </p>
+        <div className="relative z-10 mt-8">
+          <GateFile />
+        </div>
       </div>
     </div>
   );
@@ -899,8 +955,6 @@ function CoverWatermark({
   );
 }
 
-type ReportLayout = "classic" | "digest";
-
 /** Classic keeps full-bleed heroes; digest only keeps cinema for video. */
 function isHeroStory(story: WeekStory, index: number, layout: ReportLayout = "digest") {
   if (layout === "classic") return true;
@@ -982,21 +1036,27 @@ function CompactStoryHeader({
   const hasImage = Boolean(story.imageSrc);
   return (
     <section id={story.id} data-story className={`relative scroll-mt-12 ${plateClass}`}>
-      {locked ? <CoverLock /> : null}
       {hasImage ? (
-        <figure className="w-full overflow-hidden bg-[#111]">
+        <figure className="relative w-full overflow-hidden bg-[#111]">
           <div className={`relative w-full overflow-hidden ${lead ? "aspect-[16/10]" : "aspect-[16/10] sm:aspect-[16/9]"}`}>
-            <Image
-              src={story.imageSrc!}
-              alt=""
-              fill
-              priority={lead}
-              unoptimized={story.imageSrc!.startsWith("/") || story.imageSrc!.startsWith("http")}
-              className="object-cover object-center"
-              sizes="(max-width: 1023px) 100vw, 50vw"
-            />
+            <div className={locked ? "absolute inset-0 scale-105 blur-[14px]" : "absolute inset-0"}>
+              <Image
+                src={story.imageSrc!}
+                alt=""
+                fill
+                priority={lead}
+                unoptimized={story.imageSrc!.startsWith("/") || story.imageSrc!.startsWith("http")}
+                className="object-cover object-center"
+                sizes="(max-width: 1023px) 100vw, 50vw"
+              />
+            </div>
           </div>
+          {locked ? <CoverLock /> : null}
         </figure>
+      ) : locked ? (
+        <div className="relative flex h-28 items-center justify-center bg-[#E8E2D8]">
+          <CoverLock />
+        </div>
       ) : null}
       <div className={`${digestTextPad} ${hasImage ? "pt-5 pb-2" : "pt-8 pb-2"}`}>
         {hasImage && story.imageCaption ? (
@@ -1069,17 +1129,25 @@ function StoryCover({
       className={`relative flex h-[calc(100svh-48px)] min-h-[520px] scroll-mt-12 items-end overflow-clip ${plateBg}`}
     >
       {story.imageSrc ? (
-        <Image
-          src={story.imageSrc}
-          alt=""
-          fill
-          priority={index === 0}
-          unoptimized={story.imageSrc.startsWith("/") || story.imageSrc.startsWith("http")}
-          className="report-parallax object-cover object-center"
-          sizes="100vw"
-        />
+        <div className={locked ? "absolute inset-0 scale-105 blur-[18px]" : "absolute inset-0"}>
+          <Image
+            src={story.imageSrc}
+            alt=""
+            fill
+            priority={index === 0}
+            unoptimized={story.imageSrc.startsWith("/") || story.imageSrc.startsWith("http")}
+            className="report-parallax object-cover object-center"
+            sizes="100vw"
+          />
+        </div>
       ) : story.format === "video" && story.videoSrc ? (
-        <video src={story.videoSrc} muted playsInline preload="metadata" className="absolute inset-0 h-full w-full object-cover" />
+        <video
+          src={story.videoSrc}
+          muted
+          playsInline
+          preload="metadata"
+          className={`absolute inset-0 h-full w-full object-cover ${locked ? "scale-105 blur-[18px]" : ""}`}
+        />
       ) : textOnly ? (
         <div className="absolute inset-0 bg-[var(--report-beige)]" aria-hidden />
       ) : null}
@@ -1828,7 +1896,7 @@ function StoryBody({
     return (
       <>
         <StoryReading story={story} part="hook" place={place} layout={layout} />
-        <CaptureGate>
+        <CaptureGate layout={layout}>
           <StoryReading story={story} part="rest" layout={layout} />
         </CaptureGate>
       </>
@@ -1836,11 +1904,8 @@ function StoryBody({
   }
   if (locked && !lead) {
     return (
-      <CaptureGate>
-        <div className="mx-auto w-full max-w-[65ch] px-4 sm:px-8">
-          <p className="text-2xl leading-8" style={roman}>{story.dek}</p>
-          {story.whatHappened ? <p className="text-base leading-6" style={roman}>{story.whatHappened}</p> : null}
-        </div>
+      <CaptureGate layout={layout}>
+        <StoryReading story={story} place={place} layout={layout} />
       </CaptureGate>
     );
   }
@@ -2354,6 +2419,21 @@ export function ReportBriefing({
               className={!digest ? "text-[#DF0A14]" : "text-[var(--brand-text-secondary,#45556c)] hover:text-[#DF0A14]"}
             >
               Classic
+            </Link>
+            <span className="text-black/20" aria-hidden>
+              |
+            </span>
+            <Link
+              href={layoutHref(layout, false, ads)}
+              className={!locked ? "text-[#DF0A14]" : "text-[var(--brand-text-secondary,#45556c)] hover:text-[#DF0A14]"}
+            >
+              Open
+            </Link>
+            <Link
+              href={layoutHref(layout, true, ads)}
+              className={locked ? "text-[#DF0A14]" : "text-[var(--brand-text-secondary,#45556c)] hover:text-[#DF0A14]"}
+            >
+              Locked
             </Link>
           </div>
           {!digest ? (
