@@ -1283,6 +1283,7 @@ function HeroSplitComposition({
   stories: WeekStory[];
   onJump: (id: string) => void;
 }) {
+  const [insideOpen, setInsideOpen] = useState(false);
   const activeId = heroEditionId(briefing);
   const active = HERO_EDITIONS.find((item) => item.id === activeId) ?? HERO_EDITIONS[0];
   const lead = stories[0];
@@ -1306,26 +1307,131 @@ function HeroSplitComposition({
   const statLabel =
     stat?.displayTitle || "Palestinians killed in Gaza since the ceasefire was signed";
 
+  const statsPanel = (
+    <div className="grid gap-6 sm:grid-cols-3 sm:gap-0">
+      <button
+        type="button"
+        onClick={() => onJump(big?.id ?? stories[0]?.id ?? "")}
+        className="w-full text-left sm:border-r sm:border-white/15 sm:pr-6"
+      >
+        <span className={`block ${typeLabel} text-[#9CA3AF]`} style={uiBold}>
+          {questionLabel}
+        </span>
+        <span className="mt-2 block text-[15px] leading-6 text-white" style={roman}>
+          {questionTitle}
+        </span>
+        <span className="mt-2 block text-[12px] leading-[18px] text-[#9CA3AF]" style={roman}>
+          {questionSupport}
+        </span>
+      </button>
+      <button
+        type="button"
+        onClick={() => onJump(quote?.id ?? stories[0]?.id ?? "")}
+        className="w-full text-left sm:border-r sm:border-white/15 sm:px-6"
+      >
+        <span className={`block ${typeLabel} text-[#9CA3AF]`} style={uiBold}>
+          Quote of the day
+        </span>
+        <span className="mt-2 flex gap-3">
+          <span className="shrink-0 text-[22px] leading-none text-white" style={roman} aria-hidden>
+            ”
+          </span>
+          <span className="min-w-0 text-[13px] leading-[19px] text-white" style={roman}>
+            {quoteText}
+          </span>
+        </span>
+      </button>
+      <button
+        type="button"
+        onClick={() => onJump(stat?.id ?? stories[0]?.id ?? "")}
+        className="w-full text-left sm:pl-6"
+      >
+        <span className={`block ${typeLabel} text-[#9CA3AF]`} style={uiBold}>
+          Statistics
+        </span>
+        <span className="mt-2 flex flex-wrap items-end gap-3">
+          <span className="text-[1.8rem] leading-[1.3] text-white" style={roman}>
+            {statValue}
+          </span>
+          <span className="min-w-0 flex-1 pb-0.5 text-[12px] leading-[19px] text-white" style={roman}>
+            {statLabel}
+          </span>
+        </span>
+      </button>
+    </div>
+  );
+
   return (
     <header className="hero-split-composition relative isolate min-h-[100svh] w-full overflow-hidden bg-black text-white" aria-label={briefing}>
       <div className="absolute inset-0 z-0">
         <Image src={heroImage} alt="" fill priority sizes="100vw" className="object-cover object-center" />
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 lg:hidden"
+          style={{ background: "linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, #000000 80%)" }}
+          aria-hidden
+        />
+        <div
+          className="absolute inset-0 hidden lg:block"
           style={{ background: "linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, #000000 78%)" }}
           aria-hidden
         />
       </div>
 
-      <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1400px] flex-col px-4 py-6 sm:px-8 sm:py-8 lg:px-10 lg:py-10">
+      <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1400px] flex-col px-5 py-4 sm:px-8 sm:py-8 lg:px-10 lg:py-10">
         <div className="flex justify-end">
-          <span className="inline-flex shrink-0 items-center gap-2 rounded-full border border-white/15 bg-black/45 px-3 py-1.5 text-[10px] font-bold tracking-[0.14em] text-white uppercase backdrop-blur-sm" style={uiBold}>
-            <Lock size={12} strokeWidth={2.4} className="text-[#DF0A14]" aria-hidden />
-            Exclusive
+          <span className="inline-flex items-center gap-2.5 rounded-[5px] bg-black/50 px-2.5 py-2.5 backdrop-blur-[5px]">
+            <span className="inline-flex h-[29px] w-[29px] items-center justify-center rounded-full bg-[#DF0A14]">
+              <Lock size={14} strokeWidth={2.4} className="text-white" aria-hidden />
+            </span>
+            <span className="pr-1 text-[14px] leading-5 font-bold tracking-[0.02em] text-white uppercase" style={uiBold}>
+              Exclusive
+            </span>
           </span>
         </div>
 
-        <div className="mt-auto flex flex-col gap-8 pb-2 lg:gap-10">
+        {/* Mobile */}
+        <div className="mt-auto flex w-full max-w-[350px] flex-col gap-[15px] self-center pb-2 lg:hidden">
+          <div className="flex flex-col gap-2.5">
+            <p className="text-[14px] leading-[25px] font-bold text-white uppercase" style={uiBold}>
+              The Week’s daily reports
+            </p>
+            <h1 className="text-[36px] leading-[48px] text-[#FAFAFA]" style={roman}>
+              {heroEditionTitle(active.label)}
+            </h1>
+          </div>
+          <p className="text-base leading-6 text-white" style={roman}>
+            {editionDek}
+          </p>
+          <div>
+            <button
+              type="button"
+              aria-expanded={insideOpen}
+              onClick={() => setInsideOpen((value) => !value)}
+              className="flex w-full items-center justify-between gap-3 rounded-[5px] border-l-[5px] border-[#DF0A14] bg-[rgba(251,249,245,0.75)] px-[15px] py-[15px] backdrop-blur-[7.5px]"
+            >
+              <span className="flex min-w-0 items-center gap-2.5">
+                <WeekMark />
+                <span className="text-base leading-6 font-bold text-[#171717]" style={romanBold}>
+                  Inside this edition
+                </span>
+              </span>
+              <BrandIcon name="chevronDown" defaultIcon={ChevronDown} className={`h-5 w-5 shrink-0 text-black transition-transform ${insideOpen ? "rotate-180" : ""}`} />
+            </button>
+            {insideOpen ? <div className="mt-3 rounded-[5px] bg-black px-4 py-5">{statsPanel}</div> : null}
+          </div>
+          <button
+            type="button"
+            onClick={() => onJump(lead?.id ?? stories[0]?.id ?? "")}
+            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[3px] bg-[#DF0A14] px-3 text-[14px] leading-5 font-bold text-[#FAFAFA] uppercase transition-colors hover:bg-[#B20810]"
+            style={uiBold}
+          >
+            {ctaLabel}
+            <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-3.5 w-3.5" />
+          </button>
+        </div>
+
+        {/* Desktop */}
+        <div className="mt-auto hidden flex-col gap-8 pb-2 lg:flex lg:gap-10">
           <div className="max-w-[40rem]">
             <p className={`${typeEyebrow} text-white`} style={uiBold}>
               The Week’s daily reports
@@ -1347,64 +1453,14 @@ function HeroSplitComposition({
             </button>
           </div>
 
-          <div className="border-t border-white/25 pt-5">
-            <div className="mb-4 flex items-center gap-3">
+          <div className="rounded-[10px] bg-black/95 px-6 py-6 ring-1 ring-white/10">
+            <div className="mb-4 flex items-center gap-3 border-b border-white/15 pb-4">
               <WeekMark />
               <p className={`${typeLabel} text-white`} style={uiBold}>
                 Inside this edition
               </p>
             </div>
-            <div className="grid gap-6 border-t border-white/15 pt-5 sm:grid-cols-3 sm:gap-0">
-              <button
-                type="button"
-                onClick={() => onJump(big?.id ?? stories[0]?.id ?? "")}
-                className="w-full text-left sm:border-r sm:border-white/15 sm:pr-6"
-              >
-                <span className={`block ${typeLabel} text-[#9CA3AF]`} style={uiBold}>
-                  {questionLabel}
-                </span>
-                <span className={`mt-2 block text-[15px] leading-6 text-white`} style={roman}>
-                  {questionTitle}
-                </span>
-                <span className={`mt-2 block text-[12px] leading-[18px] text-[#9CA3AF]`} style={roman}>
-                  {questionSupport}
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => onJump(quote?.id ?? stories[0]?.id ?? "")}
-                className="w-full text-left sm:border-r sm:border-white/15 sm:px-6"
-              >
-                <span className={`block ${typeLabel} text-[#9CA3AF]`} style={uiBold}>
-                  Quote of the day
-                </span>
-                <span className="mt-2 flex gap-3">
-                  <span className="shrink-0 text-[22px] leading-none text-white" style={roman} aria-hidden>
-                    ”
-                  </span>
-                  <span className="min-w-0 text-[13px] leading-[19px] text-white" style={roman}>
-                    {quoteText}
-                  </span>
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => onJump(stat?.id ?? stories[0]?.id ?? "")}
-                className="w-full text-left sm:pl-6"
-              >
-                <span className={`block ${typeLabel} text-[#9CA3AF]`} style={uiBold}>
-                  Statistics
-                </span>
-                <span className="mt-2 flex flex-wrap items-end gap-3">
-                  <span className="text-[1.8rem] leading-[1.3] text-white" style={roman}>
-                    {statValue}
-                  </span>
-                  <span className="min-w-0 flex-1 pb-0.5 text-[12px] leading-[19px] text-white" style={roman}>
-                    {statLabel}
-                  </span>
-                </span>
-              </button>
-            </div>
+            {statsPanel}
           </div>
         </div>
       </div>
