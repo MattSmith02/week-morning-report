@@ -1311,132 +1311,134 @@ function HeroSplitComposition({
   const explainerTitle = explainer?.dek || explainer?.displayTitle || "Why the Red Sea matters so much to global shipping";
 
   return (
-    <header className="hero-split-composition relative isolate w-full overflow-hidden bg-black text-white" aria-label={briefing}>
-      <div className="absolute inset-0 z-0">
-        <Image src={heroImage} alt="" fill priority sizes="100vw" className="object-cover object-center" />
-        <div
-          className="absolute inset-0"
-          style={{ background: "linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, #000000 82%)" }}
-          aria-hidden
-        />
-      </div>
-
-      <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-col justify-between gap-10 px-4 py-10 sm:px-8 sm:py-12 lg:min-h-[min(720px,78svh)] lg:gap-12 lg:px-10 lg:py-14 xl:px-12">
-        <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:gap-12 xl:gap-16">
-          <div className="flex w-full max-w-[36rem] flex-col items-start lg:max-w-[40rem]">
-            <p className={`${typeEyebrow} text-[#DF0A14]`} style={uiBold}>
-              The Week’s daily editions
-            </p>
-            <h1 className={`mt-2 max-w-[18ch] ${typeEdition} text-[#FAFAFA]`} style={roman}>
-              {heroEditionTitle(active.label)}
-            </h1>
-            <div className={digestRule} aria-hidden />
-            <p className={`mt-8 ${typeLabel} text-white/80`} style={uiBold}>
-              {questionLabel}
-            </p>
-            <p className={`mt-2 max-w-[28ch] ${typeQuestion} text-[#FAFAFA]`} style={roman}>
-              {questionTitle}
-            </p>
-            <p className={`mt-3 max-w-[46ch] ${typeBodyLg} text-white/85`} style={roman}>
-              {questionDek}
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-5">
-              <button
-                type="button"
-                onClick={() => onJump(lead?.id ?? stories[0]?.id ?? "")}
-                className={weekCta}
-                style={uiBold}
-              >
-                {ctaLabel}
-              </button>
-              <a href="#previous-editions" className={`${typeStatus} text-white underline decoration-white/60 underline-offset-4 transition-opacity hover:opacity-80`} style={roman}>
-                View all editions
-              </a>
-            </div>
-          </div>
-
-          <aside className="relative isolate w-full max-w-[28rem] overflow-hidden rounded-[10px] border-l-4 border-[#DF0A14] bg-[rgba(244,240,234,0.92)] py-5 backdrop-blur-md lg:ml-auto lg:shrink-0">
-            <div className="flex items-center gap-3 border-b border-black/15 px-5 pb-3">
-              <WeekMark />
-              <p className={`${typeLabel} text-[#1F2937]`} style={uiBold}>
-                Inside this edition
-              </p>
-            </div>
-            <div className="flex flex-col px-5">
-              <button type="button" onClick={() => onJump(quote?.id ?? stories[0]?.id ?? "")} className="w-full border-b border-black/12 py-3.5 text-left">
-                <span className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
-                  Quote of the day
-                </span>
-                <span className="mt-3 flex gap-3">
-                  <span className="shrink-0 text-[28px] leading-none text-[#DF0A14]" style={roman} aria-hidden>
-                    ”
-                  </span>
-                  <span className="min-w-0">
-                    <span className={`block ${typeQuote} text-[#111827]`} style={roman}>
-                      {quoteText}
-                    </span>
-                    <span className={`mt-2 block ${typeAttr} text-[#374151]`} style={roman}>
-                      {quoteBy}
-                    </span>
-                  </span>
-                </span>
-              </button>
-              <button type="button" onClick={() => onJump(stat?.id ?? stories[0]?.id ?? "")} className="w-full border-b border-black/12 py-3.5 text-left">
-                <span className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
-                  Statistic of the day
-                </span>
-                <span className={`mt-2 block ${typeEdition} text-black`} style={roman}>
-                  {statValue}
-                </span>
-                <span className={`mt-1 block ${typeBodyLg} text-[#111827]`} style={roman}>
-                  {statLabel}
-                </span>
-              </button>
-              <button type="button" onClick={() => onJump(explainer?.id ?? stories[0]?.id ?? "")} className="w-full border-b border-black/12 py-3.5 text-left">
-                <span className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
-                  The explainer
-                </span>
-                <span className={`mt-2 block ${typeBodyLg} text-[#111827]`} style={roman}>
-                  {explainerTitle}
-                </span>
-              </button>
-              <p className={`py-3.5 ${typeAttr} text-[#374151]`} style={roman}>
-                Plus commentary, puzzles, Good day / Bad day and more
-              </p>
-            </div>
-          </aside>
+    <header className="hero-split-composition w-full bg-[#F4F0EA] px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8" aria-label={briefing}>
+      <div className="relative isolate mx-auto w-full max-w-[1529px] overflow-hidden rounded-[15px] text-white lg:aspect-[1529/891]">
+        <div className="absolute inset-0 z-0">
+          <Image src={heroImage} alt="" fill priority sizes="(max-width: 1530px) 100vw, 1529px" className="object-cover object-center" />
+          <div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, #000000 100%)" }}
+            aria-hidden
+          />
         </div>
 
-        <nav className="w-full" aria-label="Editions">
-          <div className="relative mb-4 h-[5px] w-full" aria-hidden>
-            <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-white/25" />
-            <div
-              className="absolute top-1/2 h-[3px] -translate-y-1/2 bg-[#DF0A14] transition-[left,width] duration-300"
-              style={{ left: `${(HERO_EDITIONS.findIndex((item) => item.id === activeId) / HERO_EDITIONS.length) * 100}%`, width: `${100 / HERO_EDITIONS.length}%` }}
-            />
+        <div className="relative z-10 flex h-full min-h-[560px] flex-col justify-between gap-8 px-5 py-8 sm:min-h-[640px] sm:px-8 sm:py-10 lg:min-h-0 lg:px-12 lg:py-12 xl:px-14">
+          <div className="flex flex-1 flex-col gap-8 lg:flex-row lg:items-end lg:gap-12 xl:gap-16">
+            <div className="flex w-full max-w-[36rem] flex-col items-start lg:max-w-[40rem]">
+              <p className={`${typeEyebrow} text-[#DF0A14]`} style={uiBold}>
+                The Week’s daily editions
+              </p>
+              <h1 className={`mt-2 max-w-[18ch] ${typeEdition} text-[#FAFAFA]`} style={roman}>
+                {heroEditionTitle(active.label)}
+              </h1>
+              <div className={digestRule} aria-hidden />
+              <p className={`mt-8 ${typeLabel} text-white/80`} style={uiBold}>
+                {questionLabel}
+              </p>
+              <p className={`mt-2 max-w-[28ch] ${typeQuestion} text-[#FAFAFA]`} style={roman}>
+                {questionTitle}
+              </p>
+              <p className={`mt-3 max-w-[46ch] ${typeBodyLg} text-white/85`} style={roman}>
+                {questionDek}
+              </p>
+              <div className="mt-8 flex flex-wrap items-center gap-5">
+                <button
+                  type="button"
+                  onClick={() => onJump(lead?.id ?? stories[0]?.id ?? "")}
+                  className={weekCta}
+                  style={uiBold}
+                >
+                  {ctaLabel}
+                </button>
+                <a href="#previous-editions" className={`${typeStatus} text-white underline decoration-white/60 underline-offset-4 transition-opacity hover:opacity-80`} style={roman}>
+                  View all editions
+                </a>
+              </div>
+            </div>
+
+            <aside className="relative isolate w-full max-w-[28rem] overflow-hidden rounded-[10px] border-l-4 border-[#DF0A14] bg-[rgba(244,240,234,0.92)] py-5 backdrop-blur-md lg:ml-auto lg:shrink-0">
+              <div className="flex items-center gap-3 border-b border-black/15 px-5 pb-3">
+                <WeekMark />
+                <p className={`${typeLabel} text-[#1F2937]`} style={uiBold}>
+                  Inside this edition
+                </p>
+              </div>
+              <div className="flex flex-col px-5">
+                <button type="button" onClick={() => onJump(quote?.id ?? stories[0]?.id ?? "")} className="w-full border-b border-black/12 py-3.5 text-left">
+                  <span className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
+                    Quote of the day
+                  </span>
+                  <span className="mt-3 flex gap-3">
+                    <span className="shrink-0 text-[28px] leading-none text-[#DF0A14]" style={roman} aria-hidden>
+                      ”
+                    </span>
+                    <span className="min-w-0">
+                      <span className={`block ${typeQuote} text-[#111827]`} style={roman}>
+                        {quoteText}
+                      </span>
+                      <span className={`mt-2 block ${typeAttr} text-[#374151]`} style={roman}>
+                        {quoteBy}
+                      </span>
+                    </span>
+                  </span>
+                </button>
+                <button type="button" onClick={() => onJump(stat?.id ?? stories[0]?.id ?? "")} className="w-full border-b border-black/12 py-3.5 text-left">
+                  <span className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
+                    Statistic of the day
+                  </span>
+                  <span className={`mt-2 block ${typeEdition} text-black`} style={roman}>
+                    {statValue}
+                  </span>
+                  <span className={`mt-1 block ${typeBodyLg} text-[#111827]`} style={roman}>
+                    {statLabel}
+                  </span>
+                </button>
+                <button type="button" onClick={() => onJump(explainer?.id ?? stories[0]?.id ?? "")} className="w-full border-b border-black/12 py-3.5 text-left">
+                  <span className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
+                    The explainer
+                  </span>
+                  <span className={`mt-2 block ${typeBodyLg} text-[#111827]`} style={roman}>
+                    {explainerTitle}
+                  </span>
+                </button>
+                <p className={`py-3.5 ${typeAttr} text-[#374151]`} style={roman}>
+                  Plus commentary, puzzles, Good day / Bad day and more
+                </p>
+              </div>
+            </aside>
           </div>
-          <ul className="grid grid-cols-2 gap-5 sm:gap-6 lg:grid-cols-4 lg:gap-8">
-            {HERO_EDITIONS.map((edition) => {
-              const current = edition.id === activeId;
-              return (
-                <li key={edition.id}>
-                  <div className={`flex flex-col items-start gap-1 ${current ? "text-white" : "text-[#9CA3AF]"}`}>
-                    <p className={typeTab} style={roman}>
-                      {edition.label}
-                    </p>
-                    <p className={`flex items-center gap-1.5 ${typeStatus}`} style={roman}>
-                      <span
-                        className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${edition.live ? "bg-[#DF0A14]" : "bg-[#6B7280]"}`}
-                        aria-hidden
-                      />
-                      <span>{edition.status}</span>
-                    </p>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
+
+          <nav className="w-full" aria-label="Editions">
+            <div className="relative mb-4 h-[5px] w-full" aria-hidden>
+              <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-white/25" />
+              <div
+                className="absolute top-1/2 h-[3px] -translate-y-1/2 bg-[#DF0A14] transition-[left,width] duration-300"
+                style={{ left: `${(HERO_EDITIONS.findIndex((item) => item.id === activeId) / HERO_EDITIONS.length) * 100}%`, width: `${100 / HERO_EDITIONS.length}%` }}
+              />
+            </div>
+            <ul className="grid grid-cols-2 gap-5 sm:gap-6 lg:grid-cols-4 lg:gap-8">
+              {HERO_EDITIONS.map((edition) => {
+                const current = edition.id === activeId;
+                return (
+                  <li key={edition.id}>
+                    <div className={`flex flex-col items-start gap-1 ${current ? "text-white" : "text-[#9CA3AF]"}`}>
+                      <p className={typeTab} style={roman}>
+                        {edition.label}
+                      </p>
+                      <p className={`flex items-center gap-1.5 ${typeStatus}`} style={roman}>
+                        <span
+                          className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${edition.live ? "bg-[#DF0A14]" : "bg-[#6B7280]"}`}
+                          aria-hidden
+                        />
+                        <span>{edition.status}</span>
+                      </p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+        </div>
       </div>
     </header>
   );
