@@ -1296,24 +1296,23 @@ function HeroSplitComposition({
     stat?.displayTitle || "Palestinians killed in Gaza since the ceasefire was signed";
 
   const leadCopy = (
-    <div className="w-full">
-      <p className={`${typeEyebrow} text-white`} style={uiBold}>
-        The Week’s daily editions
+    <div className="w-full max-w-[42rem]">
+      <p className="text-[11px] font-bold tracking-[0.18em] text-white uppercase" style={uiBold}>
+        The Week’s daily reports
       </p>
-      <h1 className={`mt-3 max-w-[14ch] ${typeEdition} text-white`} style={roman}>
+      <h1 className={`mt-2.5 max-w-[12ch] ${typeEdition} leading-[1.02] text-white`} style={roman}>
         {heroEditionTitle(active.label)}
       </h1>
-      <div className="mt-4 h-[4px] w-20 bg-[#DF0A14]" aria-hidden />
-      <p className={`mt-10 ${typeLabel} text-white`} style={uiBold}>
+      <p className={`mt-6 ${typeLabel} text-white`} style={uiBold}>
         {storyLabel}
       </p>
-      <p className={`mt-3 max-w-[28ch] ${typeQuestion} text-white`} style={roman}>
+      <p className={`mt-2 max-w-[28ch] ${typeQuestion} leading-[1.15] text-white`} style={roman}>
         {storyTitle}
       </p>
-      <p className={`mt-4 max-w-[46ch] ${typeBodyLg} text-white/90`} style={roman}>
+      <p className={`mt-3 max-w-[40ch] ${typeBodyLg} leading-7 text-white/90`} style={roman}>
         {storySupportTrimmed}
       </p>
-      <div className="mt-8 flex flex-wrap items-center gap-5">
+      <div className="mt-10 flex flex-wrap items-center gap-5">
         <button type="button" onClick={onExplore} className={weekCta} style={uiBold}>
           {ctaLabel}
         </button>
@@ -1409,24 +1408,23 @@ function HeroSplitComposition({
           </span>
         </div>
 
-        <div className="mt-auto flex w-full max-w-[350px] flex-col gap-[15px] self-center pb-2 lg:hidden">
-          <div className="flex flex-col gap-2.5">
-            <p className="text-[14px] leading-[25px] font-bold text-white uppercase" style={uiBold}>
-              The Week’s daily editions
+        <div className="mt-auto flex w-full max-w-[350px] flex-col gap-6 self-center pb-2 lg:hidden">
+          <div className="flex flex-col gap-2">
+            <p className="text-[12px] leading-5 font-bold tracking-[0.16em] text-white uppercase" style={uiBold}>
+              The Week’s daily reports
             </p>
-            <h1 className="text-[36px] leading-[48px] text-[#FAFAFA]" style={roman}>
+            <h1 className="text-[36px] leading-[1.05] text-[#FAFAFA]" style={roman}>
               {heroEditionTitle(active.label)}
             </h1>
-            <div className="h-[3px] w-16 bg-[#DF0A14]" aria-hidden />
           </div>
-          <div className="flex flex-col gap-2.5">
-            <p className="text-[14px] leading-5 font-bold text-white uppercase" style={uiBold}>
+          <div className="flex flex-col gap-2">
+            <p className="text-[12px] leading-5 font-bold tracking-[0.12em] text-white uppercase" style={uiBold}>
               {storyLabel}
             </p>
-            <p className="text-[28px] leading-8 text-[#FAFAFA]" style={roman}>
+            <p className="text-[28px] leading-[1.15] text-[#FAFAFA]" style={roman}>
               {storyTitle}
             </p>
-            <p className="text-base leading-6 text-white" style={roman}>
+            <p className="text-base leading-7 text-white" style={roman}>
               {storySupportTrimmed}
             </p>
           </div>
@@ -1464,9 +1462,9 @@ function HeroSplitComposition({
         </div>
 
         {/* Desktop — full width of all three digest columns */}
-        <div className="mt-auto hidden w-full flex-col gap-10 px-5 pb-2 xl:px-8 lg:flex">
-          <div className="flex items-start justify-between gap-6">
-            <div className="min-w-0 max-w-[48rem] flex-1">{leadCopy}</div>
+        <div className="mt-auto hidden w-full flex-col gap-12 px-5 pb-4 xl:px-8 lg:flex">
+          <div className="flex items-start justify-between gap-6 pt-[min(12vh,7rem)]">
+            <div className="min-w-0 flex-1">{leadCopy}</div>
             <span className="mt-1 inline-flex shrink-0 items-center gap-2.5 rounded-[5px] bg-black/50 px-2.5 py-2.5 backdrop-blur-[5px]">
               <span className="inline-flex h-[29px] w-[29px] items-center justify-center rounded-full bg-[#DF0A14]">
                 <Lock size={14} strokeWidth={2.4} className="text-white" aria-hidden />
