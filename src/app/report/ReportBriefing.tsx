@@ -1150,42 +1150,36 @@ function DigestLeftRail() {
 
   return (
     <nav aria-label="Recent editions">
-      <p className={`border-b border-black pb-2 ${typeLabel} text-[#DF0A14]`} style={uiBold}>
+      <p className="border-b border-black pb-2 text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
         Recent editions
       </p>
-      <ul className="mt-4 flex flex-col gap-5">
+      <ul className="mt-3 flex flex-col gap-3">
         {cards.map((card) => (
           <li key={card.id}>
-            <a href="#previous-editions" className="block transition-opacity hover:opacity-85">
-              <div className="relative aspect-square overflow-clip bg-[#111]">
-                <Image src={card.image} alt="" fill sizes="200px" className="object-cover" />
+            <a href="#previous-editions" className="flex gap-2.5 transition-opacity hover:opacity-85">
+              <span className="relative h-14 w-14 shrink-0 overflow-clip bg-[#111]">
+                <Image src={card.image} alt="" fill sizes="56px" className="object-cover" />
                 <span className={`absolute inset-0 ${coverScrim}`} />
-                <EditionBanner label={card.label} size="card" className="absolute inset-x-0 top-0" />
-                <span className="absolute top-[40%] left-2.5 text-[#F9FAFB]">
-                  <span className="block text-[48px] leading-none" style={roman}>
-                    {card.day}
-                  </span>
-                  <span className="mt-0.5 block text-[12px] leading-4" style={roman}>
-                    {card.when}
-                  </span>
+                <span className="absolute inset-x-0 bottom-0 px-1 pb-0.5 text-[10px] leading-none text-white" style={roman}>
+                  {card.day}
                 </span>
-              </div>
-              <span className="mt-2.5 flex flex-col gap-1.5">
-                <span className="block text-[11px] leading-4 text-[#4B5563] uppercase" style={ui}>
-                  top story
+              </span>
+              <span className="min-w-0 flex-1 py-0.5">
+                <span className="block text-[11px] leading-4 text-[#DF0A14]" style={uiBold}>
+                  {card.label}
                 </span>
-                <span className="block text-[14px] leading-5 text-black" style={roman}>
+                <span className="mt-0.5 block text-[12px] leading-4 text-black/55" style={ui}>
+                  {card.when}
+                </span>
+                <span className="mt-1 block line-clamp-2 text-[13px] leading-[17px] text-black" style={roman}>
                   {card.headline}
-                </span>
-                <span className="block text-[12px] leading-4 text-black/70" style={roman}>
-                  + {card.more} more inside
                 </span>
               </span>
             </a>
           </li>
         ))}
       </ul>
-      <a href="#previous-editions" className="mt-4 inline-block text-[13px] leading-5 text-[#DF0A14] underline underline-offset-2" style={roman}>
+      <a href="#previous-editions" className="mt-3 inline-block text-[12px] leading-4 text-[#DF0A14] underline underline-offset-2" style={roman}>
         Browse all editions
       </a>
     </nav>
