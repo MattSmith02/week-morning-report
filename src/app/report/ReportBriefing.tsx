@@ -1288,7 +1288,7 @@ function HeroSplitComposition({
   const activeId = heroEditionId(briefing);
   const active = HERO_EDITIONS.find((item) => item.id === activeId) ?? HERO_EDITIONS[0];
   const lead = stories[0];
-  const heroImage = lead?.imageSrc || active.image;
+  const heroImage = "/the-week/hero-header.jpg";
   const big = stories.find((story) => /big question/i.test(story.chip) || /big question/i.test(story.kicker ?? ""));
   const quote = stories.find((story) => story.format === "quote" || /quote/i.test(story.chip));
   const stat = stories.find((story) => story.format === "stat" || /statistic/i.test(story.chip));
@@ -1311,28 +1311,31 @@ function HeroSplitComposition({
   const explainerTitle = explainer?.dek || explainer?.displayTitle || "Why the Red Sea matters so much to global shipping";
 
   return (
-    <header className="hero-split-composition w-full bg-[#F4F0EA] px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8" aria-label={briefing}>
-      <div className="relative isolate mx-auto w-full max-w-[1529px] overflow-hidden rounded-[15px] text-white lg:aspect-[1529/891]">
-        <div className="absolute inset-0 z-0">
-          <Image src={heroImage} alt="" fill priority sizes="(max-width: 1530px) 100vw, 1529px" className="object-cover object-center" />
-          <div
-            className="absolute inset-0"
-            style={{ background: "linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, #000000 100%)" }}
-            aria-hidden
-          />
+    <header className="hero-split-composition relative isolate w-full overflow-hidden bg-black text-white" aria-label={briefing}>
+      <div className="absolute inset-0 z-0">
+        <Image src={heroImage} alt="" fill priority sizes="100vw" className="object-cover object-center" />
+        <div
+          className="absolute inset-0"
+          style={{ background: "linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, #000000 100%)" }}
+          aria-hidden
+        />
+      </div>
+
+      <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1600px] flex-col justify-between px-4 py-8 sm:px-8 sm:py-10 lg:px-12 lg:py-12 xl:px-16">
+        <div className="max-w-[40rem] pt-4 sm:pt-8 lg:pt-10">
+          <p className={`${typeEyebrow} text-[#DF0A14]`} style={uiBold}>
+            The Week’s daily editions
+          </p>
+          <h1 className={`mt-2 max-w-[18ch] ${typeEdition} text-[#FAFAFA]`} style={roman}>
+            {heroEditionTitle(active.label)}
+          </h1>
+          <div className={digestRule} aria-hidden />
         </div>
 
-        <div className="relative z-10 flex h-full min-h-[560px] flex-col justify-between gap-8 px-5 py-8 sm:min-h-[640px] sm:px-8 sm:py-10 lg:min-h-0 lg:px-12 lg:py-12 xl:px-14">
-          <div className="flex flex-1 flex-col gap-8 lg:flex-row lg:items-end lg:gap-12 xl:gap-16">
+        <div className="mt-auto flex flex-col gap-8 pb-2 lg:gap-10">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:gap-12 xl:gap-16">
             <div className="flex w-full max-w-[36rem] flex-col items-start lg:max-w-[40rem]">
-              <p className={`${typeEyebrow} text-[#DF0A14]`} style={uiBold}>
-                The Week’s daily editions
-              </p>
-              <h1 className={`mt-2 max-w-[18ch] ${typeEdition} text-[#FAFAFA]`} style={roman}>
-                {heroEditionTitle(active.label)}
-              </h1>
-              <div className={digestRule} aria-hidden />
-              <p className={`mt-8 ${typeLabel} text-white/80`} style={uiBold}>
+              <p className={`${typeLabel} text-white/80`} style={uiBold}>
                 {questionLabel}
               </p>
               <p className={`mt-2 max-w-[28ch] ${typeQuestion} text-[#FAFAFA]`} style={roman}>
@@ -1341,7 +1344,7 @@ function HeroSplitComposition({
               <p className={`mt-3 max-w-[46ch] ${typeBodyLg} text-white/85`} style={roman}>
                 {questionDek}
               </p>
-              <div className="mt-8 flex flex-wrap items-center gap-5">
+              <div className="mt-6 flex flex-wrap items-center gap-5">
                 <button
                   type="button"
                   onClick={() => onJump(lead?.id ?? stories[0]?.id ?? "")}
