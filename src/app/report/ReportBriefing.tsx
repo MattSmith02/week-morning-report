@@ -1259,6 +1259,10 @@ function heroEditionId(briefing: string) {
   return hit?.id ?? "morning";
 }
 
+function heroEditionTitle(label: string) {
+  return /^the\s/i.test(label) ? label : `The ${label}`;
+}
+
 function HeroSplitComposition({
   briefing,
   stories,
@@ -1271,15 +1275,18 @@ function HeroSplitComposition({
   const activeId = heroEditionId(briefing);
   const active = HERO_EDITIONS.find((item) => item.id === activeId) ?? HERO_EDITIONS[0];
   const lead = stories[0];
+  const heroImage = lead?.imageSrc || active.image;
   const big = stories.find((story) => /big question/i.test(story.chip) || /big question/i.test(story.kicker ?? ""));
   const quote = stories.find((story) => story.format === "quote" || /quote/i.test(story.chip));
   const stat = stories.find((story) => story.format === "stat" || /statistic/i.test(story.chip));
   const explainer = stories.find((story) => /explainer/i.test(story.chip));
   const evening = activeId === "evening";
   const questionLabel = evening ? "Tonight’s big question" : "Today’s big question";
+  const ctaLabel = evening ? "Explore tonight’s report" : "Explore today’s report";
   const questionTitle = big?.dek || big?.displayTitle || "Why is the trade deficit getting bigger?";
+  const questionSource = big?.whatHappened || lead?.dek || "";
   const questionDek =
-    big?.whatHappened?.slice(0, 140) ||
+    (questionSource.length > 160 ? `${questionSource.slice(0, 157).trimEnd()}…` : questionSource) ||
     "Exploring rising tensions, regional implications and what could determine the next developments.";
   const quoteText =
     quote?.quote ||
@@ -1293,7 +1300,7 @@ function HeroSplitComposition({
   return (
     <header className="hero-split-composition relative isolate w-full overflow-hidden bg-black text-white" aria-label={briefing}>
       <div className="absolute inset-0 z-0">
-        <Image src={active.image} alt="" fill priority sizes="100vw" className="object-cover" />
+        <Image src={heroImage} alt="" fill priority sizes="100vw" className="object-cover object-center" />
         <div
           className="absolute inset-0"
           style={{ background: "linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, #000000 80%)" }}
@@ -1306,10 +1313,10 @@ function HeroSplitComposition({
           <div className="flex w-full max-w-[911px] flex-col items-start gap-6 sm:gap-8 lg:gap-[35px]">
             <div className="flex w-full flex-col gap-3">
               <p className="text-[13px] leading-5 font-bold tracking-[0.04em] text-white uppercase sm:text-[18px] sm:leading-7 lg:text-[21px]" style={uiBold}>
-                {lead?.chip || "Category"}
+                The Week’s daily editions
               </p>
               <h1 className="text-[2.5rem] leading-[1.1] text-[#FAFAFA] sm:text-[3.5rem] lg:text-[clamp(2.75rem,4.5vw,5.235rem)] lg:leading-[1.11]" style={roman}>
-                {lead?.displayTitle || briefing}
+                {heroEditionTitle(active.label)}
               </h1>
             </div>
             <div className="h-2 w-[100px] bg-[#DF0A14]" aria-hidden />
@@ -1322,7 +1329,6 @@ function HeroSplitComposition({
               </p>
               <p className="max-w-[46ch] text-[16px] leading-6 text-white sm:text-[20px] sm:leading-[1.3] lg:text-[23px] lg:leading-[30px]" style={roman}>
                 {questionDek}
-                {questionDek.length >= 140 && !questionDek.endsWith(".") ? "…" : ""}
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-6 sm:gap-[35px]">
@@ -1332,7 +1338,7 @@ function HeroSplitComposition({
                 className="inline-flex items-center justify-center rounded-[5px] bg-[#DF0A14] px-5 py-3.5 text-[15px] leading-7 font-bold text-[#FAFAFA] uppercase transition-colors hover:bg-[#B20810] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#DF0A14] sm:text-[19px]"
                 style={uiBold}
               >
-                Read this briefing
+                {ctaLabel}
               </button>
               <a href="#previous-editions" className="text-[15px] leading-7 text-white underline decoration-white/70 underline-offset-4 transition-opacity hover:opacity-80 sm:text-[19px]" style={roman}>
                 View all editions
