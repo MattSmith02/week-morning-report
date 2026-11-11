@@ -34,17 +34,18 @@ const softPanel = "bg-[#F0EAE1]";
 const hairline = "border-black/12";
 /** Shared digest type scale — hero mirrors body */
 const typeEyebrow = "text-[11px] font-bold tracking-[0.14em] uppercase";
-const typeEdition = "text-[clamp(2.35rem,3.2vw,2.75rem)] leading-[1.1]";
+const typeEdition = "text-[clamp(2.75rem,4.5vw,4.25rem)] leading-[1.08]";
 const typeLabel = "text-[11px] font-bold tracking-[0.12em] uppercase";
-const typeQuestion = "text-[clamp(1.85rem,2.8vw,2.35rem)] leading-[1.12]";
+const typeQuestion = "text-[clamp(1.85rem,2.8vw,2.5rem)] leading-[1.12]";
 const typeBodyLg = "text-[17px] leading-7";
 const typeQuote = "text-[1.75rem] italic leading-9";
 const typeAttr = "text-[15px] leading-6";
-const digestArticleTitle = typeQuestion;
-const digestArticleTitleLead = typeEdition;
+const digestArticleTitle = "text-[clamp(1.85rem,2.8vw,2.35rem)] leading-[1.12]";
+const digestArticleTitleLead = "text-[clamp(2.35rem,3.2vw,2.75rem)] leading-[1.1]";
 const digestSectionTitle = "text-[1.35rem] leading-8 text-[var(--brand-text-primary,#0f172b)] sm:text-[1.5rem] sm:leading-9";
 const digestBodyCopy = `${typeBodyLg} text-[var(--brand-text-secondary,#45556c)]`;
 const digestRule = "mt-2 h-px w-12 bg-[#DF0A14]";
+const digestShell = "mx-auto w-full max-w-[1480px]";
 /** Shared photo cover/thumbnail scrim — same on mobile and desktop. */
 const coverScrim = "bg-gradient-to-t from-black/75 via-black/15 to-black/25";
 const OUTLET_DOMAIN: Record<string, string> = {
@@ -1144,89 +1145,66 @@ function StoryCover({
   );
 }
 
-function InsideEdition({ stories, onJump }: { stories: WeekStory[]; onJump: (id: string) => void }) {
-  const explainer = stories.find((story) => /explainer/i.test(story.chip));
-  const goodBad = stories.find((story) => story.format === "day" || /good\s*\/\s*bad/i.test(story.chip));
-  const underRadar = stories.find((story) => /under the radar/i.test(story.chip));
-  const puzzle = stories.find((story) => /puzzle|sudoku/i.test(story.chip) || story.format === "puzzle");
-  const also = stories
-    .filter((story) => ![explainer?.id, goodBad?.id, underRadar?.id, puzzle?.id, stories[0]?.id].includes(story.id))
-    .slice(0, 4);
+const RECENT_EDITIONS = [
+  { label: "Evening Review", when: "Yesterday", href: "#previous-editions" },
+  { label: "Saturday Wrap", when: "Sat · 10 Oct", href: "#previous-editions" },
+  { label: "Sunday Shortlist", when: "Sun · 11 Oct", href: "#previous-editions" },
+  { label: "Morning Report", when: "Fri · 9 Oct", href: "#previous-editions" },
+] as const;
 
+const SOCIAL_LINKS = [
+  { label: "X", href: "https://x.com/TheWeek" },
+  { label: "Facebook", href: "https://www.facebook.com/TheWeek" },
+  { label: "Instagram", href: "https://www.instagram.com/theweek/" },
+  { label: "YouTube", href: "https://www.youtube.com/@TheWeek" },
+] as const;
+
+function DigestLeftRail() {
   return (
-    <nav aria-label="Also in this report">
-      <p className={`border-b border-black pb-2 ${typeLabel} text-[#DF0A14]`} style={uiBold}>
-        Also in this report
-      </p>
-      <ul>
-        {explainer ? (
-          <li className="border-b border-black/12 py-3.5">
-            <button type="button" onClick={() => onJump(explainer.id)} className="w-full text-left">
-              <span className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
-                The explainer
-              </span>
-              <span className="mt-2 block text-[15px] leading-6 text-black" style={roman}>
-                {explainer.dek || explainer.displayTitle}
-              </span>
-            </button>
-          </li>
-        ) : null}
-        {goodBad ? (
-          <li className="border-b border-black/12 py-3.5">
-            <button type="button" onClick={() => onJump(goodBad.id)} className="w-full text-left">
-              <span className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
-                Good day / Bad day
-              </span>
-              <span className="mt-2 block text-[15px] leading-6 text-black" style={roman}>
-                {goodBad.dek || goodBad.displayTitle}
-              </span>
-            </button>
-          </li>
-        ) : null}
-        {underRadar ? (
-          <li className="border-b border-black/12 py-3.5">
-            <button type="button" onClick={() => onJump(underRadar.id)} className="w-full text-left">
-              <span className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
-                Under the radar
-              </span>
-              <span className="mt-2 block text-[15px] leading-6 text-black" style={roman}>
-                {underRadar.dek || underRadar.displayTitle}
-              </span>
-            </button>
-          </li>
-        ) : null}
-        {puzzle ? (
-          <li className="border-b border-black/12 py-3.5">
-            <button type="button" onClick={() => onJump(puzzle.id)} className="w-full text-left">
-              <span className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
-                Today&apos;s puzzle
-              </span>
-              <span className="mt-2 block text-[15px] leading-6 text-black" style={roman}>
-                {puzzle.dek || puzzle.displayTitle}
-              </span>
-            </button>
-          </li>
-        ) : null}
-        {also.length ? (
-          <li className="py-3.5">
-            <p className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
-              Keep reading
-            </p>
-            <ul className="mt-2 space-y-2">
-              {also.map((story) => (
-                <li key={story.id}>
-                  <button type="button" onClick={() => onJump(story.id)} className="w-full text-left text-[13px] leading-5 text-black/80 hover:text-black" style={roman}>
-                    <span className="text-[#DF0A14]">{story.chip}</span>
-                    <span className="mx-1.5 text-black/30">·</span>
-                    {story.menuTitle || story.displayTitle}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </li>
-        ) : null}
-      </ul>
-    </nav>
+    <div className="flex flex-col gap-8">
+      <nav aria-label="Recent editions">
+        <p className={`border-b border-black pb-2 ${typeLabel} text-[#DF0A14]`} style={uiBold}>
+          Recent editions
+        </p>
+        <ul>
+          {RECENT_EDITIONS.map((edition) => (
+            <li key={`${edition.label}-${edition.when}`} className="border-b border-black/12">
+              <a href={edition.href} className="block py-3.5 transition-colors hover:bg-[#F0EAE1]">
+                <span className="block text-[15px] leading-6 text-black" style={roman}>
+                  {edition.label}
+                </span>
+                <span className="mt-1 block text-[12px] leading-[18px] text-black/55" style={ui}>
+                  {edition.when}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <a href="#previous-editions" className="mt-3 inline-block text-[13px] leading-5 text-[#DF0A14] underline underline-offset-2" style={roman}>
+          Browse all editions
+        </a>
+      </nav>
+      <nav aria-label="Social">
+        <p className={`border-b border-black pb-2 ${typeLabel} text-[#DF0A14]`} style={uiBold}>
+          Follow The Week
+        </p>
+        <ul className="mt-3 flex flex-col gap-2">
+          {SOCIAL_LINKS.map((link) => (
+            <li key={link.label}>
+              <a
+                href={link.href}
+                target="_blank"
+                rel="noreferrer"
+                className="text-[14px] leading-6 text-black/75 transition-colors hover:text-[#DF0A14]"
+                style={roman}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
   );
 }
 
@@ -1348,24 +1326,24 @@ function HeroSplitComposition({
     stat?.displayTitle || "Palestinians killed in Gaza since the ceasefire was signed";
 
   const leadCopy = (
-    <div className="max-w-[40rem]">
+    <div className="w-full">
       <p className={`${typeEyebrow} text-white`} style={uiBold}>
         The Week’s daily editions
       </p>
-      <h1 className={`mt-2 max-w-[16ch] ${typeEdition} text-white`} style={roman}>
+      <h1 className={`mt-3 max-w-[14ch] ${typeEdition} text-white`} style={roman}>
         {heroEditionTitle(active.label)}
       </h1>
-      <div className={`${digestRule} mt-3`} aria-hidden />
-      <p className={`mt-8 ${typeLabel} text-white`} style={uiBold}>
+      <div className="mt-4 h-[4px] w-20 bg-[#DF0A14]" aria-hidden />
+      <p className={`mt-10 ${typeLabel} text-white`} style={uiBold}>
         {storyLabel}
       </p>
-      <p className={`mt-2 max-w-[28ch] ${typeQuestion} text-white`} style={roman}>
+      <p className={`mt-3 max-w-[28ch] ${typeQuestion} text-white`} style={roman}>
         {storyTitle}
       </p>
-      <p className={`mt-3 max-w-[46ch] ${typeBodyLg} text-white/90`} style={roman}>
+      <p className={`mt-4 max-w-[46ch] ${typeBodyLg} text-white/90`} style={roman}>
         {storySupportTrimmed}
       </p>
-      <div className="mt-6 flex flex-wrap items-center gap-5">
+      <div className="mt-8 flex flex-wrap items-center gap-5">
         <button type="button" onClick={onExplore} className={weekCta} style={uiBold}>
           {ctaLabel}
         </button>
@@ -1435,7 +1413,7 @@ function HeroSplitComposition({
   );
 
   return (
-    <header className="hero-split-composition relative isolate min-h-[100svh] w-full overflow-hidden bg-black text-white" aria-label={briefing}>
+    <header className="hero-split-composition relative isolate min-h-[100svh] w-full overflow-hidden bg-black text-white lg:min-h-[110svh]" aria-label={briefing}>
       <div className="absolute inset-0 z-0">
         <Image src={heroImage} alt="" fill priority sizes="100vw" className="object-cover object-center" />
         <div
@@ -1450,8 +1428,9 @@ function HeroSplitComposition({
         />
       </div>
 
-      <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1400px] flex-col px-5 py-4 sm:px-8 sm:py-8 lg:px-10 lg:py-10">
-        <div className="flex justify-end">
+      <div className={`relative z-10 flex min-h-[100svh] w-full flex-col px-5 py-4 sm:px-8 sm:py-8 lg:min-h-[110svh] lg:px-0 lg:py-10 ${digestShell}`}>
+        {/* Mobile */}
+        <div className="flex justify-end lg:hidden">
           <span className="inline-flex items-center gap-2.5 rounded-[5px] bg-black/50 px-2.5 py-2.5 backdrop-blur-[5px]">
             <span className="inline-flex h-[29px] w-[29px] items-center justify-center rounded-full bg-[#DF0A14]">
               <Lock size={14} strokeWidth={2.4} className="text-white" aria-hidden />
@@ -1462,7 +1441,6 @@ function HeroSplitComposition({
           </span>
         </div>
 
-        {/* Mobile */}
         <div className="mt-auto flex w-full max-w-[350px] flex-col gap-[15px] self-center pb-2 lg:hidden">
           <div className="flex flex-col gap-2.5">
             <p className="text-[14px] leading-[25px] font-bold text-white uppercase" style={uiBold}>
@@ -1517,19 +1495,32 @@ function HeroSplitComposition({
           </div>
         </div>
 
-        {/* Desktop */}
-        <div className="mt-auto hidden flex-col gap-8 pb-2 lg:flex lg:gap-10">
-          {leadCopy}
-
-          <div className="rounded-[10px] bg-black px-6 py-6 ring-1 ring-white/10">
-            <div className="mb-4 flex items-center gap-3 border-b border-white/15 pb-4">
-              <WeekMark />
-              <p className={`${typeLabel} text-white`} style={uiBold}>
-                Inside this edition
-              </p>
+        {/* Desktop — align with digest 2/7/3 columns */}
+        <div className="mt-auto hidden w-full grid-cols-12 gap-0 pb-2 lg:grid">
+          <div className="col-span-2" aria-hidden />
+          <div className="col-span-7 flex flex-col gap-10 px-7">
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0 flex-1">{leadCopy}</div>
+              <span className="mt-1 inline-flex shrink-0 items-center gap-2.5 rounded-[5px] bg-black/50 px-2.5 py-2.5 backdrop-blur-[5px]">
+                <span className="inline-flex h-[29px] w-[29px] items-center justify-center rounded-full bg-[#DF0A14]">
+                  <Lock size={14} strokeWidth={2.4} className="text-white" aria-hidden />
+                </span>
+                <span className="pr-1 text-[14px] leading-5 font-bold tracking-[0.02em] text-white uppercase" style={uiBold}>
+                  Exclusive
+                </span>
+              </span>
             </div>
-            {statsPanel}
+            <div className="rounded-[10px] bg-black px-6 py-6 ring-1 ring-white/10">
+              <div className="mb-4 flex items-center gap-3 border-b border-white/15 pb-4">
+                <WeekMark />
+                <p className={`${typeLabel} text-white`} style={uiBold}>
+                  Inside this edition
+                </p>
+              </div>
+              {statsPanel}
+            </div>
           </div>
+          <div className="col-span-3" aria-hidden />
         </div>
       </div>
     </header>
@@ -2164,15 +2155,15 @@ export function ReportBriefing({
         html:has(.report-digest),
         html:has(.report-digest) body {
           scrollbar-width: thin;
-          scrollbar-color: #9CA3AF #F4F0EA;
+          scrollbar-color: #D1D5DB #F4F0EA;
         }
         html:has(.report-digest)::-webkit-scrollbar,
         html:has(.report-digest) body::-webkit-scrollbar,
         .report-digest::-webkit-scrollbar,
         .brand-scrollbar::-webkit-scrollbar {
           -webkit-appearance: none;
-          width: 11px;
-          height: 11px;
+          width: 10px;
+          height: 10px;
           background: #F4F0EA;
         }
         html:has(.report-digest)::-webkit-scrollbar-track,
@@ -2185,7 +2176,7 @@ export function ReportBriefing({
         html:has(.report-digest) body::-webkit-scrollbar-thumb,
         .report-digest::-webkit-scrollbar-thumb,
         .brand-scrollbar::-webkit-scrollbar-thumb {
-          background: #9CA3AF;
+          background: #D1D5DB;
           border: 2px solid #F4F0EA;
           border-radius: 0;
           min-height: 40px;
@@ -2194,7 +2185,7 @@ export function ReportBriefing({
         html:has(.report-digest) body::-webkit-scrollbar-thumb:hover,
         .report-digest::-webkit-scrollbar-thumb:hover,
         .brand-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #6B7280;
+          background: #9CA3AF;
         }
         html:has(.report-digest)::-webkit-scrollbar-corner,
         html:has(.report-digest) body::-webkit-scrollbar-corner,
@@ -2204,7 +2195,7 @@ export function ReportBriefing({
         }
         .brand-scrollbar {
           scrollbar-width: thin;
-          scrollbar-color: #9CA3AF #F4F0EA;
+          scrollbar-color: #D1D5DB #F4F0EA;
         }
         .digest-wide-bar {
           box-shadow: none;
@@ -2478,15 +2469,15 @@ export function ReportBriefing({
             }}
           />
           <div id="report-briefing" className="w-full scroll-mt-12 bg-[#F4F0EA]">
-            <div className="mx-auto grid max-w-[1480px] lg:grid-cols-12 lg:items-stretch">
+            <div className={`grid lg:grid-cols-12 lg:items-stretch ${digestShell}`}>
               <aside className={`hidden min-h-0 border-r border-black/15 lg:col-span-2 lg:block ${DIGEST_WIDE_BAR}`}>
                 <div className={`py-8 pr-5 pl-5 xl:pl-8 ${DIGEST_WIDE_BAR}`}>
-                  <InsideEdition stories={stories} onJump={jump} />
+                  <DigestLeftRail />
                 </div>
               </aside>
               <div className={`min-w-0 lg:col-span-7 ${DIGEST_GROUND}`}>
                 <div className={`border-b border-black/15 py-8 lg:hidden ${digestTextPad}`}>
-                  <InsideEdition stories={stories} onJump={jump} />
+                  <DigestLeftRail />
                 </div>
                 {stories.map((story, storyIndex) => (
                   <article key={story.id} data-story-article={story.id} className={`${DIGEST_GROUND} border-b border-black/10`}>
