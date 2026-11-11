@@ -1303,6 +1303,7 @@ function HeroSplitComposition({
       <h1 className={`mt-2.5 max-w-[12ch] ${typeEdition} leading-[1.02] text-white`} style={roman}>
         {heroEditionTitle(active.label)}
       </h1>
+      <div className="mt-3.5 h-[4px] w-20 bg-[#DF0A14]" aria-hidden />
       <p className={`mt-6 ${typeLabel} text-white`} style={uiBold}>
         {storyLabel}
       </p>
@@ -1416,6 +1417,7 @@ function HeroSplitComposition({
             <h1 className="text-[36px] leading-[1.05] text-[#FAFAFA]" style={roman}>
               {heroEditionTitle(active.label)}
             </h1>
+            <div className="mt-1 h-[3px] w-16 bg-[#DF0A14]" aria-hidden />
           </div>
           <div className="flex flex-col gap-2">
             <p className="text-[12px] leading-5 font-bold tracking-[0.12em] text-white uppercase" style={uiBold}>
