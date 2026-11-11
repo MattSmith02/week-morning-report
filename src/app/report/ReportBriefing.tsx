@@ -32,21 +32,21 @@ const readColumn = "w-full max-w-[65ch]";
 const bodyCopy = "mt-6 text-base leading-6";
 const softPanel = "bg-[#F0EAE1]";
 const hairline = "border-black/12";
-/** Shared Figma hero-split type scale — header + digest body */
-const typeEyebrow = "text-[21px] leading-[29px] font-bold uppercase";
-const typeEdition = "text-[clamp(3rem,5.2vw,84px)] leading-[1.11]";
-const typeLabel = "text-[19px] leading-7 font-bold uppercase";
-const typeQuestion = "text-[clamp(2rem,3.8vw,56px)] leading-[1.17]";
-const typeBodyLg = "text-[23px] leading-[30px]";
-const typeQuote = "text-[28px] leading-[30px] italic";
-const typeAttr = "text-[21px] leading-[30px]";
-const typeCta = "text-[19px] leading-7 font-bold uppercase";
-const typeTab = "text-[28px] leading-[37px]";
-const typeStatus = "text-[19px] leading-7";
-const digestArticleTitle = "text-[clamp(1.85rem,2.8vw,40px)] leading-[1.12]";
-const digestArticleTitleLead = typeQuestion;
-const digestSectionTitle = `${typeLabel} text-[var(--brand-text-primary,#0f172b)]`;
+/** Shared digest type scale — hero mirrors body */
+const typeEyebrow = "text-[11px] font-bold tracking-[0.14em] uppercase";
+const typeEdition = "text-[clamp(2.35rem,3.2vw,2.75rem)] leading-[1.1]";
+const typeLabel = "text-[11px] font-bold tracking-[0.12em] uppercase";
+const typeQuestion = "text-[clamp(1.85rem,2.8vw,2.35rem)] leading-[1.12]";
+const typeBodyLg = "text-[17px] leading-7";
+const typeQuote = "text-[1.75rem] italic leading-9";
+const typeAttr = "text-[15px] leading-6";
+const typeTab = "text-[20px] leading-7";
+const typeStatus = "text-[15px] leading-6";
+const digestArticleTitle = typeQuestion;
+const digestArticleTitleLead = typeEdition;
+const digestSectionTitle = "text-[1.35rem] leading-8 text-[var(--brand-text-primary,#0f172b)] sm:text-[1.5rem] sm:leading-9";
 const digestBodyCopy = `${typeBodyLg} text-[var(--brand-text-secondary,#45556c)]`;
+const digestRule = "mt-2 h-px w-12 bg-[#DF0A14]";
 /** Shared photo cover/thumbnail scrim — same on mobile and desktop. */
 const coverScrim = "bg-gradient-to-t from-black/75 via-black/15 to-black/25";
 const OUTLET_DOMAIN: Record<string, string> = {
@@ -325,10 +325,10 @@ function StoryReading({
         {hook && story.format !== "quote" && story.whatHappened ? (
           <section>
             <div>
-              <h3 className={digest ? digestSectionTitle : "text-[1.65rem] leading-9 text-black sm:text-[1.85rem] sm:leading-10"} style={digest ? romanBold : roman}>
+              <h3 className={digest ? digestSectionTitle : "text-[1.65rem] leading-9 text-black sm:text-[1.85rem] sm:leading-10"} style={roman}>
                 {happenedLabel}
               </h3>
-              <div className="mt-2 h-px w-12 bg-[#DF0A14]" />
+              <div className={digestRule} />
             </div>
             {story.format === "tale" ? (
               <p className={`mt-6 border-l-2 border-[#DF0A14] pl-4 text-black ${digest ? typeQuote : "text-2xl italic leading-8"}`} style={roman}>
@@ -345,7 +345,7 @@ function StoryReading({
           <ul className={`${digest ? "w-full" : "max-w-[635px]"} border-t ${hairline}`}>
             {story.items.map((item) => (
               <li key={item.label} className={`border-b py-5 ${hairline}`}>
-                <p className={digest ? `${typeLabel} text-[#DF0A14]` : subInfo} style={digest ? romanBold : uiBold}>
+                <p className={digest ? `${typeLabel} text-[#DF0A14]` : subInfo} style={uiBold}>
                   {item.label}
                 </p>
                 <p className={`mt-2 text-black ${digest ? typeBodyLg : "text-xl leading-7"}`} style={roman}>
@@ -374,10 +374,10 @@ function StoryReading({
           {story.whoSaidWhat ? (
             <section className={`border-t ${digest ? "pt-8" : "pt-10"} ${hairline}`}>
               <div>
-                <h3 className={digest ? digestSectionTitle : "text-[2rem] leading-10 text-black"} style={digest ? romanBold : roman}>
+                <h3 className={digest ? digestSectionTitle : "text-[2rem] leading-10 text-black"} style={roman}>
                   Who said what
                 </h3>
-                <div className="mt-2 h-px w-12 bg-[#DF0A14]" />
+                <div className={digestRule} />
               </div>
               <p className={`mt-6 ${digest ? digestBodyCopy : "text-base leading-6 text-[var(--brand-text-secondary,#45556c)]"}`} style={roman}>
                 {story.whoSaidWhat}
@@ -387,10 +387,10 @@ function StoryReading({
           {story.whatsNext ? (
             <section className={`border-t ${digest ? "pt-8" : "pt-10"} ${hairline}`}>
               <div>
-                <h3 className={digest ? digestSectionTitle : "text-[2rem] leading-10 text-black"} style={digest ? romanBold : roman}>
+                <h3 className={digest ? digestSectionTitle : "text-[2rem] leading-10 text-black"} style={roman}>
                   What’s next?
                 </h3>
-                <div className="mt-2 h-px w-12 bg-[#DF0A14]" />
+                <div className={digestRule} />
               </div>
               <p className={`mt-6 ${digest ? digestBodyCopy : "text-base leading-6 text-[var(--brand-text-secondary,#45556c)]"}`} style={roman}>
                 {story.whatsNext}
@@ -1159,27 +1159,27 @@ function InsideEdition({ stories, onJump }: { stories: WeekStory[]; onJump: (id:
       <ul>
         <li className="border-b border-black/12 py-3.5">
           <button type="button" onClick={() => onJump(big?.id ?? stories[0]?.id ?? "")} className="w-full text-left">
-            <span className={`block ${typeLabel} text-[#DF0A14]`} style={romanBold}>
+            <span className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
               Today&apos;s big question
             </span>
-            <span className={`mt-2 block ${typeBodyLg} text-black`} style={roman}>
+            <span className="mt-2 block text-[15px] leading-6 text-black" style={roman}>
               Why is the trade deficit getting bigger?
             </span>
-            <span className={`mt-2 block ${typeAttr} text-black/80`} style={roman}>
+            <span className="mt-2 block text-[12px] leading-[18px] text-black/80" style={roman}>
               Trump&apos;s tariffs are intended to narrow the gap. It is widening — and economists disagree on why.
             </span>
           </button>
         </li>
         <li className="border-b border-black/12 py-3.5">
           <button type="button" onClick={() => onJump(quote?.id ?? stories[0]?.id ?? "")} className="w-full text-left">
-            <span className={`block ${typeLabel} text-[#DF0A14]`} style={romanBold}>
+            <span className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
               Quote of the day
             </span>
             <span className="mt-3 flex gap-3">
               <span className="shrink-0 text-[28px] leading-none text-[#DF0A14]" style={roman} aria-hidden>
                 ”
               </span>
-              <span className={`${typeQuote} text-black`} style={roman}>
+              <span className="text-[13px] leading-[19px] text-black" style={roman}>
                 If John Lewis were marching today from Selma to Montgomery, Mike Collins would be grabbing a billy club.
               </span>
             </span>
@@ -1187,13 +1187,13 @@ function InsideEdition({ stories, onJump }: { stories: WeekStory[]; onJump: (id:
         </li>
         <li className="border-b border-black/12 py-3.5">
           <button type="button" onClick={() => onJump(stat?.id ?? stories[0]?.id ?? "")} className="w-full text-left">
-            <span className={`block ${typeLabel} text-[#DF0A14]`} style={romanBold}>
+            <span className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
               Statistics
             </span>
-            <span className={`mt-2 block ${typeQuestion} text-black`} style={roman}>
+            <span className="mt-2 block text-[1.8rem] leading-[1.3] text-black" style={roman}>
               1,034
             </span>
-            <span className={`mt-1 block ${typeBodyLg} text-black`} style={roman}>
+            <span className="mt-1 block text-[12px] leading-[19px] text-black" style={roman}>
               Palestinians killed in Gaza since the ceasefire was signed
             </span>
           </button>
@@ -1316,128 +1316,117 @@ function HeroSplitComposition({
         <Image src={heroImage} alt="" fill priority sizes="100vw" className="object-cover object-center" />
         <div
           className="absolute inset-0"
-          style={{ background: "linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, #000000 80%)" }}
+          style={{ background: "linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, #000000 82%)" }}
           aria-hidden
         />
       </div>
 
-      <div className="relative z-10 mx-auto flex min-h-[min(1043px,92svh)] w-full max-w-[2092px] flex-col justify-between px-4 pb-8 pt-16 sm:px-8 sm:pb-10 sm:pt-20 lg:px-[10%] lg:pb-12 lg:pt-24">
-        <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:gap-[clamp(2rem,8vw,10.6rem)]">
-          <div className="flex w-full max-w-[911px] flex-col items-start gap-6 sm:gap-8 lg:gap-[35px]">
-            <div className="flex w-full flex-col gap-3">
-              <p className={`${typeEyebrow} text-white`} style={uiBold}>
-                The Week’s daily editions
-              </p>
-              <h1 className={`${typeEdition} text-[#FAFAFA]`} style={roman}>
-                {heroEditionTitle(active.label)}
-              </h1>
-            </div>
-            <div className="h-2 w-[100px] bg-[#DF0A14]" aria-hidden />
-            <div className="flex w-full flex-col gap-4 sm:gap-[17px]">
-              <p className={`${typeLabel} text-white`} style={romanBold}>
-                {questionLabel}
-              </p>
-              <p className={`${typeQuestion} text-[#FAFAFA]`} style={roman}>
-                {questionTitle}
-              </p>
-              <p className={`max-w-[46ch] ${typeBodyLg} text-white`} style={roman}>
-                {questionDek}
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-6 sm:gap-[35px]">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-col justify-between gap-10 px-4 py-10 sm:px-8 sm:py-12 lg:min-h-[min(720px,78svh)] lg:gap-12 lg:px-10 lg:py-14 xl:px-12">
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:gap-12 xl:gap-16">
+          <div className="flex w-full max-w-[36rem] flex-col items-start lg:max-w-[40rem]">
+            <p className={`${typeEyebrow} text-[#DF0A14]`} style={uiBold}>
+              The Week’s daily editions
+            </p>
+            <h1 className={`mt-2 max-w-[18ch] ${typeEdition} text-[#FAFAFA]`} style={roman}>
+              {heroEditionTitle(active.label)}
+            </h1>
+            <div className={digestRule} aria-hidden />
+            <p className={`mt-8 ${typeLabel} text-white/80`} style={uiBold}>
+              {questionLabel}
+            </p>
+            <p className={`mt-2 max-w-[28ch] ${typeQuestion} text-[#FAFAFA]`} style={roman}>
+              {questionTitle}
+            </p>
+            <p className={`mt-3 max-w-[46ch] ${typeBodyLg} text-white/85`} style={roman}>
+              {questionDek}
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-5">
               <button
                 type="button"
                 onClick={() => onJump(lead?.id ?? stories[0]?.id ?? "")}
-                className={`inline-flex items-center justify-center rounded-[5px] bg-[#DF0A14] px-5 py-3.5 ${typeCta} text-[#FAFAFA] transition-colors hover:bg-[#B20810] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#DF0A14]`}
+                className={weekCta}
                 style={uiBold}
               >
                 {ctaLabel}
               </button>
-              <a href="#previous-editions" className={`${typeStatus} text-white underline decoration-white/70 underline-offset-4 transition-opacity hover:opacity-80`} style={roman}>
+              <a href="#previous-editions" className={`${typeStatus} text-white underline decoration-white/60 underline-offset-4 transition-opacity hover:opacity-80`} style={roman}>
                 View all editions
               </a>
             </div>
           </div>
 
-          <aside className="relative isolate flex w-full max-w-[665px] flex-col gap-5 overflow-hidden rounded-[12px] border-l-[6px] border-[#DF0A14] bg-[rgba(251,249,245,0.75)] py-5 backdrop-blur-[9px] lg:shrink-0 lg:gap-6 lg:py-6">
-            <div className="absolute inset-x-[6px] top-[78px] bottom-0 z-0 rounded-t-[9px] bg-[rgba(251,249,245,0.3)]" aria-hidden />
-            <div className="relative z-10 flex items-center gap-3 px-5 sm:px-[22px]">
+          <aside className="relative isolate w-full max-w-[28rem] overflow-hidden rounded-[10px] border-l-4 border-[#DF0A14] bg-[rgba(244,240,234,0.92)] py-5 backdrop-blur-md lg:ml-auto lg:shrink-0">
+            <div className="flex items-center gap-3 border-b border-black/15 px-5 pb-3">
               <WeekMark />
               <p className={`${typeLabel} text-[#1F2937]`} style={uiBold}>
                 Inside this edition
               </p>
             </div>
-            <div className="relative z-10 mx-5 border-t border-[#9CA3AF] sm:mx-[22px]" aria-hidden />
-            <div className="relative z-10 flex flex-col gap-5 px-5 sm:gap-6 sm:px-[22px]">
-              <button type="button" onClick={() => onJump(quote?.id ?? stories[0]?.id ?? "")} className="w-full text-left">
-                <span className={`block ${typeLabel} text-[#DF0A14]`} style={romanBold}>
+            <div className="flex flex-col px-5">
+              <button type="button" onClick={() => onJump(quote?.id ?? stories[0]?.id ?? "")} className="w-full border-b border-black/12 py-3.5 text-left">
+                <span className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
                   Quote of the day
                 </span>
-                <span className="mt-3 flex items-start gap-4">
-                  <span className="mt-1 shrink-0 rotate-180 text-[28px] leading-none text-[#DF0A14]" style={roman} aria-hidden>
+                <span className="mt-3 flex gap-3">
+                  <span className="shrink-0 text-[28px] leading-none text-[#DF0A14]" style={roman} aria-hidden>
                     ”
                   </span>
                   <span className="min-w-0">
                     <span className={`block ${typeQuote} text-[#111827]`} style={roman}>
                       {quoteText}
                     </span>
-                    <span className={`mt-3 block ${typeAttr} text-[#374151]`} style={roman}>
+                    <span className={`mt-2 block ${typeAttr} text-[#374151]`} style={roman}>
                       {quoteBy}
                     </span>
                   </span>
                 </span>
               </button>
-              <div className="border-t border-[#9CA3AF]" aria-hidden />
-              <button type="button" onClick={() => onJump(stat?.id ?? stories[0]?.id ?? "")} className="w-full text-left">
-                <span className={`block ${typeLabel} text-[#DF0A14]`} style={romanBold}>
+              <button type="button" onClick={() => onJump(stat?.id ?? stories[0]?.id ?? "")} className="w-full border-b border-black/12 py-3.5 text-left">
+                <span className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
                   Statistic of the day
                 </span>
-                <span className="mt-3 flex flex-wrap items-center gap-4 sm:gap-[17px]">
-                  <span className={`${typeQuestion} text-black`} style={roman}>
-                    {statValue}
-                  </span>
-                  <span className={`min-w-0 flex-1 ${typeBodyLg} text-[#111827]`} style={roman}>
-                    {statLabel}
-                  </span>
+                <span className={`mt-2 block ${typeEdition} text-black`} style={roman}>
+                  {statValue}
+                </span>
+                <span className={`mt-1 block ${typeBodyLg} text-[#111827]`} style={roman}>
+                  {statLabel}
                 </span>
               </button>
-              <div className="border-t border-[#9CA3AF]" aria-hidden />
-              <button type="button" onClick={() => onJump(explainer?.id ?? stories[0]?.id ?? "")} className="w-full text-left">
-                <span className={`block ${typeLabel} text-[#DF0A14]`} style={romanBold}>
+              <button type="button" onClick={() => onJump(explainer?.id ?? stories[0]?.id ?? "")} className="w-full border-b border-black/12 py-3.5 text-left">
+                <span className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
                   The explainer
                 </span>
                 <span className={`mt-2 block ${typeBodyLg} text-[#111827]`} style={roman}>
                   {explainerTitle}
                 </span>
               </button>
-              <div className="border-t border-[#9CA3AF]" aria-hidden />
-              <p className={`${typeAttr} text-[#374151]`} style={roman}>
+              <p className={`py-3.5 ${typeAttr} text-[#374151]`} style={roman}>
                 Plus commentary, puzzles, Good day / Bad day and more
               </p>
             </div>
           </aside>
         </div>
 
-        <nav className="mt-10 w-full max-w-[1745px] lg:mt-14" aria-label="Editions">
-          <div className="relative mb-5 h-[7px] w-full" aria-hidden>
-            <div className="absolute inset-x-0 top-1/2 h-[3.5px] -translate-y-1/2 bg-[#D9D9D9]" />
+        <nav className="w-full" aria-label="Editions">
+          <div className="relative mb-4 h-[5px] w-full" aria-hidden>
+            <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-white/25" />
             <div
-              className="absolute top-1/2 h-[6px] -translate-y-1/2 bg-[#DF0A14] transition-[left,width] duration-300"
+              className="absolute top-1/2 h-[3px] -translate-y-1/2 bg-[#DF0A14] transition-[left,width] duration-300"
               style={{ left: `${(HERO_EDITIONS.findIndex((item) => item.id === activeId) / HERO_EDITIONS.length) * 100}%`, width: `${100 / HERO_EDITIONS.length}%` }}
             />
           </div>
-          <ul className="grid grid-cols-2 gap-6 sm:gap-8 lg:grid-cols-4 lg:gap-[clamp(1.5rem,12vw,16rem)]">
+          <ul className="grid grid-cols-2 gap-5 sm:gap-6 lg:grid-cols-4 lg:gap-8">
             {HERO_EDITIONS.map((edition) => {
               const current = edition.id === activeId;
               return (
                 <li key={edition.id}>
-                  <div className={`flex flex-col items-start gap-1.5 ${current ? "text-white" : "text-[#6B7280]"}`}>
+                  <div className={`flex flex-col items-start gap-1 ${current ? "text-white" : "text-[#9CA3AF]"}`}>
                     <p className={typeTab} style={roman}>
                       {edition.label}
                     </p>
                     <p className={`flex items-center gap-1.5 ${typeStatus}`} style={roman}>
                       <span
-                        className={`inline-block h-3 w-3 shrink-0 rounded-full ${edition.live ? "bg-[#DF0A14]" : "bg-[#9CA3AF]"}`}
+                        className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${edition.live ? "bg-[#DF0A14]" : "bg-[#6B7280]"}`}
                         aria-hidden
                       />
                       <span>{edition.status}</span>
