@@ -315,11 +315,11 @@ function StoryReading({
   const framed = part !== "rest";
   const digest = layout === "digest";
   const readWidth = digest
-    ? "relative flex w-full flex-col gap-8"
+    ? "relative flex w-full flex-col gap-6"
     : "relative mx-auto flex w-full max-w-[65ch] flex-col gap-10 sm:gap-12";
 
   return (
-    <div className={framed ? `relative ${digest ? "py-8" : "px-4 py-8 sm:px-8 sm:py-10"}` : ""}>
+    <div className={framed ? `relative ${digest ? "pt-3 pb-8" : "px-4 py-8 sm:px-8 sm:py-10"}` : ""}>
       <div className={framed ? readWidth : "mx-auto flex w-full max-w-[65ch] flex-col gap-6 px-4 sm:px-8"}>
         {hook && story.format !== "quote" && story.whatHappened ? (
           <section>
@@ -330,11 +330,11 @@ function StoryReading({
               <div className={digestRule} />
             </div>
             {story.format === "tale" ? (
-              <p className={`mt-6 border-l-2 border-[#DF0A14] pl-4 text-black ${digest ? typeQuote : "text-2xl italic leading-8"}`} style={roman}>
+              <p className={`mt-4 border-l-2 border-[#DF0A14] pl-4 text-black ${digest ? typeQuote : "text-2xl italic leading-8"}`} style={roman}>
                 {story.whatHappened}
               </p>
             ) : (
-              <p className={`mt-6 ${digest ? digestBodyCopy : "text-base leading-6 text-[var(--brand-text-secondary,#45556c)]"}`} style={roman}>
+              <p className={`mt-4 ${digest ? digestBodyCopy : "text-base leading-6 text-[var(--brand-text-secondary,#45556c)]"}`} style={roman}>
                 {story.whatHappened}
               </p>
             )}
@@ -998,7 +998,7 @@ function CompactStoryHeader({
           </div>
         </figure>
       ) : null}
-      <div className={`${digestTextPad} ${hasImage ? "pt-5 pb-8 sm:pb-10" : "py-8 sm:py-10"}`}>
+      <div className={`${digestTextPad} ${hasImage ? "pt-5 pb-2" : "pt-8 pb-2"}`}>
         {hasImage && story.imageCaption ? (
           <p className="mb-4 text-[13px] leading-5 text-black/50" style={ui}>
             {story.imageCaption}
@@ -1145,34 +1145,47 @@ function StoryCover({
   );
 }
 
-const RECENT_EDITIONS = [
-  { label: "Evening Review", when: "Yesterday", href: "#previous-editions" },
-  { label: "Saturday Wrap", when: "Sat · 10 Oct", href: "#previous-editions" },
-  { label: "Sunday Shortlist", when: "Sun · 11 Oct", href: "#previous-editions" },
-  { label: "Morning Report", when: "Fri · 9 Oct", href: "#previous-editions" },
-] as const;
-
 function DigestLeftRail() {
+  const cards = ARCHIVE_CARDS.slice(0, 4);
+
   return (
     <nav aria-label="Recent editions">
       <p className={`border-b border-black pb-2 ${typeLabel} text-[#DF0A14]`} style={uiBold}>
         Recent editions
       </p>
-      <ul>
-        {RECENT_EDITIONS.map((edition) => (
-          <li key={`${edition.label}-${edition.when}`} className="border-b border-black/12">
-            <a href={edition.href} className="block py-3.5 transition-colors hover:bg-[#F0EAE1]">
-              <span className="block text-[15px] leading-6 text-black" style={roman}>
-                {edition.label}
-              </span>
-              <span className="mt-1 block text-[12px] leading-[18px] text-black/55" style={ui}>
-                {edition.when}
+      <ul className="mt-4 flex flex-col gap-5">
+        {cards.map((card) => (
+          <li key={card.id}>
+            <a href="#previous-editions" className="block transition-opacity hover:opacity-85">
+              <div className="relative aspect-square overflow-clip bg-[#111]">
+                <Image src={card.image} alt="" fill sizes="200px" className="object-cover" />
+                <span className={`absolute inset-0 ${coverScrim}`} />
+                <EditionBanner label={card.label} size="card" className="absolute inset-x-0 top-0" />
+                <span className="absolute top-[40%] left-2.5 text-[#F9FAFB]">
+                  <span className="block text-[48px] leading-none" style={roman}>
+                    {card.day}
+                  </span>
+                  <span className="mt-0.5 block text-[12px] leading-4" style={roman}>
+                    {card.when}
+                  </span>
+                </span>
+              </div>
+              <span className="mt-2.5 flex flex-col gap-1.5">
+                <span className="block text-[11px] leading-4 text-[#4B5563] uppercase" style={ui}>
+                  top story
+                </span>
+                <span className="block text-[14px] leading-5 text-black" style={roman}>
+                  {card.headline}
+                </span>
+                <span className="block text-[12px] leading-4 text-black/70" style={roman}>
+                  + {card.more} more inside
+                </span>
               </span>
             </a>
           </li>
         ))}
       </ul>
-      <a href="#previous-editions" className="mt-3 inline-block text-[13px] leading-5 text-[#DF0A14] underline underline-offset-2" style={roman}>
+      <a href="#previous-editions" className="mt-4 inline-block text-[13px] leading-5 text-[#DF0A14] underline underline-offset-2" style={roman}>
         Browse all editions
       </a>
     </nav>
