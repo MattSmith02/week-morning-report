@@ -1152,59 +1152,30 @@ const RECENT_EDITIONS = [
   { label: "Morning Report", when: "Fri · 9 Oct", href: "#previous-editions" },
 ] as const;
 
-const SOCIAL_LINKS = [
-  { label: "X", href: "https://x.com/TheWeek" },
-  { label: "Facebook", href: "https://www.facebook.com/TheWeek" },
-  { label: "Instagram", href: "https://www.instagram.com/theweek/" },
-  { label: "YouTube", href: "https://www.youtube.com/@TheWeek" },
-] as const;
-
 function DigestLeftRail() {
   return (
-    <div className="flex flex-col gap-8">
-      <nav aria-label="Recent editions">
-        <p className={`border-b border-black pb-2 ${typeLabel} text-[#DF0A14]`} style={uiBold}>
-          Recent editions
-        </p>
-        <ul>
-          {RECENT_EDITIONS.map((edition) => (
-            <li key={`${edition.label}-${edition.when}`} className="border-b border-black/12">
-              <a href={edition.href} className="block py-3.5 transition-colors hover:bg-[#F0EAE1]">
-                <span className="block text-[15px] leading-6 text-black" style={roman}>
-                  {edition.label}
-                </span>
-                <span className="mt-1 block text-[12px] leading-[18px] text-black/55" style={ui}>
-                  {edition.when}
-                </span>
-              </a>
-            </li>
-          ))}
-        </ul>
-        <a href="#previous-editions" className="mt-3 inline-block text-[13px] leading-5 text-[#DF0A14] underline underline-offset-2" style={roman}>
-          Browse all editions
-        </a>
-      </nav>
-      <nav aria-label="Social">
-        <p className={`border-b border-black pb-2 ${typeLabel} text-[#DF0A14]`} style={uiBold}>
-          Follow The Week
-        </p>
-        <ul className="mt-3 flex flex-col gap-2">
-          {SOCIAL_LINKS.map((link) => (
-            <li key={link.label}>
-              <a
-                href={link.href}
-                target="_blank"
-                rel="noreferrer"
-                className="text-[14px] leading-6 text-black/75 transition-colors hover:text-[#DF0A14]"
-                style={roman}
-              >
-                {link.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </div>
+    <nav aria-label="Recent editions">
+      <p className={`border-b border-black pb-2 ${typeLabel} text-[#DF0A14]`} style={uiBold}>
+        Recent editions
+      </p>
+      <ul>
+        {RECENT_EDITIONS.map((edition) => (
+          <li key={`${edition.label}-${edition.when}`} className="border-b border-black/12">
+            <a href={edition.href} className="block py-3.5 transition-colors hover:bg-[#F0EAE1]">
+              <span className="block text-[15px] leading-6 text-black" style={roman}>
+                {edition.label}
+              </span>
+              <span className="mt-1 block text-[12px] leading-[18px] text-black/55" style={ui}>
+                {edition.when}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+      <a href="#previous-editions" className="mt-3 inline-block text-[13px] leading-5 text-[#DF0A14] underline underline-offset-2" style={roman}>
+        Browse all editions
+      </a>
+    </nav>
   );
 }
 
