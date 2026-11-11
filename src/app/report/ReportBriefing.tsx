@@ -963,7 +963,7 @@ function ImagelessCover({
 
 const DIGEST_GROUND = "bg-[#F4F0EA]";
 const DIGEST_WIDE_BAR = "digest-wide-bar bg-[#F4F0EA]";
-const digestTextPad = "px-4 sm:px-6 lg:mx-auto lg:w-full lg:max-w-[700px] lg:px-0";
+const digestTextPad = "px-4 sm:px-6 lg:mx-auto lg:w-full lg:max-w-[900px] lg:px-0";
 const brandScrollbar = "brand-scrollbar";
 
 function CompactStoryHeader({
