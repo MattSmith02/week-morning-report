@@ -962,7 +962,7 @@ function ImagelessCover({
 
 const DIGEST_GROUND = "bg-[var(--report-beige,#F4F0EA)]";
 const DIGEST_WIDE_BAR = "digest-wide-bar bg-[var(--report-beige,#F4F0EA)]";
-const digestTextPad = "px-4 sm:px-5";
+const digestTextPad = "px-4 sm:px-6 lg:px-7";
 const brandScrollbar = "brand-scrollbar";
 
 function CompactStoryHeader({
@@ -1145,57 +1145,86 @@ function StoryCover({
 }
 
 function InsideEdition({ stories, onJump }: { stories: WeekStory[]; onJump: (id: string) => void }) {
-  const big = stories.find((story) => /big question/i.test(story.chip) || /big question/i.test(story.kicker ?? ""));
-  const quote = stories.find((story) => story.format === "quote" || /quote/i.test(story.chip));
-  const stat = stories.find((story) => story.format === "stat" || /statistic/i.test(story.chip));
+  const explainer = stories.find((story) => /explainer/i.test(story.chip));
+  const goodBad = stories.find((story) => story.format === "day" || /good\s*\/\s*bad/i.test(story.chip));
+  const underRadar = stories.find((story) => /under the radar/i.test(story.chip));
+  const puzzle = stories.find((story) => /puzzle|sudoku/i.test(story.chip) || story.format === "puzzle");
+  const also = stories
+    .filter((story) => ![explainer?.id, goodBad?.id, underRadar?.id, puzzle?.id, stories[0]?.id].includes(story.id))
+    .slice(0, 4);
 
   return (
-    <nav aria-label="Inside this edition">
+    <nav aria-label="Also in this report">
       <p className={`border-b border-black pb-2 ${typeLabel} text-[#DF0A14]`} style={uiBold}>
-        Inside this edition
+        Also in this report
       </p>
       <ul>
-        <li className="border-b border-black/12 py-3.5">
-          <button type="button" onClick={() => onJump(big?.id ?? stories[0]?.id ?? "")} className="w-full text-left">
-            <span className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
-              Today&apos;s big question
-            </span>
-            <span className="mt-2 block text-[15px] leading-6 text-black" style={roman}>
-              Why is the trade deficit getting bigger?
-            </span>
-            <span className="mt-2 block text-[12px] leading-[18px] text-black/80" style={roman}>
-              Trump&apos;s tariffs are intended to narrow the gap. It is widening — and economists disagree on why.
-            </span>
-          </button>
-        </li>
-        <li className="border-b border-black/12 py-3.5">
-          <button type="button" onClick={() => onJump(quote?.id ?? stories[0]?.id ?? "")} className="w-full text-left">
-            <span className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
-              Quote of the day
-            </span>
-            <span className="mt-3 flex gap-3">
-              <span className="shrink-0 text-[28px] leading-none text-[#DF0A14]" style={roman} aria-hidden>
-                ”
+        {explainer ? (
+          <li className="border-b border-black/12 py-3.5">
+            <button type="button" onClick={() => onJump(explainer.id)} className="w-full text-left">
+              <span className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
+                The explainer
               </span>
-              <span className="text-[13px] leading-[19px] text-black" style={roman}>
-                If John Lewis were marching today from Selma to Montgomery, Mike Collins would be grabbing a billy club.
+              <span className="mt-2 block text-[15px] leading-6 text-black" style={roman}>
+                {explainer.dek || explainer.displayTitle}
               </span>
-            </span>
-          </button>
-        </li>
-        <li className="border-b border-black/12 py-3.5">
-          <button type="button" onClick={() => onJump(stat?.id ?? stories[0]?.id ?? "")} className="w-full text-left">
-            <span className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
-              Statistics
-            </span>
-            <span className="mt-2 block text-[1.8rem] leading-[1.3] text-black" style={roman}>
-              1,034
-            </span>
-            <span className="mt-1 block text-[12px] leading-[19px] text-black" style={roman}>
-              Palestinians killed in Gaza since the ceasefire was signed
-            </span>
-          </button>
-        </li>
+            </button>
+          </li>
+        ) : null}
+        {goodBad ? (
+          <li className="border-b border-black/12 py-3.5">
+            <button type="button" onClick={() => onJump(goodBad.id)} className="w-full text-left">
+              <span className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
+                Good day / Bad day
+              </span>
+              <span className="mt-2 block text-[15px] leading-6 text-black" style={roman}>
+                {goodBad.dek || goodBad.displayTitle}
+              </span>
+            </button>
+          </li>
+        ) : null}
+        {underRadar ? (
+          <li className="border-b border-black/12 py-3.5">
+            <button type="button" onClick={() => onJump(underRadar.id)} className="w-full text-left">
+              <span className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
+                Under the radar
+              </span>
+              <span className="mt-2 block text-[15px] leading-6 text-black" style={roman}>
+                {underRadar.dek || underRadar.displayTitle}
+              </span>
+            </button>
+          </li>
+        ) : null}
+        {puzzle ? (
+          <li className="border-b border-black/12 py-3.5">
+            <button type="button" onClick={() => onJump(puzzle.id)} className="w-full text-left">
+              <span className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
+                Today&apos;s puzzle
+              </span>
+              <span className="mt-2 block text-[15px] leading-6 text-black" style={roman}>
+                {puzzle.dek || puzzle.displayTitle}
+              </span>
+            </button>
+          </li>
+        ) : null}
+        {also.length ? (
+          <li className="py-3.5">
+            <p className={`block ${typeLabel} text-[#DF0A14]`} style={uiBold}>
+              Keep reading
+            </p>
+            <ul className="mt-2 space-y-2">
+              {also.map((story) => (
+                <li key={story.id}>
+                  <button type="button" onClick={() => onJump(story.id)} className="w-full text-left text-[13px] leading-5 text-black/80 hover:text-black" style={roman}>
+                    <span className="text-[#DF0A14]">{story.chip}</span>
+                    <span className="mx-1.5 text-black/30">·</span>
+                    {story.menuTitle || story.displayTitle}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ) : null}
       </ul>
     </nav>
   );
@@ -1278,10 +1307,12 @@ function HeroSplitComposition({
   briefing,
   stories,
   onJump,
+  onExplore,
 }: {
   briefing: string;
   stories: WeekStory[];
   onJump: (id: string) => void;
+  onExplore: () => void;
 }) {
   const [insideOpen, setInsideOpen] = useState(false);
   const activeId = heroEditionId(briefing);
@@ -1294,7 +1325,6 @@ function HeroSplitComposition({
   const evening = activeId === "evening";
   const storyLabel = evening ? "Tonight’s big question" : "Today’s story";
   const ctaLabel = evening ? "Explore tonight’s report" : "Explore today’s report";
-  const featured = evening ? big ?? lead : lead;
   const storyTitle =
     (evening ? big?.dek || big?.displayTitle : lead?.displayTitle || lead?.dek) ||
     "Why is the trade deficit getting bigger?";
@@ -1336,12 +1366,7 @@ function HeroSplitComposition({
         {storySupportTrimmed}
       </p>
       <div className="mt-6 flex flex-wrap items-center gap-5">
-        <button
-          type="button"
-          onClick={() => onJump(featured?.id ?? stories[0]?.id ?? "")}
-          className={weekCta}
-          style={uiBold}
-        >
+        <button type="button" onClick={onExplore} className={weekCta} style={uiBold}>
           {ctaLabel}
         </button>
         <a
@@ -1479,7 +1504,7 @@ function HeroSplitComposition({
           <div className="flex flex-col gap-3">
             <button
               type="button"
-              onClick={() => onJump(featured?.id ?? stories[0]?.id ?? "")}
+              onClick={onExplore}
               className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[3px] bg-[#DF0A14] px-3 text-[14px] leading-5 font-bold text-[#FAFAFA] uppercase transition-colors hover:bg-[#B20810]"
               style={uiBold}
             >
@@ -2135,11 +2160,11 @@ export function ReportBriefing({
         .report-feed, .report-article, .report-end { scrollbar-width: none; }
         .report-feed::-webkit-scrollbar, .report-article::-webkit-scrollbar, .report-end::-webkit-scrollbar { display: none; }
 
-        /* Cream track, black thumb */
+        /* Cream track, light brand-gray thumb */
         html:has(.report-digest),
         html:has(.report-digest) body {
           scrollbar-width: thin;
-          scrollbar-color: #0A0A0A #F4F0EA;
+          scrollbar-color: #9CA3AF #F4F0EA;
         }
         html:has(.report-digest)::-webkit-scrollbar,
         html:has(.report-digest) body::-webkit-scrollbar,
@@ -2160,7 +2185,7 @@ export function ReportBriefing({
         html:has(.report-digest) body::-webkit-scrollbar-thumb,
         .report-digest::-webkit-scrollbar-thumb,
         .brand-scrollbar::-webkit-scrollbar-thumb {
-          background: #0A0A0A;
+          background: #9CA3AF;
           border: 2px solid #F4F0EA;
           border-radius: 0;
           min-height: 40px;
@@ -2169,7 +2194,7 @@ export function ReportBriefing({
         html:has(.report-digest) body::-webkit-scrollbar-thumb:hover,
         .report-digest::-webkit-scrollbar-thumb:hover,
         .brand-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #000;
+          background: #6B7280;
         }
         html:has(.report-digest)::-webkit-scrollbar-corner,
         html:has(.report-digest) body::-webkit-scrollbar-corner,
@@ -2179,7 +2204,7 @@ export function ReportBriefing({
         }
         .brand-scrollbar {
           scrollbar-width: thin;
-          scrollbar-color: #0A0A0A #F4F0EA;
+          scrollbar-color: #9CA3AF #F4F0EA;
         }
         .digest-wide-bar {
           box-shadow: none;
@@ -2443,15 +2468,23 @@ export function ReportBriefing({
 
       {digest ? (
         <>
-          <HeroSplitComposition briefing={briefing} stories={stories} onJump={jump} />
-          <div className="w-full bg-[#F4F0EA]">
-            <div className="mx-auto grid max-w-[1400px] lg:grid-cols-12 lg:items-stretch">
-              <aside className={`hidden min-h-0 border-r border-black/15 lg:col-span-3 lg:block ${DIGEST_WIDE_BAR}`}>
-                <div className={`py-8 pr-6 pl-6 xl:pl-10 ${DIGEST_WIDE_BAR}`}>
+          <HeroSplitComposition
+            briefing={briefing}
+            stories={stories}
+            onJump={jump}
+            onExplore={() => {
+              const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+              document.getElementById("report-briefing")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+            }}
+          />
+          <div id="report-briefing" className="w-full scroll-mt-12 bg-[#F4F0EA]">
+            <div className="mx-auto grid max-w-[1480px] lg:grid-cols-12 lg:items-stretch">
+              <aside className={`hidden min-h-0 border-r border-black/15 lg:col-span-2 lg:block ${DIGEST_WIDE_BAR}`}>
+                <div className={`py-8 pr-5 pl-5 xl:pl-8 ${DIGEST_WIDE_BAR}`}>
                   <InsideEdition stories={stories} onJump={jump} />
                 </div>
               </aside>
-              <div className={`min-w-0 lg:col-span-6 ${DIGEST_GROUND}`}>
+              <div className={`min-w-0 lg:col-span-7 ${DIGEST_GROUND}`}>
                 <div className={`border-b border-black/15 py-8 lg:hidden ${digestTextPad}`}>
                   <InsideEdition stories={stories} onJump={jump} />
                 </div>
@@ -2465,7 +2498,7 @@ export function ReportBriefing({
                 ))}
               </div>
               <aside className={`hidden min-h-0 border-l border-black/15 lg:col-span-3 lg:block ${DIGEST_WIDE_BAR}`}>
-                <div className={`sticky top-12 z-20 max-h-[calc(100svh-3rem)] overflow-y-auto overscroll-contain py-8 pr-6 pl-6 xl:pr-10 ${DIGEST_WIDE_BAR} ${brandScrollbar}`}>
+                <div className={`sticky top-12 z-20 max-h-[calc(100svh-3rem)] overflow-y-auto overscroll-contain py-8 pr-6 pl-5 xl:pr-10 ${DIGEST_WIDE_BAR} ${brandScrollbar}`}>
                   <DigestRail stories={stories} onJump={jump} currentId={stories[index]?.id} />
                 </div>
               </aside>
