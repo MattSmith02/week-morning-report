@@ -259,7 +259,7 @@ const SUBSCRIPTION_BENEFITS = [
 
 function GateFile() {
   return (
-    <div className="bg-[#F0EAE1] px-4 py-4">
+    <div className="bg-white px-4 py-4">
       <p className="text-[16px] leading-6 text-[#1B1B1B]" style={roman}>
         The rest of this article is locked. Sign up for the coverage: news and opinion from over 200 sources, gathered in one place.
       </p>
