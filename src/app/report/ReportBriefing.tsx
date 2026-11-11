@@ -1153,34 +1153,26 @@ function DigestLeftRail() {
       <p className="border-b border-black pb-2 text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
         Recent editions
       </p>
-      <ul className="mt-3 flex flex-col gap-3">
+      <ul className="mt-2">
         {cards.map((card) => (
-          <li key={card.id}>
-            <a href="#previous-editions" className="flex gap-2.5 transition-opacity hover:opacity-85">
-              <span className="relative h-14 w-14 shrink-0 overflow-clip bg-[#111]">
-                <Image src={card.image} alt="" fill sizes="56px" className="object-cover" />
-                <span className={`absolute inset-0 ${coverScrim}`} />
-                <span className="absolute inset-x-0 bottom-0 px-1 pb-0.5 text-[10px] leading-none text-white" style={roman}>
-                  {card.day}
-                </span>
-              </span>
-              <span className="min-w-0 flex-1 py-0.5">
-                <span className="block text-[11px] leading-4 text-[#DF0A14]" style={uiBold}>
+          <li key={card.id} className="border-b border-black/12">
+            <a href="#previous-editions" className="group flex items-center gap-2 py-2.5 text-left transition-colors hover:text-[#DF0A14]">
+              <span className="min-w-0 flex-1">
+                <span className="block text-[14px] leading-5 text-black group-hover:text-[#DF0A14]" style={roman}>
                   {card.label}
                 </span>
                 <span className="mt-0.5 block text-[12px] leading-4 text-black/55" style={ui}>
                   {card.when}
                 </span>
-                <span className="mt-1 block line-clamp-2 text-[13px] leading-[17px] text-black" style={roman}>
-                  {card.headline}
-                </span>
               </span>
+              <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-4 w-4 shrink-0 text-[#DF0A14]" />
             </a>
           </li>
         ))}
       </ul>
-      <a href="#previous-editions" className="mt-3 inline-block text-[12px] leading-4 text-[#DF0A14] underline underline-offset-2" style={roman}>
+      <a href="#previous-editions" className="mt-3 inline-flex items-center gap-1 text-[12px] leading-4 text-[#DF0A14] transition-opacity hover:opacity-80" style={roman}>
         Browse all editions
+        <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-3.5 w-3.5" />
       </a>
     </nav>
   );
