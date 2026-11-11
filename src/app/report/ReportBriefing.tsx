@@ -1247,24 +1247,189 @@ function DigestRail({
   );
 }
 
-function BriefingDigest({ briefing }: { briefing: string }) {
-  const today = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date());
+const HERO_EDITIONS = [
+  { id: "morning", label: "Morning Report", status: "Published this morning", live: true, image: "/the-week/hero-morning-field.jpg" },
+  { id: "evening", label: "Evening Review", status: "Out now", live: true, image: "/the-week/hero-evening-field.jpg" },
+  { id: "saturday", label: "Saturday Wrap", status: "Last week · Saturday, 10 October", live: false, image: "/the-week/hero-saturday-field.jpg" },
+  { id: "sunday", label: "Sunday Shortlist", status: "Last week · Sunday, 11 October", live: false, image: "/the-week/hero-sunday-field.jpg" },
+] as const;
+
+function heroEditionId(briefing: string) {
+  const hit = HERO_EDITIONS.find((item) => item.label.toLowerCase() === briefing.toLowerCase());
+  return hit?.id ?? "morning";
+}
+
+function HeroSplitComposition({
+  briefing,
+  stories,
+  onJump,
+}: {
+  briefing: string;
+  stories: WeekStory[];
+  onJump: (id: string) => void;
+}) {
+  const activeId = heroEditionId(briefing);
+  const active = HERO_EDITIONS.find((item) => item.id === activeId) ?? HERO_EDITIONS[0];
+  const lead = stories[0];
+  const big = stories.find((story) => /big question/i.test(story.chip) || /big question/i.test(story.kicker ?? ""));
+  const quote = stories.find((story) => story.format === "quote" || /quote/i.test(story.chip));
+  const stat = stories.find((story) => story.format === "stat" || /statistic/i.test(story.chip));
+  const explainer = stories.find((story) => /explainer/i.test(story.chip));
+  const evening = activeId === "evening";
+  const questionLabel = evening ? "Tonight’s big question" : "Today’s big question";
+  const questionTitle = big?.dek || big?.displayTitle || "Why is the trade deficit getting bigger?";
+  const questionDek =
+    big?.whatHappened?.slice(0, 140) ||
+    "Exploring rising tensions, regional implications and what could determine the next developments.";
+  const quoteText =
+    quote?.quote ||
+    "If John Lewis were marching today from Selma to Montgomery, Mike Collins would be grabbing a billy club.";
+  const quoteBy = quote?.quoteAttribution || "Sen. Jon Ossoff (D-Ga.)";
+  const statValue = stat?.dek || stat?.stats?.[0]?.value || "1,034";
+  const statLabel =
+    stat?.displayTitle || "Palestinians killed in Gaza since the ceasefire was signed";
+  const explainerTitle = explainer?.dek || explainer?.displayTitle || "Why the Red Sea matters so much to global shipping";
 
   return (
-    <header className="border-b border-[var(--brand-border-default,#e2e8f0)] bg-transparent py-8">
-      <p className="brand-label-copy text-[11px] tracking-[0.22em] text-[#DF0A14]" style={romanBold}>
-        The Week
-      </p>
-      <h1 className="mt-2 text-[2.5rem] leading-none text-[var(--brand-text-primary,#0f172b)] sm:text-[3.15rem]" style={roman}>
-        {briefing}
-      </h1>
-      <div className="mt-2 h-px w-12 bg-[#DF0A14]" aria-hidden />
-      <p className="brand-muted-copy mt-2 text-[13px] leading-5" style={ui}>
-        {today}
-      </p>
-      <p className="mt-4 max-w-[46ch] text-[15px] leading-6 text-[var(--brand-text-secondary,#45556c)]" style={roman}>
-        Good morning. Browse the front page, then jump from The latest.
-      </p>
+    <header className="hero-split-composition relative isolate w-full overflow-hidden bg-black text-white" aria-label={briefing}>
+      <div className="absolute inset-0 z-0">
+        <Image src={active.image} alt="" fill priority sizes="100vw" className="object-cover" />
+        <div
+          className="absolute inset-0"
+          style={{ background: "linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, #000000 80%)" }}
+          aria-hidden
+        />
+      </div>
+
+      <div className="relative z-10 mx-auto flex min-h-[min(1043px,92svh)] w-full max-w-[2092px] flex-col justify-between px-4 pb-8 pt-16 sm:px-8 sm:pb-10 sm:pt-20 lg:px-[10%] lg:pb-12 lg:pt-24">
+        <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:gap-[clamp(2rem,8vw,10.6rem)]">
+          <div className="flex w-full max-w-[911px] flex-col items-start gap-6 sm:gap-8 lg:gap-[35px]">
+            <div className="flex w-full flex-col gap-3">
+              <p className="text-[13px] leading-5 font-bold tracking-[0.04em] text-white uppercase sm:text-[18px] sm:leading-7 lg:text-[21px]" style={uiBold}>
+                {lead?.chip || "Category"}
+              </p>
+              <h1 className="text-[2.5rem] leading-[1.1] text-[#FAFAFA] sm:text-[3.5rem] lg:text-[clamp(2.75rem,4.5vw,5.235rem)] lg:leading-[1.11]" style={roman}>
+                {lead?.displayTitle || briefing}
+              </h1>
+            </div>
+            <div className="h-2 w-[100px] bg-[#DF0A14]" aria-hidden />
+            <div className="flex w-full flex-col gap-4 sm:gap-[17px]">
+              <p className="text-[15px] leading-6 font-bold text-white uppercase sm:text-[19px] sm:leading-7" style={romanBold}>
+                {questionLabel}
+              </p>
+              <p className="text-[1.75rem] leading-[1.15] text-[#FAFAFA] sm:text-[2.5rem] lg:text-[clamp(2rem,3vw,3.49rem)] lg:leading-[1.17]" style={roman}>
+                {questionTitle}
+              </p>
+              <p className="max-w-[46ch] text-[16px] leading-6 text-white sm:text-[20px] sm:leading-[1.3] lg:text-[23px] lg:leading-[30px]" style={roman}>
+                {questionDek}
+                {questionDek.length >= 140 && !questionDek.endsWith(".") ? "…" : ""}
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-6 sm:gap-[35px]">
+              <button
+                type="button"
+                onClick={() => onJump(lead?.id ?? stories[0]?.id ?? "")}
+                className="inline-flex items-center justify-center rounded-[5px] bg-[#DF0A14] px-5 py-3.5 text-[15px] leading-7 font-bold text-[#FAFAFA] uppercase transition-colors hover:bg-[#B20810] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#DF0A14] sm:text-[19px]"
+                style={uiBold}
+              >
+                Read this briefing
+              </button>
+              <a href="#previous-editions" className="text-[15px] leading-7 text-white underline decoration-white/70 underline-offset-4 transition-opacity hover:opacity-80 sm:text-[19px]" style={roman}>
+                View all editions
+              </a>
+            </div>
+          </div>
+
+          <aside className="relative isolate flex w-full max-w-[665px] flex-col gap-5 overflow-hidden rounded-[12px] border-l-[6px] border-[#DF0A14] bg-[rgba(251,249,245,0.75)] py-5 backdrop-blur-[9px] lg:shrink-0 lg:gap-6 lg:py-6">
+            <div className="absolute inset-x-[6px] top-[78px] bottom-0 z-0 rounded-t-[9px] bg-[rgba(251,249,245,0.3)]" aria-hidden />
+            <div className="relative z-10 flex items-center gap-3 px-5 sm:px-[22px]">
+              <WeekMark />
+              <p className="text-[14px] leading-none font-bold tracking-[0.04em] text-[#1F2937] uppercase" style={uiBold}>
+                Inside this edition
+              </p>
+            </div>
+            <div className="relative z-10 mx-5 border-t border-[#9CA3AF] sm:mx-[22px]" aria-hidden />
+            <div className="relative z-10 flex flex-col gap-5 px-5 sm:gap-6 sm:px-[22px]">
+              <button type="button" onClick={() => onJump(quote?.id ?? stories[0]?.id ?? "")} className="w-full text-left">
+                <span className="block text-[15px] leading-7 font-bold text-[#DF0A14] uppercase sm:text-[19px]" style={romanBold}>
+                  Quote of the day
+                </span>
+                <span className="mt-3 flex items-start gap-4">
+                  <span className="mt-1 shrink-0 rotate-180 text-[28px] leading-none text-[#DF0A14]" style={roman} aria-hidden>
+                    ”
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-[18px] leading-[22px] text-[#111827] italic sm:text-[24px] sm:leading-[28px] lg:text-[28px] lg:leading-[30px]" style={roman}>
+                      {quoteText}
+                    </span>
+                    <span className="mt-3 block text-[16px] leading-7 text-[#374151] sm:text-[21px]" style={roman}>
+                      {quoteBy}
+                    </span>
+                  </span>
+                </span>
+              </button>
+              <div className="border-t border-[#9CA3AF]" aria-hidden />
+              <button type="button" onClick={() => onJump(stat?.id ?? stories[0]?.id ?? "")} className="w-full text-left">
+                <span className="block text-[15px] leading-7 font-bold text-[#DF0A14] uppercase sm:text-[19px]" style={romanBold}>
+                  Statistic of the day
+                </span>
+                <span className="mt-3 flex flex-wrap items-center gap-4 sm:gap-[17px]">
+                  <span className="text-[2.5rem] leading-none text-black sm:text-[3.5rem]" style={roman}>
+                    {statValue}
+                  </span>
+                  <span className="min-w-0 flex-1 text-[16px] leading-[22px] text-[#111827] sm:text-[23px] sm:leading-[30px]" style={roman}>
+                    {statLabel}
+                  </span>
+                </span>
+              </button>
+              <div className="border-t border-[#9CA3AF]" aria-hidden />
+              <button type="button" onClick={() => onJump(explainer?.id ?? stories[0]?.id ?? "")} className="w-full text-left">
+                <span className="block text-[15px] leading-7 font-bold text-[#DF0A14] uppercase sm:text-[19px]" style={romanBold}>
+                  The explainer
+                </span>
+                <span className="mt-2 block text-[16px] leading-[22px] text-[#111827] sm:text-[23px] sm:leading-[30px]" style={roman}>
+                  {explainerTitle}
+                </span>
+              </button>
+              <div className="border-t border-[#9CA3AF]" aria-hidden />
+              <p className="text-[16px] leading-7 text-[#374151] sm:text-[21px]" style={roman}>
+                Plus commentary, puzzles, Good day / Bad day and more
+              </p>
+            </div>
+          </aside>
+        </div>
+
+        <nav className="mt-10 w-full max-w-[1745px] lg:mt-14" aria-label="Editions">
+          <div className="relative mb-5 h-[7px] w-full" aria-hidden>
+            <div className="absolute inset-x-0 top-1/2 h-[3.5px] -translate-y-1/2 bg-[#D9D9D9]" />
+            <div
+              className="absolute top-1/2 h-[6px] -translate-y-1/2 bg-[#DF0A14] transition-[left,width] duration-300"
+              style={{ left: `${(HERO_EDITIONS.findIndex((item) => item.id === activeId) / HERO_EDITIONS.length) * 100}%`, width: `${100 / HERO_EDITIONS.length}%` }}
+            />
+          </div>
+          <ul className="grid grid-cols-2 gap-6 sm:gap-8 lg:grid-cols-4 lg:gap-[clamp(1.5rem,12vw,16rem)]">
+            {HERO_EDITIONS.map((edition) => {
+              const current = edition.id === activeId;
+              return (
+                <li key={edition.id}>
+                  <div className={`flex flex-col items-start gap-1.5 ${current ? "text-white" : "text-[#6B7280]"}`}>
+                    <p className="text-[18px] leading-7 sm:text-[24px] sm:leading-9 lg:text-[28px] lg:leading-[37px]" style={roman}>
+                      {edition.label}
+                    </p>
+                    <p className="flex items-center gap-1.5 text-[14px] leading-6 sm:text-[16px] sm:leading-7 lg:text-[19px]" style={roman}>
+                      <span
+                        className={`inline-block h-3 w-3 shrink-0 rounded-full ${edition.live ? "bg-[#DF0A14]" : "bg-[#9CA3AF]"}`}
+                        aria-hidden
+                      />
+                      <span>{edition.status}</span>
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      </div>
     </header>
   );
 }
@@ -1329,7 +1494,7 @@ function Recirculation() {
   };
 
   return (
-    <section className={`bg-[#F4F0EA] py-16 xl:py-20 ${pagePad}`} aria-label="Previous editions">
+    <section id="previous-editions" className={`bg-[#F4F0EA] py-16 xl:py-20 ${pagePad}`} aria-label="Previous editions">
       <div className="flex flex-col gap-[30px]">
         <h2 className="text-[40px] leading-[48px] text-black lg:text-[60px] lg:leading-[72px]" style={roman}>
           Previous editions
@@ -2200,36 +2365,36 @@ export function ReportBriefing({
       ) : null}
 
       {digest ? (
-        <div className="w-full bg-[#F4F0EA]">
-          <div className="mx-auto grid max-w-[1400px] lg:grid-cols-12 lg:items-stretch">
-            <aside className={`hidden min-h-0 border-r border-black/15 lg:col-span-3 lg:block ${DIGEST_WIDE_BAR}`}>
-              <div className={`py-8 pr-6 pl-6 xl:pl-10 ${DIGEST_WIDE_BAR}`}>
-                <InsideEdition stories={stories} onJump={jump} />
+        <>
+          <HeroSplitComposition briefing={briefing} stories={stories} onJump={jump} />
+          <div className="w-full bg-[#F4F0EA]">
+            <div className="mx-auto grid max-w-[1400px] lg:grid-cols-12 lg:items-stretch">
+              <aside className={`hidden min-h-0 border-r border-black/15 lg:col-span-3 lg:block ${DIGEST_WIDE_BAR}`}>
+                <div className={`py-8 pr-6 pl-6 xl:pl-10 ${DIGEST_WIDE_BAR}`}>
+                  <InsideEdition stories={stories} onJump={jump} />
+                </div>
+              </aside>
+              <div className={`min-w-0 lg:col-span-6 ${DIGEST_GROUND}`}>
+                <div className={`border-b border-black/15 py-8 lg:hidden ${digestTextPad}`}>
+                  <InsideEdition stories={stories} onJump={jump} />
+                </div>
+                {stories.map((story, storyIndex) => (
+                  <article key={story.id} data-story-article={story.id} className={`${DIGEST_GROUND} border-b border-black/10`}>
+                    <StoryCover story={story} index={storyIndex} edition={storyIndex === 0} locked={locked && storyIndex > 0} layout={layout} />
+                    <div className={digestTextPad}>
+                      <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" layout={layout} />
+                    </div>
+                  </article>
+                ))}
               </div>
-            </aside>
-            <div className={`min-w-0 lg:col-span-6 ${DIGEST_GROUND}`}>
-              <div className={digestTextPad}>
-                <BriefingDigest briefing={briefing} />
-              </div>
-              <div className={`border-t border-black/15 py-8 lg:hidden ${digestTextPad}`}>
-                <InsideEdition stories={stories} onJump={jump} />
-              </div>
-              {stories.map((story, storyIndex) => (
-                <article key={story.id} data-story-article={story.id} className={`${DIGEST_GROUND} border-b border-black/10`}>
-                  <StoryCover story={story} index={storyIndex} edition={storyIndex === 0} locked={locked && storyIndex > 0} layout={layout} />
-                  <div className={digestTextPad}>
-                    <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" layout={layout} />
-                  </div>
-                </article>
-              ))}
+              <aside className={`hidden min-h-0 border-l border-black/15 lg:col-span-3 lg:block ${DIGEST_WIDE_BAR}`}>
+                <div className={`sticky top-12 z-20 max-h-[calc(100svh-3rem)] overflow-y-auto overscroll-contain py-8 pr-6 pl-6 xl:pr-10 ${DIGEST_WIDE_BAR} ${brandScrollbar}`}>
+                  <DigestRail stories={stories} onJump={jump} currentId={stories[index]?.id} />
+                </div>
+              </aside>
             </div>
-            <aside className={`hidden min-h-0 border-l border-black/15 lg:col-span-3 lg:block ${DIGEST_WIDE_BAR}`}>
-              <div className={`sticky top-12 z-20 max-h-[calc(100svh-3rem)] overflow-y-auto overscroll-contain py-8 pr-6 pl-6 xl:pr-10 ${DIGEST_WIDE_BAR} ${brandScrollbar}`}>
-                <DigestRail stories={stories} onJump={jump} currentId={stories[index]?.id} />
-              </div>
-            </aside>
           </div>
-        </div>
+        </>
       ) : (
         stories.map((story, storyIndex) => (
           <div key={story.id}>
