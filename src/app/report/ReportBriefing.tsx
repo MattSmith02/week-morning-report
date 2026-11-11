@@ -218,9 +218,9 @@ function WeekMark() {
   );
 }
 
-function QuoteMark() {
+function QuoteMark({ className = "mt-2 h-10 w-14 shrink-0" }: { className?: string }) {
   return (
-    <svg className="mt-2 h-10 w-14 shrink-0" viewBox="0 130 52 40" fill="none" aria-hidden>
+    <svg className={className} viewBox="0 130 52 40" fill="none" aria-hidden>
       <path
         d="M51.3797 134.046C46.9979 136.135 43.5661 138.566 41.0844 141.339C38.6027 144.112 37.1679 147.474 36.7802 151.425L40.0374 151.425C42.4416 151.425 44.3998 151.69 45.9121 152.222C47.4245 152.754 48.6459 153.495 49.5766 154.444C50.4685 155.356 51.1083 156.363 51.496 157.464C51.845 158.566 52.0195 159.706 52.0195 160.883C52.0195 163.314 51.0307 165.442 49.0531 167.265C47.0367 169.088 44.6713 170 41.9569 170C37.6914 170 34.4148 168.613 32.1269 165.84C29.8391 163.067 28.6951 159.231 28.6951 154.33C28.6951 149.772 30.6728 145.176 34.628 140.541C38.5445 135.907 43.2753 132.393 48.8204 130L51.3797 134.046ZM22.7041 134.046C18.3223 136.135 14.8905 138.566 12.4088 141.339C9.92706 144.112 8.49231 147.474 8.10454 151.424L11.3618 151.424C13.766 151.424 15.7242 151.69 17.2365 152.222C18.7488 152.754 19.9703 153.495 20.901 154.444C21.7928 155.356 22.4327 156.363 22.8204 157.464C23.1694 158.566 23.3439 159.706 23.3439 160.883C23.3439 163.314 22.3551 165.442 20.3775 167.265C18.3611 169.088 15.9957 170 13.2813 170C9.0158 170 5.73914 168.613 3.45129 165.84C1.16345 163.067 0.019527 159.231 0.0195274 154.33C0.0195278 149.772 1.99716 145.176 5.95242 140.541C9.8689 135.907 14.5997 132.393 20.1448 130L22.7041 134.046Z"
         fill="#DF0A14"
@@ -963,7 +963,7 @@ function ImagelessCover({
 
 const DIGEST_GROUND = "bg-[#F4F0EA]";
 const DIGEST_WIDE_BAR = "digest-wide-bar bg-[#F4F0EA]";
-const digestTextPad = "px-4 sm:px-6 lg:px-7";
+const digestTextPad = "px-4 sm:px-6 lg:mx-auto lg:w-full lg:max-w-[600px] lg:px-0";
 const brandScrollbar = "brand-scrollbar";
 
 function CompactStoryHeader({
@@ -1353,10 +1353,8 @@ function HeroSplitComposition({
         <span className={`block ${typeLabel} text-[#9CA3AF]`} style={uiBold}>
           Quote of the day
         </span>
-        <span className="mt-2 flex gap-3">
-          <span className="shrink-0 text-[22px] leading-none text-white" style={roman} aria-hidden>
-            ”
-          </span>
+        <span className="mt-2 flex items-start gap-3">
+          <QuoteMark className="mt-0.5 h-7 w-10 shrink-0" />
           <span className="min-w-0 text-[13px] leading-[19px] text-white" style={roman}>
             {quoteText}
           </span>
