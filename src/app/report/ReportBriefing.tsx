@@ -42,8 +42,8 @@ const typeQuote = "text-[1.75rem] italic leading-9";
 const typeAttr = "text-[15px] leading-6";
 const digestArticleTitle = "text-[clamp(1.85rem,2.8vw,2.35rem)] leading-[1.12]";
 const digestArticleTitleLead = "text-[clamp(2.35rem,3.2vw,2.75rem)] leading-[1.1]";
-const digestSectionTitle = "text-[1.35rem] leading-8 text-[var(--brand-text-primary,#0f172b)] sm:text-[1.5rem] sm:leading-9";
-const digestBodyCopy = `${typeBodyLg} text-[var(--brand-text-secondary,#45556c)]`;
+const digestSectionTitle = "text-[1.35rem] leading-8 text-black sm:text-[1.5rem] sm:leading-9";
+const digestBodyCopy = `${typeBodyLg} text-black`;
 const digestRule = "mt-2 h-px w-12 bg-[#DF0A14]";
 const digestShell = "mx-auto w-full max-w-[1480px]";
 /** Shared photo cover/thumbnail scrim — same on mobile and desktop. */
@@ -1008,7 +1008,7 @@ function CompactStoryHeader({
           {story.chip}
         </p>
         <h2
-          className={`mt-2 max-w-[28ch] text-[var(--brand-text-primary,#0f172b)] ${lead ? digestArticleTitleLead : digestArticleTitle}`}
+          className={`mt-2 max-w-[28ch] text-black ${lead ? digestArticleTitleLead : digestArticleTitle}`}
           style={roman}
         >
           {story.displayTitle}
