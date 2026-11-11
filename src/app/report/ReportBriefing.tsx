@@ -1292,11 +1292,21 @@ function HeroSplitComposition({
   const quote = stories.find((story) => story.format === "quote" || /quote/i.test(story.chip));
   const stat = stories.find((story) => story.format === "stat" || /statistic/i.test(story.chip));
   const evening = activeId === "evening";
-  const questionLabel = evening ? "Tonight’s big question" : "Today’s big question";
+  const storyLabel = evening ? "Tonight’s big question" : "Today’s story";
   const ctaLabel = evening ? "Explore tonight’s report" : "Explore today’s report";
-  const editionDek = evening
-    ? "Each evening, our editors sift the day’s news and the sharpest commentary from all sides into one considered report, so you end the day knowing what happened and what it means."
-    : "Each morning, our editors sift the day’s news and the sharpest commentary from all sides into one considered report, so you start the day knowing what happened and what it means.";
+  const featured = evening ? big ?? lead : lead;
+  const storyTitle =
+    (evening ? big?.dek || big?.displayTitle : lead?.displayTitle || lead?.dek) ||
+    "Why is the trade deficit getting bigger?";
+  const storySupport =
+    (evening
+      ? "Exploring rising tensions, regional implications and what could determine the next developments."
+      : lead?.dek && lead.dek !== lead.displayTitle
+        ? lead.dek
+        : lead?.whatHappened?.slice(0, 140)) ||
+    "Exploring rising tensions, regional implications and what could determine the next developments.";
+  const storySupportTrimmed =
+    storySupport.length > 160 ? `${storySupport.slice(0, 157).trimEnd()}…` : storySupport;
   const questionTitle = big?.dek || big?.displayTitle || "Why is the trade deficit getting bigger?";
   const questionSupport =
     "Trump’s tariffs are intended to narrow the gap. It is widening — and economists disagree on why.";
@@ -1307,6 +1317,44 @@ function HeroSplitComposition({
   const statLabel =
     stat?.displayTitle || "Palestinians killed in Gaza since the ceasefire was signed";
 
+  const leadCopy = (
+    <div className="max-w-[40rem]">
+      <p className={`${typeEyebrow} text-white`} style={uiBold}>
+        The Week’s daily editions
+      </p>
+      <h1 className={`mt-2 max-w-[16ch] ${typeEdition} text-white`} style={roman}>
+        {heroEditionTitle(active.label)}
+      </h1>
+      <div className={`${digestRule} mt-3`} aria-hidden />
+      <p className={`mt-8 ${typeLabel} text-white`} style={uiBold}>
+        {storyLabel}
+      </p>
+      <p className={`mt-2 max-w-[28ch] ${typeQuestion} text-white`} style={roman}>
+        {storyTitle}
+      </p>
+      <p className={`mt-3 max-w-[46ch] ${typeBodyLg} text-white/90`} style={roman}>
+        {storySupportTrimmed}
+      </p>
+      <div className="mt-6 flex flex-wrap items-center gap-5">
+        <button
+          type="button"
+          onClick={() => onJump(featured?.id ?? stories[0]?.id ?? "")}
+          className={weekCta}
+          style={uiBold}
+        >
+          {ctaLabel}
+        </button>
+        <a
+          href="#previous-editions"
+          className="text-[15px] leading-6 text-white underline decoration-white/70 underline-offset-4 transition-opacity hover:opacity-80"
+          style={roman}
+        >
+          View all editions
+        </a>
+      </div>
+    </div>
+  );
+
   const statsPanel = (
     <div className="grid gap-6 sm:grid-cols-3 sm:gap-0">
       <button
@@ -1315,7 +1363,7 @@ function HeroSplitComposition({
         className="w-full text-left sm:border-r sm:border-white/15 sm:pr-6"
       >
         <span className={`block ${typeLabel} text-[#9CA3AF]`} style={uiBold}>
-          {questionLabel}
+          {evening ? "Tonight’s big question" : "Today’s big question"}
         </span>
         <span className="mt-2 block text-[15px] leading-6 text-white" style={roman}>
           {questionTitle}
@@ -1393,15 +1441,24 @@ function HeroSplitComposition({
         <div className="mt-auto flex w-full max-w-[350px] flex-col gap-[15px] self-center pb-2 lg:hidden">
           <div className="flex flex-col gap-2.5">
             <p className="text-[14px] leading-[25px] font-bold text-white uppercase" style={uiBold}>
-              The Week’s daily reports
+              The Week’s daily editions
             </p>
             <h1 className="text-[36px] leading-[48px] text-[#FAFAFA]" style={roman}>
               {heroEditionTitle(active.label)}
             </h1>
+            <div className="h-[3px] w-16 bg-[#DF0A14]" aria-hidden />
           </div>
-          <p className="text-base leading-6 text-white" style={roman}>
-            {editionDek}
-          </p>
+          <div className="flex flex-col gap-2.5">
+            <p className="text-[14px] leading-5 font-bold text-white uppercase" style={uiBold}>
+              {storyLabel}
+            </p>
+            <p className="text-[28px] leading-8 text-[#FAFAFA]" style={roman}>
+              {storyTitle}
+            </p>
+            <p className="text-base leading-6 text-white" style={roman}>
+              {storySupportTrimmed}
+            </p>
+          </div>
           <div>
             <button
               type="button"
@@ -1419,41 +1476,27 @@ function HeroSplitComposition({
             </button>
             {insideOpen ? <div className="mt-3 rounded-[5px] bg-black px-4 py-5">{statsPanel}</div> : null}
           </div>
-          <button
-            type="button"
-            onClick={() => onJump(lead?.id ?? stories[0]?.id ?? "")}
-            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[3px] bg-[#DF0A14] px-3 text-[14px] leading-5 font-bold text-[#FAFAFA] uppercase transition-colors hover:bg-[#B20810]"
-            style={uiBold}
-          >
-            {ctaLabel}
-            <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-3.5 w-3.5" />
-          </button>
+          <div className="flex flex-col gap-3">
+            <button
+              type="button"
+              onClick={() => onJump(featured?.id ?? stories[0]?.id ?? "")}
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[3px] bg-[#DF0A14] px-3 text-[14px] leading-5 font-bold text-[#FAFAFA] uppercase transition-colors hover:bg-[#B20810]"
+              style={uiBold}
+            >
+              {ctaLabel}
+              <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-3.5 w-3.5" />
+            </button>
+            <a href="#previous-editions" className="text-center text-[15px] leading-6 text-white underline decoration-white/70 underline-offset-4" style={roman}>
+              View all editions
+            </a>
+          </div>
         </div>
 
         {/* Desktop */}
         <div className="mt-auto hidden flex-col gap-8 pb-2 lg:flex lg:gap-10">
-          <div className="max-w-[40rem]">
-            <p className={`${typeEyebrow} text-white`} style={uiBold}>
-              The Week’s daily reports
-            </p>
-            <h1 className={`mt-2 max-w-[16ch] ${typeEdition} text-white`} style={roman}>
-              {heroEditionTitle(active.label)}
-            </h1>
-            <div className={digestRule} aria-hidden />
-            <p className={`mt-4 max-w-[46ch] ${typeBodyLg} text-white/90`} style={roman}>
-              {editionDek}
-            </p>
-            <button
-              type="button"
-              onClick={() => onJump(lead?.id ?? stories[0]?.id ?? "")}
-              className={`${weekCta} mt-6`}
-              style={uiBold}
-            >
-              {ctaLabel}
-            </button>
-          </div>
+          {leadCopy}
 
-          <div className="rounded-[10px] bg-black/95 px-6 py-6 ring-1 ring-white/10">
+          <div className="rounded-[10px] bg-black px-6 py-6 ring-1 ring-white/10">
             <div className="mb-4 flex items-center gap-3 border-b border-white/15 pb-4">
               <WeekMark />
               <p className={`${typeLabel} text-white`} style={uiBold}>
