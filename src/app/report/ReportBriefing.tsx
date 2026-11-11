@@ -961,8 +961,8 @@ function ImagelessCover({
   );
 }
 
-const DIGEST_GROUND = "bg-[var(--report-beige,#F4F0EA)]";
-const DIGEST_WIDE_BAR = "digest-wide-bar bg-[var(--report-beige,#F4F0EA)]";
+const DIGEST_GROUND = "bg-[#F4F0EA]";
+const DIGEST_WIDE_BAR = "digest-wide-bar bg-[#F4F0EA]";
 const digestTextPad = "px-4 sm:px-6 lg:px-7";
 const brandScrollbar = "brand-scrollbar";
 
