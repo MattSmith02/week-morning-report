@@ -1495,32 +1495,28 @@ function HeroSplitComposition({
           </div>
         </div>
 
-        {/* Desktop — align with digest 2/7/3 columns */}
-        <div className="mt-auto hidden w-full grid-cols-12 gap-0 pb-2 lg:grid">
-          <div className="col-span-2" aria-hidden />
-          <div className="col-span-7 flex flex-col gap-10 px-7">
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0 flex-1">{leadCopy}</div>
-              <span className="mt-1 inline-flex shrink-0 items-center gap-2.5 rounded-[5px] bg-black/50 px-2.5 py-2.5 backdrop-blur-[5px]">
-                <span className="inline-flex h-[29px] w-[29px] items-center justify-center rounded-full bg-[#DF0A14]">
-                  <Lock size={14} strokeWidth={2.4} className="text-white" aria-hidden />
-                </span>
-                <span className="pr-1 text-[14px] leading-5 font-bold tracking-[0.02em] text-white uppercase" style={uiBold}>
-                  Exclusive
-                </span>
+        {/* Desktop — full width of all three digest columns */}
+        <div className="mt-auto hidden w-full flex-col gap-10 px-5 pb-2 xl:px-8 lg:flex">
+          <div className="flex items-start justify-between gap-6">
+            <div className="min-w-0 max-w-[48rem] flex-1">{leadCopy}</div>
+            <span className="mt-1 inline-flex shrink-0 items-center gap-2.5 rounded-[5px] bg-black/50 px-2.5 py-2.5 backdrop-blur-[5px]">
+              <span className="inline-flex h-[29px] w-[29px] items-center justify-center rounded-full bg-[#DF0A14]">
+                <Lock size={14} strokeWidth={2.4} className="text-white" aria-hidden />
               </span>
-            </div>
-            <div className="rounded-[10px] bg-black px-6 py-6 ring-1 ring-white/10">
-              <div className="mb-4 flex items-center gap-3 border-b border-white/15 pb-4">
-                <WeekMark />
-                <p className={`${typeLabel} text-white`} style={uiBold}>
-                  Inside this edition
-                </p>
-              </div>
-              {statsPanel}
-            </div>
+              <span className="pr-1 text-[14px] leading-5 font-bold tracking-[0.02em] text-white uppercase" style={uiBold}>
+                Exclusive
+              </span>
+            </span>
           </div>
-          <div className="col-span-3" aria-hidden />
+          <div className="w-full rounded-[10px] bg-black px-6 py-6 ring-1 ring-white/10 xl:px-8">
+            <div className="mb-4 flex items-center gap-3 border-b border-white/15 pb-4">
+              <WeekMark />
+              <p className={`${typeLabel} text-white`} style={uiBold}>
+                Inside this edition
+              </p>
+            </div>
+            {statsPanel}
+          </div>
         </div>
       </div>
     </header>
