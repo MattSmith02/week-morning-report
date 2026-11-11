@@ -1700,43 +1700,47 @@ function BriefingSources({ periods }: { periods: SourcePeriod[] }) {
   if (!period) return null;
 
   return (
-    <section aria-label="Sources behind this briefing" className={`w-full ${softPanel} py-16`}>
-      <div className={`mx-auto px-4 ${readColumn}`}>
-        <h2 className={heading} style={roman}>
-          Sources behind this briefing
-        </h2>
-        <p className="mt-4 max-w-[68ch] text-base leading-6 text-black/70" style={ui}>
-          Built to be trustworthy and transparent: every story shows the outlets we drew from, so you can judge the reporting for yourself.
-        </p>
-        <a href="/report?sources=1" target="_blank" rel="noopener noreferrer" className={`mt-6 ${weekCta}`}>
-          View sources
-          <ChevronRight size={14} aria-hidden />
-        </a>
-        <div className="mt-8 flex items-center gap-4">
-          <p className={`shrink-0 ${subInfo}`} style={ui}>
-            Cited this week
+    <section aria-label="Sources behind this briefing" className="flex w-full flex-col items-center bg-[#F0EAE1] py-16">
+      <div className="mx-auto flex w-full max-w-[699px] flex-col items-center px-[11px]">
+        <div className="flex w-full flex-col gap-1.5">
+          <h2 className="text-[32px] leading-10 text-black" style={roman}>
+            Sources behind this briefing
+          </h2>
+          <p className="text-base leading-7 font-bold text-black" style={uiBold}>
+            Built to be trustworthy and transparent: every story shows the outlets we drew from, so you can judge the reporting for yourself.
           </p>
-          <div className="h-px min-w-8 flex-1 bg-black/12" />
+          <div className="relative pt-6">
+            <a
+              href="/report?sources=1"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#DF0A14] px-4 py-3 text-xs font-bold tracking-[0.05em] text-[#FAFAFA] uppercase transition-colors hover:bg-[#B20810]"
+              style={uiBold}
+            >
+              View sources
+              <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-3.5 w-3.5" />
+            </a>
+          </div>
+          <div className="flex items-center gap-4 pt-8">
+            <p className="shrink-0 text-[11px] leading-4 tracking-[0.12em] text-[#6B7280] uppercase" style={ui}>
+              Cited this week
+            </p>
+            <div className="h-px min-w-8 flex-1 bg-black/12" />
+          </div>
+          <ul className={`mt-1 flex gap-3 overflow-x-auto pb-1 ${brandScrollbar}`}>
+            {period.uses.map((source) => (
+              <li
+                key={source.name}
+                className="flex shrink-0 items-center justify-center rounded-full border border-[#E2E8F0] bg-white px-4 py-4"
+              >
+                <span className="whitespace-nowrap text-base leading-6 text-black" style={romanBold}>
+                  {source.name}
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
-      <ul className={`report-cards mt-4 flex gap-3 overflow-x-auto px-4 pb-3 sm:px-8 ${brandScrollbar}`}>
-        {period.uses.map((source) => (
-          <li
-            key={source.name}
-            className="flex w-[210px] shrink-0 flex-col overflow-hidden border border-black/10 bg-white"
-          >
-            <SourceMark name={source.name} size={64} well />
-            <span className="flex flex-col gap-1 px-4 py-4">
-              <span className="block text-base leading-6 text-black" style={romanBold}>
-                {source.name}
-              </span>
-              <span className={subInfo} style={ui}>
-                {source.count} {source.count === 1 ? "citation" : "citations"}
-              </span>
-            </span>
-          </li>
-        ))}
-      </ul>
     </section>
   );
 }
