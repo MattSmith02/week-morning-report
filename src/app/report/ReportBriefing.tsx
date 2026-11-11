@@ -1271,7 +1271,7 @@ function HeroSplitComposition({
   const quote = stories.find((story) => story.format === "quote" || /quote/i.test(story.chip));
   const stat = stories.find((story) => story.format === "stat" || /statistic/i.test(story.chip));
   const evening = activeId === "evening";
-  const storyLabel = evening ? "Tonight’s big question" : "Today’s story";
+  const storyLabel = evening ? "Tonight’s big question" : "Today’s main story";
   const ctaLabel = evening ? "Explore tonight’s report" : "Explore today’s report";
   const storyTitle =
     (evening ? big?.dek || big?.displayTitle : lead?.displayTitle || lead?.dek) ||
