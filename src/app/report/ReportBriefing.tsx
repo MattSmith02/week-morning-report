@@ -299,11 +299,13 @@ function StoryReading({
   const rest = part !== "hook";
   const framed = part !== "rest";
   const digest = layout === "digest";
-  const readWidth = digest ? "relative flex w-full flex-col gap-8" : "relative flex max-w-[65ch] flex-col gap-10 sm:gap-12";
+  const readWidth = digest
+    ? "relative flex w-full flex-col gap-8"
+    : "relative mx-auto flex w-full max-w-[65ch] flex-col gap-10 sm:gap-12";
 
   return (
-    <div className={framed ? `relative ${digest ? "py-8" : "py-8 sm:py-10"}` : ""}>
-      <div className={framed ? readWidth : "flex flex-col gap-6"}>
+    <div className={framed ? `relative ${digest ? "py-8" : "px-4 py-8 sm:px-8 sm:py-10"}` : ""}>
+      <div className={framed ? readWidth : "mx-auto flex w-full max-w-[65ch] flex-col gap-6 px-4 sm:px-8"}>
         {hook && story.format !== "quote" && story.whatHappened ? (
           <section>
             <div>
@@ -1609,8 +1611,10 @@ function StoryBody({
   if (locked && !lead) {
     return (
       <CaptureGate>
-        <p className="text-2xl leading-8" style={roman}>{story.dek}</p>
-        {story.whatHappened ? <p className="text-base leading-6" style={roman}>{story.whatHappened}</p> : null}
+        <div className="mx-auto w-full max-w-[65ch] px-4 sm:px-8">
+          <p className="text-2xl leading-8" style={roman}>{story.dek}</p>
+          {story.whatHappened ? <p className="text-base leading-6" style={roman}>{story.whatHappened}</p> : null}
+        </div>
       </CaptureGate>
     );
   }
@@ -2230,7 +2234,7 @@ export function ReportBriefing({
         stories.map((story, storyIndex) => (
           <div key={story.id}>
             <StoryCover story={story} index={storyIndex} edition={storyIndex === 0} locked={locked && storyIndex > 0} layout={layout} />
-            <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" />
+            <StoryBody story={story} locked={locked} lead={storyIndex === 0} place="none" layout="classic" />
           </div>
         ))
       )}
