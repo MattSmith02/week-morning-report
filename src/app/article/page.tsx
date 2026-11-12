@@ -551,35 +551,46 @@ export default function ArticlePage() {
                   Beyond that, it’s important to have a handle on your own timeline and risk tolerance. IPO shares can jump — and they can fall just as fast once the lockups expire and the story cools.
                 </p>
 
-                <div className="mt-6 pb-8">
-                  <div className="bg-white pb-6">
-                    <div className="inline-flex bg-[#262626] px-3 py-1">
-                      <p className="text-[20px] leading-7 text-[#FAFAFA] uppercase" style={ui}>
-                        Related
-                      </p>
-                    </div>
-                    <div className="h-0.5 w-full bg-[#262626]" aria-hidden />
+                <div className="mt-10 pb-8">
+                  <div className="border border-black/10 px-5 py-6 sm:px-6" style={{ background: CREAM }}>
+                    <p className="text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
+                      Related
+                    </p>
+                    <div className="mt-2 h-[3px] w-14 bg-[#DF0A14]" aria-hidden />
+                    <ul className="mt-5 flex flex-col gap-4">
+                      {RELATED.map((item) => (
+                        <li key={item}>
+                          <a
+                            href="#top"
+                            className="group inline-flex items-start gap-2 text-[18px] leading-7 text-[#1B1B1B] transition-colors hover:text-[#DF0A14]"
+                            style={roman}
+                          >
+                            <BrandIcon
+                              name="chevronRight"
+                              defaultIcon={ChevronRight}
+                              className="mt-1.5 h-4 w-4 shrink-0 text-[#DF0A14]"
+                            />
+                            <span className="underline decoration-black/20 underline-offset-4 group-hover:decoration-[#DF0A14]/40">
+                              {item}
+                            </span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <ul className="flex flex-col gap-3 pb-6">
-                    {RELATED.map((item) => (
-                      <li key={item}>
-                        <a href="#top" className="text-[18px] leading-[26px] text-[#006971]" style={ui}>
-                          {item}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                  <div>
-                    <p className="pb-3 text-[18px] leading-[26px] font-bold text-[#0A0A0A]" style={{ fontFamily: "Merriweather, Georgia, serif", fontWeight: 700 }}>
+
+                  <div className="mt-8">
+                    <p className="text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
                       Topics
                     </p>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="mt-2 h-[3px] w-14 bg-[#DF0A14]" aria-hidden />
+                    <div className="mt-4 flex flex-wrap gap-2">
                       {TAGS.map((tag) => (
                         <a
                           key={tag}
                           href="https://theweek.com/"
-                          className="inline-flex h-10 items-center rounded-[2px] bg-[#262626] px-4 text-[16px] leading-6 text-[#FAFAFA]"
-                          style={ui}
+                          className="inline-flex h-10 items-center border border-black/15 bg-white px-4 text-[12px] font-bold tracking-[0.08em] text-[#011535] uppercase transition-colors hover:border-[#DF0A14] hover:text-[#DF0A14]"
+                          style={uiBold}
                         >
                           {tag}
                         </a>
