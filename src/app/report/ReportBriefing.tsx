@@ -1597,7 +1597,7 @@ function PrintPlate({
             fill
             priority={priority}
             unoptimized={src.startsWith("/") || src.startsWith("http")}
-            className={`led-print-img object-cover object-center ${locked ? "scale-105 blur-[12px]" : ""}`}
+            className={`led-collage-soft object-cover object-center opacity-85 ${locked ? "scale-105 !blur-[12px]" : ""}`}
             sizes={sizes}
           />
           <div
@@ -1682,20 +1682,20 @@ function CarsonLedBriefing({
         }
         .led-briefing .led-print-wash--ink {
           background:
-            linear-gradient(180deg, rgba(18,14,12,0.15), rgba(18,14,12,0.55)),
-            radial-gradient(90% 70% at 80% 30%, rgba(180,90,40,0.18), transparent 60%);
+            radial-gradient(110% 80% at 70% 40%, rgba(255,120,40,0.28), transparent 55%),
+            linear-gradient(180deg, rgba(18,14,12,0.2), rgba(18,14,12,0.72));
           mix-blend-mode: multiply;
         }
         .led-briefing .led-print-wash--crimson {
           background:
-            linear-gradient(115deg, rgba(120,10,16,0.35), transparent 50%, rgba(40,6,8,0.55)),
-            radial-gradient(80% 60% at 85% 40%, rgba(255,110,35,0.35), transparent 55%);
+            radial-gradient(120% 80% at 78% 42%, rgba(255,120,40,0.55), transparent 55%),
+            linear-gradient(180deg, rgba(90,8,12,0.2), rgba(40,4,6,0.78));
           mix-blend-mode: multiply;
         }
         .led-briefing .led-print-wash--midnight {
           background:
-            linear-gradient(180deg, rgba(8,16,28,0.25), rgba(8,12,20,0.6)),
-            radial-gradient(70% 50% at 20% 80%, rgba(223,10,20,0.2), transparent 55%);
+            radial-gradient(100% 70% at 30% 70%, rgba(223,10,20,0.28), transparent 55%),
+            linear-gradient(180deg, rgba(8,16,28,0.2), rgba(8,12,20,0.75));
           mix-blend-mode: multiply;
         }
         .led-briefing .led-print-bleed {
@@ -1806,19 +1806,6 @@ function CarsonLedBriefing({
       </header>
 
       <section id="led-stack" className="relative scroll-mt-12 bg-[#120e0c]">
-        <div className="relative z-20 border-t border-white/10 bg-[#EDE7DE] px-4 pt-12 pb-8 sm:px-8 lg:px-12">
-          <p className="text-[11px] font-bold tracking-[0.2em] text-[#DF0A14] uppercase" style={uiBold}>
-            Article previews · press stack
-          </p>
-          <h2 className="led-ink mt-3 max-w-[16ch] text-[clamp(2.2rem,5.5vw,3.8rem)] leading-[0.92] tracking-[-0.035em] text-[#011535]" style={roman}>
-            More from this edition
-          </h2>
-          <p className="mt-3 max-w-[40ch] text-[16px] leading-7 text-black/60" style={roman}>
-            The peeking plates live here — tap one to read the story underneath.
-          </p>
-          <div className="mt-5 h-[4px] w-24 bg-[#DF0A14]" aria-hidden />
-        </div>
-
         <ol className="relative m-0 list-none p-0">
           {stack.map((story, storyIndex) => {
             const plateNo = lead && stack[0]?.id !== lead.id ? storyIndex + 1 : storyIndex;
@@ -1851,17 +1838,17 @@ function CarsonLedBriefing({
                   />
                   <span className="pointer-events-none absolute inset-x-0 top-0 z-10 h-20 bg-gradient-to-b from-black/75 via-black/30 to-transparent" aria-hidden />
                   <span className="pointer-events-none absolute inset-x-0 top-0 z-10 h-[3px] bg-black/45" aria-hidden />
-                  <span className="absolute inset-x-0 bottom-0 z-20 flex items-end justify-between gap-4 bg-gradient-to-t from-black/90 via-black/45 to-transparent px-4 pb-5 pt-20 sm:px-8 sm:pb-7 lg:px-12">
-                    <span className="min-w-0 max-w-[48rem]">
-                      <span className="inline-flex items-center gap-2 bg-black/70 px-2 py-1 text-[11px] font-bold tracking-[0.14em] text-white uppercase shadow-[2px_2px_0_#DF0A14]" style={uiBold}>
-                        {number(plateNo)} · {story.chip}
+                  <span className="absolute inset-x-0 bottom-0 z-20 flex items-end justify-between gap-4 bg-gradient-to-t from-black/90 via-black/40 to-transparent px-4 pb-5 pt-16 sm:px-8 sm:pb-7 lg:px-12">
+                    <span className="min-w-0 max-w-[40rem] border-l-[5px] border-[#E8E0D4]/70 bg-black/45 p-4 sm:p-5">
+                      <span className="block text-[11px] font-bold tracking-[0.18em] text-[#E8E0D4]/70 uppercase" style={uiBold}>
+                        Plate {number(plateNo)} · {story.chip}
                       </span>
-                      <span className="mt-3 block line-clamp-2 text-[clamp(1.35rem,2.8vw,2.1rem)] leading-[1.1] text-white" style={roman}>
+                      <span className="led-ink mt-2 block line-clamp-2 text-[clamp(1.25rem,2.6vw,1.9rem)] leading-[1.08] text-white" style={roman}>
                         {story.dek}
                       </span>
                     </span>
-                    <span className="inline-flex shrink-0 items-center gap-1 bg-white px-3 py-2 text-[11px] font-bold tracking-[0.12em] text-black uppercase" style={uiBold}>
-                      {isOpen ? "Close" : "Read"}
+                    <span className="inline-flex shrink-0 items-center gap-1 text-[11px] font-bold tracking-[0.16em] text-[#E8E0D4] uppercase" style={uiBold}>
+                      {isOpen ? "Fold" : "Open"}
                       <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className={`h-3.5 w-3.5 transition-transform ${isOpen ? "rotate-90" : ""}`} />
                     </span>
                   </span>
@@ -1869,50 +1856,126 @@ function CarsonLedBriefing({
 
                 <div
                   id={`led-story-${story.id}`}
-                  className={`grid overflow-hidden bg-[#EDE7DE] transition-[grid-template-rows] duration-500 ease-out ${
+                  className={`grid overflow-hidden bg-[#120e0c] transition-[grid-template-rows] duration-500 ease-out ${
                     isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
                   }`}
                 >
                   <div className="min-h-0">
-                    <div className="border-b border-black/15 px-4 py-10 sm:px-8 sm:py-12 lg:px-12">
-                      <div className="mx-auto max-w-[720px]">
-                        <p className="text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
-                          {number(plateNo)} · {story.chip}
+                    <article className="relative border-b border-white/10 px-4 py-12 text-[#E8E0D4] sm:px-8 sm:py-14 lg:px-12">
+                      <div className="led-print-grain pointer-events-none absolute inset-0 opacity-30" aria-hidden />
+                      <div className="relative mx-auto max-w-[720px]">
+                        <p className="text-[12px] font-bold tracking-[0.34em] text-[#E8E0D4]/70 uppercase" style={uiBold}>
+                          Plate {number(plateNo)} · {story.chip}
                         </p>
-                        <h3 className="mt-3 text-[clamp(1.85rem,4vw,2.75rem)] leading-[1.05] text-[#011535]" style={roman}>
+                        <h3 className="led-ink mt-4 max-w-[16ch] text-[clamp(2.2rem,5.5vw,3.6rem)] leading-[0.92] tracking-[-0.035em] text-white" style={roman}>
                           {story.displayTitle}
                         </h3>
-                        <p className="mt-3 text-[18px] leading-7 text-black/70" style={roman}>
-                          {story.dek}
-                        </p>
-                        <div className="mt-5 h-[3px] w-14 bg-[#DF0A14]" aria-hidden />
+                        <div className="relative mt-3 max-w-[40ch]">
+                          <p className="text-[clamp(1.25rem,2.4vw,1.65rem)] leading-[1.2] text-[#FF6A2A]" style={roman}>
+                            {story.dek}
+                          </p>
+                          <span className="pointer-events-none absolute inset-x-[-2%] top-[48%] h-[36%] bg-[#6b0a10]/7" aria-hidden />
+                        </div>
+                        <div className="mt-6 h-[5px] w-28 bg-[#DF0A14]" aria-hidden />
 
                         {gated ? (
-                          <div className="mt-8">
-                            <p className="text-[16px] leading-7 text-black/65" style={roman}>
+                          <div className="mt-10">
+                            <p className="max-w-[36ch] text-[17px] leading-7 text-[#E8E0D4]/75" style={roman}>
                               Sign up to unlock this story.
                             </p>
-                            <a href={WEEK_SUBSCRIBE} target="_blank" rel="noreferrer" className={`mt-5 ${weekCta}`} style={uiBold}>
+                            <a href={WEEK_SUBSCRIBE} target="_blank" rel="noreferrer" className={`mt-6 ${weekCta}`} style={uiBold}>
                               <Lock size={12} strokeWidth={2.4} aria-hidden />
                               Sign up to unlock
                             </a>
                           </div>
                         ) : (
-                          <div className="mt-2">
-                            <StoryReading story={story} layout="digest" />
+                          <div className="mt-10 space-y-8 text-[17px] leading-7 text-[#E8E0D4]/88 sm:text-[18px] sm:leading-8" style={roman}>
+                            {story.whatHappened ? (
+                              <section>
+                                <p className="text-[11px] font-bold tracking-[0.18em] text-[#FF6A2A] uppercase" style={uiBold}>
+                                  What happened
+                                </p>
+                                <p className="mt-3">{story.whatHappened}</p>
+                              </section>
+                            ) : null}
+                            {story.quote ? (
+                              <section>
+                                <p className="text-[11px] font-bold tracking-[0.18em] text-[#FF6A2A] uppercase" style={uiBold}>
+                                  Quote
+                                </p>
+                                <p className="mt-3 border-l-[5px] border-[#DF0A14] pl-4 text-[clamp(1.35rem,2.5vw,1.75rem)] leading-[1.25] text-white italic">
+                                  “{story.quote}”
+                                </p>
+                                {story.quoteAttribution ? (
+                                  <p className="mt-3 text-[13px] tracking-[0.04em] text-[#E8E0D4]/55" style={ui}>
+                                    {story.quoteAttribution}
+                                  </p>
+                                ) : null}
+                              </section>
+                            ) : null}
+                            {story.whoSaidWhat ? (
+                              <section>
+                                <p className="text-[11px] font-bold tracking-[0.18em] text-[#FF6A2A] uppercase" style={uiBold}>
+                                  Who said what
+                                </p>
+                                <p className="mt-3">{story.whoSaidWhat}</p>
+                              </section>
+                            ) : null}
+                            {story.whatsNext ? (
+                              <section>
+                                <p className="text-[11px] font-bold tracking-[0.18em] text-[#FF6A2A] uppercase" style={uiBold}>
+                                  What’s next
+                                </p>
+                                <p className="mt-3">{story.whatsNext}</p>
+                              </section>
+                            ) : null}
+                            {story.stats?.length ? (
+                              <section>
+                                <p className="text-[11px] font-bold tracking-[0.18em] text-[#FF6A2A] uppercase" style={uiBold}>
+                                  {story.statsHeading || "Figures"}
+                                </p>
+                                <ul className="mt-4 space-y-3">
+                                  {story.stats.map((stat) => (
+                                    <li key={stat.label} className="flex items-baseline justify-between gap-4 border-b border-white/15 pb-3">
+                                      <span className="text-[14px] text-[#E8E0D4]/55">{stat.label}</span>
+                                      <span className="led-ink text-[22px] text-white" style={romanBold}>
+                                        {stat.value}
+                                      </span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </section>
+                            ) : null}
+                            {story.items?.length ? (
+                              <section>
+                                <p className="text-[11px] font-bold tracking-[0.18em] text-[#FF6A2A] uppercase" style={uiBold}>
+                                  Notes
+                                </p>
+                                <ul className="mt-4 space-y-4">
+                                  {story.items.map((item) => (
+                                    <li key={item.label} className="border-b border-white/15 pb-4">
+                                      <p className="text-[11px] font-bold tracking-[0.14em] text-[#FF6A2A] uppercase" style={uiBold}>
+                                        {item.label}
+                                      </p>
+                                      <p className="mt-2 text-white">{item.text}</p>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </section>
+                            ) : null}
                           </div>
                         )}
 
                         <button
                           type="button"
                           onClick={() => setExpandedId(null)}
-                          className="mt-4 text-[12px] font-bold tracking-[0.12em] text-black/50 uppercase hover:text-[#DF0A14]"
+                          className="mt-10 text-[12px] font-bold tracking-[0.18em] text-[#E8E0D4]/55 uppercase hover:text-[#FF6A2A]"
                           style={uiBold}
                         >
                           Fold plate
                         </button>
                       </div>
-                    </div>
+                    </article>
                   </div>
                 </div>
               </li>
