@@ -279,8 +279,8 @@ function MiniLatestBriefing() {
   if (!preview.length) return null;
 
   return (
-    <section className="mt-10 border border-black/10" style={{ background: CREAM }} aria-label="Morning Report preview">
-      <div className="flex flex-col gap-5 border-b border-black/10 px-4 py-6 sm:flex-row sm:items-end sm:justify-between sm:px-5">
+    <section className="mt-10" style={{ background: CREAM }} aria-label="Morning Report preview">
+      <div className="flex flex-col gap-5 px-4 py-6 sm:flex-row sm:items-end sm:justify-between sm:px-6 lg:px-8">
         <div className="min-w-0 max-w-[36rem]">
           <p className="text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
             Preview · From today’s edition
@@ -299,32 +299,32 @@ function MiniLatestBriefing() {
         </Link>
       </div>
 
-      <div className="relative px-2 py-5 sm:px-4">
+      <div className="relative px-4 pb-6 sm:px-6 lg:px-8">
         <div
           ref={scrollerRef}
           onScroll={syncEdges}
-          className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 lg:grid lg:grid-cols-3 lg:gap-5 lg:overflow-visible lg:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {preview.map((story) => (
             <article
               key={story.id}
               data-feed-card
-              className="flex w-[min(78%,240px)] shrink-0 snap-start flex-col border border-black/10 bg-white sm:w-[220px]"
+              className="flex w-[min(78%,260px)] shrink-0 snap-start flex-col bg-white lg:w-auto lg:min-w-0"
             >
-              <Link href={`/report#${story.id}`} className="relative aspect-[4/5] w-full overflow-hidden bg-[#111]">
+              <Link href={`/report#${story.id}`} className="relative aspect-[4/5] w-full overflow-hidden bg-[#111] lg:aspect-[4/3]">
                 <Image
                   src={story.imageSrc!}
                   alt=""
                   fill
-                  sizes="240px"
+                  sizes="(min-width: 1024px) 33vw, 260px"
                   className={`object-cover object-[center_20%] ${story.imageFit === "contain" ? "object-contain" : ""}`}
                 />
               </Link>
-              <div className="flex flex-1 flex-col px-3 py-3" style={{ background: SOFT }}>
+              <div className="flex flex-1 flex-col px-3 py-3 sm:px-4 sm:py-4" style={{ background: SOFT }}>
                 <p className="text-[10px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
                   {story.chip}
                 </p>
-                <p className="mt-1.5 line-clamp-3 text-[16px] leading-5 text-[#1B1B1B]" style={roman}>
+                <p className="mt-1.5 line-clamp-3 text-[16px] leading-5 text-[#1B1B1B] lg:text-[18px] lg:leading-6" style={roman}>
                   {story.dek}
                 </p>
                 <p className="mt-2 line-clamp-2 text-[13px] leading-5 text-[#666666]" style={roman}>
@@ -348,18 +348,18 @@ function MiniLatestBriefing() {
           label="Previous stories"
           disabled={atStart}
           onClick={() => go(-1)}
-          className="absolute top-[42%] left-1 z-10 -translate-y-1/2"
+          className="absolute top-[42%] left-1 z-10 -translate-y-1/2 lg:hidden"
         />
         <BrandScrollArrow
           direction="right"
           label="Next stories"
           disabled={atEnd}
           onClick={() => go(1)}
-          className="absolute top-[42%] right-1 z-10 -translate-y-1/2"
+          className="absolute top-[42%] right-1 z-10 -translate-y-1/2 lg:hidden"
         />
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-black/10 px-4 py-4 sm:px-5">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 pb-6 sm:px-6 lg:px-8">
         <p className="text-[14px] leading-5 text-[#666666]" style={roman}>
           {moreCount > 0
             ? `${moreCount} more ${moreCount === 1 ? "story" : "stories"} in today’s briefing`
