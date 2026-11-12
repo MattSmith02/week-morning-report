@@ -552,7 +552,7 @@ export default function ArticlePage() {
                 </p>
 
                 <div className="mt-10 pb-8">
-                  <div className="border border-black/10 px-5 py-6 sm:px-6" style={{ background: CREAM }}>
+                  <div className="bg-white py-2">
                     <p className="text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
                       Related
                     </p>
