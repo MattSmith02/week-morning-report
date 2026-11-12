@@ -250,7 +250,9 @@ function NewsletterForm() {
 
 function MiniLatestBriefing() {
   const edition = EDITIONS.find((item) => item.id === "morning") ?? EDITIONS[0];
-  const stories = edition.stories.filter((story) => story.imageSrc).slice(0, 6);
+  const withImages = edition.stories.filter((story) => story.imageSrc);
+  const preview = withImages.slice(0, 5);
+  const moreCount = Math.max(0, edition.stories.length - preview.length);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
@@ -264,7 +266,7 @@ function MiniLatestBriefing() {
 
   useEffect(() => {
     syncEdges();
-  }, [stories.length]);
+  }, [preview.length]);
 
   const go = (direction: -1 | 1) => {
     const root = scrollerRef.current;
@@ -274,24 +276,37 @@ function MiniLatestBriefing() {
     root.scrollBy({ left: direction * (card.offsetWidth + 12), behavior: reduce ? "auto" : "smooth" });
   };
 
-  if (!stories.length) return null;
+  if (!preview.length) return null;
 
   return (
-    <section className="mt-10 border border-black/10" style={{ background: CREAM }} aria-label="Latest briefing">
-      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-black/10 px-4 py-5 sm:px-5">
-        <div>
+    <section className="mt-10 border border-black/10" style={{ background: CREAM }} aria-label="Morning Report preview">
+      <div className="flex flex-col gap-5 border-b border-black/10 px-4 py-6 sm:flex-row sm:items-end sm:justify-between sm:px-5">
+        <div className="min-w-0 max-w-[36rem]">
           <p className="text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
-            From today’s edition
+            Preview · From today’s edition
           </p>
           <h2 className="mt-2 text-[28px] leading-none text-[#011535] sm:text-[32px]" style={roman}>
             {edition.briefing}
           </h2>
           <div className="mt-3 h-[3px] w-14 bg-[#DF0A14]" aria-hidden />
+          <p className="mt-4 text-[15px] leading-6 text-[#666666]" style={roman}>
+            A short look at today’s stories. Keep going in the mini briefing, or open the full report.
+          </p>
         </div>
-        <Link href="/report" className={weekCta} style={uiBold}>
-          Open full briefing
-          <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-4 w-4" />
-        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            href="/report"
+            className="inline-flex items-center gap-2 border border-[#0A0A0A] bg-white px-4 py-3 text-xs font-bold tracking-[0.05em] text-[#0A0A0A] uppercase transition-opacity hover:opacity-80"
+            style={uiBold}
+          >
+            Mini briefing
+            <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-4 w-4" />
+          </Link>
+          <Link href="/report?layout=classic" className={weekCta} style={uiBold}>
+            Full briefing
+            <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-4 w-4" />
+          </Link>
+        </div>
       </div>
 
       <div className="relative px-2 py-5 sm:px-4">
@@ -300,13 +315,13 @@ function MiniLatestBriefing() {
           onScroll={syncEdges}
           className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          {stories.map((story, index) => (
+          {preview.map((story) => (
             <article
               key={story.id}
               data-feed-card
               className="flex w-[min(78%,240px)] shrink-0 snap-start flex-col border border-black/10 bg-white sm:w-[220px]"
             >
-              <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#111]">
+              <Link href={`/report#${story.id}`} className="relative aspect-[4/5] w-full overflow-hidden bg-[#111]">
                 <Image
                   src={story.imageSrc!}
                   alt=""
@@ -314,13 +329,7 @@ function MiniLatestBriefing() {
                   sizes="240px"
                   className={`object-cover object-[center_20%] ${story.imageFit === "contain" ? "object-contain" : ""}`}
                 />
-                {index > 0 ? (
-                  <span className="absolute top-2.5 right-2.5 inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#DF0A14] text-white shadow-[0_6px_16px_rgba(0,0,0,0.28)]">
-                    <Lock size={12} strokeWidth={2.4} aria-hidden />
-                    <span className="sr-only">Subscriber story</span>
-                  </span>
-                ) : null}
-              </div>
+              </Link>
               <div className="flex flex-1 flex-col px-3 py-3" style={{ background: SOFT }}>
                 <p className="text-[10px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
                   {story.chip}
@@ -328,12 +337,15 @@ function MiniLatestBriefing() {
                 <p className="mt-1.5 line-clamp-3 text-[16px] leading-5 text-[#1B1B1B]" style={roman}>
                   {story.dek}
                 </p>
+                <p className="mt-2 line-clamp-2 text-[13px] leading-5 text-[#666666]" style={roman}>
+                  {story.whatHappened}
+                </p>
                 <Link
                   href={`/report#${story.id}`}
                   className="mt-3 inline-flex items-center gap-1 text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase"
                   style={uiBold}
                 >
-                  Read
+                  Continue
                   <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-3.5 w-3.5" />
                 </Link>
               </div>
@@ -355,6 +367,22 @@ function MiniLatestBriefing() {
           onClick={() => go(1)}
           className="absolute top-[42%] right-1 z-10 -translate-y-1/2"
         />
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-black/10 px-4 py-4 sm:px-5">
+        <p className="text-[14px] leading-5 text-[#666666]" style={roman}>
+          {moreCount > 0
+            ? `${moreCount} more ${moreCount === 1 ? "story" : "stories"} in today’s briefing`
+            : "The rest of today’s briefing is ready when you are"}
+        </p>
+        <Link
+          href="/report"
+          className="inline-flex items-center gap-1 text-[12px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase"
+          style={uiBold}
+        >
+          Continue to briefing
+          <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-4 w-4" />
+        </Link>
       </div>
     </section>
   );
