@@ -1675,140 +1675,7 @@ function PressHeroCollage({ stories }: { stories: WeekStory[] }) {
   );
 }
 
-function StoryFactfile({
-  story,
-  index,
-  locked,
-  onClose,
-}: {
-  story: WeekStory;
-  index: number;
-  locked: boolean;
-  onClose: () => void;
-}) {
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
-    };
-  }, [onClose]);
-
-  return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center sm:p-6" role="dialog" aria-modal="true" aria-label={`${story.displayTitle} factfile`}>
-      <button type="button" className="absolute inset-0 bg-black/60" aria-label="Close factfile" onClick={onClose} />
-      <div className="relative z-10 flex max-h-[88svh] w-full max-w-[560px] flex-col overflow-hidden border border-black/10 bg-[#EDE7DE] shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
-        <div className="relative aspect-square w-full shrink-0 bg-[#1a1412]">
-          {story.imageSrc ? (
-            <PrintPlate src={story.imageSrc} tone={index % 3 === 0 ? "crimson" : index % 3 === 1 ? "ink" : "midnight"} className="absolute inset-0" sizes="560px" />
-          ) : (
-            <div className="absolute inset-0 bg-[#1C2A38]" />
-          )}
-          <button
-            type="button"
-            onClick={onClose}
-            className="absolute top-3 right-3 z-20 inline-flex h-10 w-10 items-center justify-center bg-black/70 text-white transition-opacity hover:opacity-80"
-            aria-label="Close"
-          >
-            <X size={18} strokeWidth={2.2} aria-hidden />
-          </button>
-          <span className="absolute bottom-3 left-3 z-20 bg-[#DF0A14] px-2 py-1 text-[11px] font-bold tracking-[0.14em] text-white uppercase" style={uiBold}>
-            {number(index)} · Factfile
-          </span>
-        </div>
-
-        <div className={`min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6 ${brandScrollbar}`}>
-          <p className="text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
-            {story.chip}
-          </p>
-          <h2 className="mt-2 text-[clamp(1.75rem,4vw,2.35rem)] leading-[1.05] text-[#011535]" style={roman}>
-            {story.displayTitle}
-          </h2>
-          <p className="mt-3 text-[17px] leading-7 text-black/80" style={roman}>
-            {story.dek}
-          </p>
-          <div className="mt-4 h-[3px] w-14 bg-[#DF0A14]" aria-hidden />
-
-          {locked && index > 0 ? (
-            <div className="mt-6">
-              <p className="text-[15px] leading-6 text-black/65" style={roman}>
-                The rest of this factfile is locked.
-              </p>
-              <a href={WEEK_SUBSCRIBE} target="_blank" rel="noreferrer" className={`mt-4 ${weekCta}`} style={uiBold}>
-                <Lock size={12} strokeWidth={2.4} aria-hidden />
-                Sign up to unlock
-              </a>
-            </div>
-          ) : (
-            <div className="mt-6 flex flex-col gap-5 text-[16px] leading-7 text-[#1B1B1B]" style={roman}>
-              {story.whatHappened ? (
-                <section>
-                  <p className="text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
-                    What happened
-                  </p>
-                  <p className="mt-2">{story.whatHappened}</p>
-                </section>
-              ) : null}
-              {story.quote ? (
-                <section>
-                  <p className="text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
-                    Quote
-                  </p>
-                  <p className="mt-2 italic">“{story.quote}”</p>
-                  {story.quoteAttribution ? (
-                    <p className="mt-2 text-[13px] text-black/55" style={ui}>
-                      {story.quoteAttribution}
-                    </p>
-                  ) : null}
-                </section>
-              ) : null}
-              {story.whoSaidWhat ? (
-                <section>
-                  <p className="text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
-                    Who said what
-                  </p>
-                  <p className="mt-2">{story.whoSaidWhat}</p>
-                </section>
-              ) : null}
-              {story.whatsNext ? (
-                <section>
-                  <p className="text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
-                    What’s next
-                  </p>
-                  <p className="mt-2">{story.whatsNext}</p>
-                </section>
-              ) : null}
-              {story.stats?.length ? (
-                <section>
-                  <p className="text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
-                    {story.statsHeading || "Figures"}
-                  </p>
-                  <ul className="mt-2 space-y-2">
-                    {story.stats.map((stat) => (
-                      <li key={stat.label} className="flex items-baseline justify-between gap-4 border-b border-black/10 pb-2">
-                        <span className="text-[14px] text-black/60">{stat.label}</span>
-                        <span className="text-[18px]" style={romanBold}>
-                          {stat.value}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              ) : null}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/** Design-led briefing — stacked press plates open factfiles. */
+/** Design-led briefing — stacked main images; click reveals story underneath. */
 function CarsonLedBriefing({
   stories,
   briefing,
@@ -1821,9 +1688,6 @@ function CarsonLedBriefing({
   const lead = stories[0];
   const words = briefing.split(" ");
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [factId, setFactId] = useState<string | null>(null);
-  const activeIndex = Math.max(0, stories.findIndex((story) => story.id === factId));
-  const activeStory = factId ? stories[activeIndex] : null;
   const withArt = stories.filter((story) => story.imageSrc);
   const stack = withArt.length ? withArt : stories;
 
@@ -1956,7 +1820,7 @@ function CarsonLedBriefing({
               {lead?.dek || lead?.displayTitle}
             </p>
             <a href="#led-stack" className={`mt-6 ${weekCta}`} style={uiBold}>
-              Open the stack
+              Browse the stack
               <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-4 w-4" />
             </a>
           </div>
@@ -1964,12 +1828,12 @@ function CarsonLedBriefing({
       </header>
 
       <section id="led-stack" className="relative scroll-mt-12 bg-[#120e0c]">
-        <div className="relative z-20 px-4 pt-14 pb-8 sm:px-8 lg:px-12">
+        <div className="relative z-20 px-4 pt-14 pb-6 sm:px-8 lg:px-12">
           <p className="text-[11px] font-bold tracking-[0.2em] text-[#FF6A2A] uppercase" style={uiBold}>
             Story order · press stack
           </p>
           <h2 className="led-ink mt-3 max-w-[16ch] text-[clamp(2.2rem,5.5vw,3.8rem)] leading-[0.92] tracking-[-0.035em] text-[#E8E0D4]" style={roman}>
-            Peel a plate. Open the factfile.
+            Tap an image. Read underneath.
           </h2>
           <div className="mt-4 h-[4px] w-24 bg-[#DF0A14]" aria-hidden />
         </div>
@@ -1979,18 +1843,22 @@ function CarsonLedBriefing({
             const tone = storyIndex % 3 === 0 ? "crimson" : storyIndex % 3 === 1 ? "ink" : "midnight";
             const gated = locked && storyIndex > 0;
             const isOpen = expandedId === story.id;
-            const peek = storyIndex === 0 ? "mt-0" : "-mt-16 sm:-mt-24";
-            const height = isOpen ? "min-h-[72svh] sm:min-h-[78svh]" : "h-[38svh] sm:h-[44svh]";
+            const peek = storyIndex === 0 ? "mt-0" : isOpen ? "mt-0" : "-mt-16 sm:-mt-24";
             return (
               <li
                 key={story.id}
+                id={`led-${story.id}`}
                 className={`relative ${peek}`}
                 style={{ zIndex: isOpen ? stack.length + 2 : storyIndex + 1 }}
               >
-                <div
-                  className={`relative w-full overflow-hidden transition-[min-height,height,transform] duration-500 ease-out ${height} ${
-                    isOpen ? "shadow-[0_-40px_90px_rgba(0,0,0,0.65)]" : "shadow-[0_-24px_60px_rgba(0,0,0,0.55)]"
-                  }`}
+                <button
+                  type="button"
+                  onClick={() => setExpandedId(isOpen ? null : story.id)}
+                  aria-expanded={isOpen}
+                  aria-controls={`led-story-${story.id}`}
+                  className={`group relative block h-[42svh] w-full overflow-hidden text-left outline-none transition-transform duration-500 sm:h-[48svh] ${
+                    isOpen ? "shadow-[0_24px_50px_rgba(0,0,0,0.35)]" : "shadow-[0_-24px_60px_rgba(0,0,0,0.55)] hover:-translate-y-0.5"
+                  } focus-visible:ring-2 focus-visible:ring-[#DF0A14] focus-visible:ring-inset`}
                 >
                   <PrintPlate
                     src={story.imageSrc}
@@ -1999,57 +1867,69 @@ function CarsonLedBriefing({
                     className="absolute inset-0 h-full w-full"
                     sizes="100vw"
                   />
-                  {/* Depth lip — tucked sheet above */}
-                  <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-20 bg-gradient-to-b from-black/75 via-black/30 to-transparent" aria-hidden />
-                  <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-[3px] bg-black/45" aria-hidden />
-
-                  <button
-                    type="button"
-                    onClick={() => setExpandedId(isOpen ? null : story.id)}
-                    aria-expanded={isOpen}
-                    aria-label={`${isOpen ? "Collapse" : "Expand"} ${story.displayTitle}`}
-                    className="absolute inset-0 z-20 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[#DF0A14] focus-visible:ring-inset"
-                  />
-
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 flex items-end justify-between gap-4 bg-gradient-to-t from-black/92 via-black/50 to-transparent px-4 pb-5 pt-24 sm:px-8 sm:pb-7 lg:px-12">
-                    <div className="min-w-0 max-w-[48rem]">
-                      <p className="inline-flex items-center gap-2 bg-black/70 px-2 py-1 text-[11px] font-bold tracking-[0.14em] text-white uppercase shadow-[2px_2px_0_#DF0A14]" style={uiBold}>
+                  <span className="pointer-events-none absolute inset-x-0 top-0 z-10 h-20 bg-gradient-to-b from-black/75 via-black/30 to-transparent" aria-hidden />
+                  <span className="pointer-events-none absolute inset-x-0 top-0 z-10 h-[3px] bg-black/45" aria-hidden />
+                  <span className="absolute inset-x-0 bottom-0 z-20 flex items-end justify-between gap-4 bg-gradient-to-t from-black/90 via-black/45 to-transparent px-4 pb-5 pt-20 sm:px-8 sm:pb-7 lg:px-12">
+                    <span className="min-w-0 max-w-[48rem]">
+                      <span className="inline-flex items-center gap-2 bg-black/70 px-2 py-1 text-[11px] font-bold tracking-[0.14em] text-white uppercase shadow-[2px_2px_0_#DF0A14]" style={uiBold}>
                         {number(storyIndex)} · {story.chip}
-                      </p>
-                      <h3 className={`mt-3 text-white ${isOpen ? "text-[clamp(1.6rem,3.5vw,2.6rem)] leading-[1.05]" : "line-clamp-2 text-[clamp(1.35rem,2.8vw,2.1rem)] leading-[1.1]"}`} style={roman}>
+                      </span>
+                      <span className="mt-3 block line-clamp-2 text-[clamp(1.35rem,2.8vw,2.1rem)] leading-[1.1] text-white" style={roman}>
                         {story.dek}
-                      </h3>
-                      {isOpen && !gated ? (
-                        <p className="mt-4 max-w-[42ch] text-[15px] leading-6 text-white/80 sm:text-[16px] sm:leading-7" style={roman}>
-                          {story.whatHappened?.slice(0, 220)}
-                          {(story.whatHappened?.length ?? 0) > 220 ? "…" : ""}
+                      </span>
+                    </span>
+                    <span className="inline-flex shrink-0 items-center gap-1 bg-white px-3 py-2 text-[11px] font-bold tracking-[0.12em] text-black uppercase" style={uiBold}>
+                      {isOpen ? "Close" : "Read"}
+                      <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className={`h-3.5 w-3.5 transition-transform ${isOpen ? "rotate-90" : ""}`} />
+                    </span>
+                  </span>
+                </button>
+
+                <div
+                  id={`led-story-${story.id}`}
+                  className={`grid overflow-hidden bg-[#EDE7DE] transition-[grid-template-rows] duration-500 ease-out ${
+                    isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                  }`}
+                >
+                  <div className="min-h-0">
+                    <div className="border-b border-black/15 px-4 py-10 sm:px-8 sm:py-12 lg:px-12">
+                      <div className="mx-auto max-w-[720px]">
+                        <p className="text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
+                          {number(storyIndex)} · {story.chip}
                         </p>
-                      ) : null}
-                    </div>
-                    <div className="pointer-events-auto relative z-40 flex shrink-0 flex-col items-end gap-2">
-                      <button
-                        type="button"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          setExpandedId(story.id);
-                          setFactId(story.id);
-                        }}
-                        className="inline-flex items-center gap-1 bg-[#DF0A14] px-3 py-2 text-[11px] font-bold tracking-[0.12em] text-white uppercase transition-colors hover:bg-[#B20810]"
-                        style={uiBold}
-                      >
-                        Factfile
-                        <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-3.5 w-3.5" />
-                      </button>
-                      {gated ? (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-bold tracking-[0.1em] text-white/70 uppercase" style={uiBold}>
-                          <Lock size={11} strokeWidth={2.4} aria-hidden />
-                          Locked
-                        </span>
-                      ) : (
-                        <span className="text-[11px] font-bold tracking-[0.1em] text-white/65 uppercase" style={uiBold}>
-                          {isOpen ? "Tap to fold" : "Tap to peel"}
-                        </span>
-                      )}
+                        <h3 className="mt-3 text-[clamp(1.85rem,4vw,2.75rem)] leading-[1.05] text-[#011535]" style={roman}>
+                          {story.displayTitle}
+                        </h3>
+                        <p className="mt-3 text-[18px] leading-7 text-black/70" style={roman}>
+                          {story.dek}
+                        </p>
+                        <div className="mt-5 h-[3px] w-14 bg-[#DF0A14]" aria-hidden />
+
+                        {gated ? (
+                          <div className="mt-8">
+                            <p className="text-[16px] leading-7 text-black/65" style={roman}>
+                              Sign up to unlock this story.
+                            </p>
+                            <a href={WEEK_SUBSCRIBE} target="_blank" rel="noreferrer" className={`mt-5 ${weekCta}`} style={uiBold}>
+                              <Lock size={12} strokeWidth={2.4} aria-hidden />
+                              Sign up to unlock
+                            </a>
+                          </div>
+                        ) : (
+                          <div className="mt-2">
+                            <StoryReading story={story} layout="digest" />
+                          </div>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() => setExpandedId(null)}
+                          className="mt-4 text-[12px] font-bold tracking-[0.12em] text-black/50 uppercase hover:text-[#DF0A14]"
+                          style={uiBold}
+                        >
+                          Fold plate
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -2081,15 +1961,6 @@ function CarsonLedBriefing({
           </Link>
         </div>
       </section>
-
-      {activeStory ? (
-        <StoryFactfile
-          story={activeStory}
-          index={activeIndex}
-          locked={locked}
-          onClose={() => setFactId(null)}
-        />
-      ) : null}
     </div>
   );
 }
