@@ -1569,7 +1569,7 @@ function layoutHref(layout: ReportLayout, locked: boolean, ads: boolean) {
   return query ? `/report?${query}` : "/report";
 }
 
-/** Print-press plate — grain, halftone, ink misregistration. */
+/** Straight photo plate with soft press wear — not tilted, not flat web. */
 function PrintPlate({
   src,
   alt = "",
@@ -1587,15 +1587,8 @@ function PrintPlate({
   sizes?: string;
   tone?: "ink" | "crimson" | "midnight";
 }) {
-  const wash =
-    tone === "crimson"
-      ? "from-[#DF0A14]/45 via-transparent to-black/70"
-      : tone === "midnight"
-        ? "from-[#011535]/55 via-transparent to-black/75"
-        : "from-black/30 via-transparent to-black/65";
-
   return (
-    <div className={`led-print relative overflow-hidden bg-[#111] ${className}`}>
+    <div className={`led-print relative overflow-hidden bg-[#1a1412] ${className}`}>
       {src ? (
         <>
           <Image
@@ -1604,12 +1597,16 @@ function PrintPlate({
             fill
             priority={priority}
             unoptimized={src.startsWith("/") || src.startsWith("http")}
-            className={`led-print-img object-cover ${locked ? "scale-105 blur-[10px]" : ""}`}
+            className={`led-print-img object-cover object-center ${locked ? "scale-105 blur-[12px]" : ""}`}
             sizes={sizes}
           />
-          <div className="led-print-misreg pointer-events-none absolute inset-0" aria-hidden />
-          <div className={`pointer-events-none absolute inset-0 bg-gradient-to-b ${wash}`} aria-hidden />
-          <div className="led-print-halftone pointer-events-none absolute inset-0" aria-hidden />
+          <div
+            className={`led-print-wash pointer-events-none absolute inset-0 ${
+              tone === "crimson" ? "led-print-wash--crimson" : tone === "midnight" ? "led-print-wash--midnight" : "led-print-wash--ink"
+            }`}
+            aria-hidden
+          />
+          <div className="led-print-bleed pointer-events-none absolute inset-0" aria-hidden />
           <div className="led-print-grain pointer-events-none absolute inset-0" aria-hidden />
         </>
       ) : (
@@ -1620,6 +1617,60 @@ function PrintPlate({
           <Lock size={22} strokeWidth={2.4} aria-hidden />
         </span>
       ) : null}
+    </div>
+  );
+}
+
+/** Fragile-style header collage — misaligned bands, ink flood, soft focus. */
+function PressHeroCollage({ stories }: { stories: WeekStory[] }) {
+  const plates = stories.filter((story) => story.imageSrc).slice(0, 4);
+  const a = plates[0]?.imageSrc;
+  const b = plates[1]?.imageSrc ?? a;
+  const c = plates[2]?.imageSrc ?? a;
+  const d = plates[3]?.imageSrc ?? b;
+
+  return (
+    <div className="led-collage absolute inset-0 overflow-hidden bg-[#120e0c]" aria-hidden>
+      {/* Top cream registration strip */}
+      <div className="absolute inset-x-0 top-0 z-20 h-[7%] bg-[#E8E0D4] opacity-90" />
+      <div className="absolute top-[5%] left-[-2%] z-10 h-[18%] w-[104%] overflow-hidden bg-[#2a2420]">
+        {b ? (
+          <Image src={b} alt="" fill unoptimized={b.startsWith("/") || b.startsWith("http")} className="led-collage-soft object-cover object-[center_30%] opacity-70" sizes="100vw" />
+        ) : null}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1a1512]/80 via-transparent to-[#1a1512]/90" />
+        <div className="led-print-grain absolute inset-0 opacity-60" />
+      </div>
+
+      {/* Mid charcoal smear band — slightly offset */}
+      <div className="absolute top-[16%] left-[-4%] z-[11] h-[28%] w-[108%] overflow-hidden bg-[#1c1816] shadow-[0_18px_40px_rgba(0,0,0,0.45)]">
+        {c ? (
+          <Image src={c} alt="" fill unoptimized={c.startsWith("/") || c.startsWith("http")} className="led-collage-soft object-cover object-[center_45%] opacity-55" sizes="100vw" />
+        ) : null}
+        <div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(20,16,14,0.85),transparent_45%,rgba(20,16,14,0.7))]" />
+        <div className="led-ink-streak absolute inset-0" />
+        <div className="led-print-grain absolute inset-0" />
+      </div>
+
+      {/* Dominant crimson flood plate */}
+      <div className="absolute top-[28%] left-[-1%] z-[12] h-[78%] w-[103%] overflow-hidden bg-[#6b0a10] shadow-[0_-30px_80px_rgba(0,0,0,0.55)]">
+        {a ? (
+          <Image src={a} alt="" fill priority unoptimized={a.startsWith("/") || a.startsWith("http")} className="led-collage-soft object-cover object-center opacity-80" sizes="100vw" />
+        ) : null}
+        <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_78%_42%,rgba(255,120,40,0.55),transparent_55%),linear-gradient(180deg,rgba(90,8,12,0.35),rgba(40,4,6,0.82))]" />
+        <div className="led-print-grain absolute inset-0 opacity-70" />
+      </div>
+
+      {/* Extra clipped fragment top-right */}
+      <div className="absolute top-[34%] right-[-6%] z-[13] h-[22%] w-[38%] overflow-hidden bg-[#3a0a0e] opacity-90 shadow-[-12px_8px_30px_rgba(0,0,0,0.4)]">
+        {d ? (
+          <Image src={d} alt="" fill unoptimized={d.startsWith("/") || d.startsWith("http")} className="led-collage-soft object-cover object-[70%_40%] opacity-65" sizes="40vw" />
+        ) : null}
+        <div className="absolute inset-0 bg-[#DF0A14]/35 mix-blend-multiply" />
+        <div className="led-print-grain absolute inset-0" />
+      </div>
+
+      <div className="led-print-grain pointer-events-none absolute inset-0 z-30 opacity-50" />
+      <div className="pointer-events-none absolute inset-0 z-30 bg-gradient-to-t from-black via-transparent to-black/30" />
     </div>
   );
 }
@@ -1640,34 +1691,57 @@ function CarsonLedBriefing({
   return (
     <div className="led-briefing min-h-screen overflow-x-hidden bg-[#EDE7DE] text-[#0A0A0A]">
       <style>{`
-        .led-briefing .led-print-img {
-          filter: grayscale(1) contrast(1.35) brightness(0.92);
+        .led-briefing .led-print-img,
+        .led-briefing .led-collage-soft {
+          filter: saturate(0.55) contrast(1.18) brightness(0.88) blur(0.35px);
         }
-        .led-briefing .led-print-misreg {
-          background-image: inherit;
-          box-shadow: inset 2px 0 0 rgba(0, 180, 255, 0.22), inset -2px 0 0 rgba(255, 40, 80, 0.2);
-          mix-blend-mode: screen;
-          opacity: 0.55;
+        .led-briefing .led-collage-soft {
+          filter: saturate(0.45) contrast(1.25) brightness(0.82) blur(1.4px);
+          transform: scale(1.06);
         }
-        .led-briefing .led-print-halftone {
-          background-image: radial-gradient(circle, rgba(0,0,0,0.55) 1.1px, transparent 1.35px);
-          background-size: 5px 5px;
+        .led-briefing .led-print-wash--ink {
+          background:
+            linear-gradient(180deg, rgba(18,14,12,0.15), rgba(18,14,12,0.55)),
+            radial-gradient(90% 70% at 80% 30%, rgba(180,90,40,0.18), transparent 60%);
           mix-blend-mode: multiply;
-          opacity: 0.38;
+        }
+        .led-briefing .led-print-wash--crimson {
+          background:
+            linear-gradient(115deg, rgba(120,10,16,0.35), transparent 50%, rgba(40,6,8,0.55)),
+            radial-gradient(80% 60% at 85% 40%, rgba(255,110,35,0.35), transparent 55%);
+          mix-blend-mode: multiply;
+        }
+        .led-briefing .led-print-wash--midnight {
+          background:
+            linear-gradient(180deg, rgba(8,16,28,0.25), rgba(8,12,20,0.6)),
+            radial-gradient(70% 50% at 20% 80%, rgba(223,10,20,0.2), transparent 55%);
+          mix-blend-mode: multiply;
+        }
+        .led-briefing .led-print-bleed {
+          box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04), inset 3px 0 0 rgba(0,140,180,0.12), inset -3px 0 0 rgba(223,10,20,0.14);
         }
         .led-briefing .led-print-grain {
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 260 260' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.62'/%3E%3C/svg%3E");
+          mix-blend-mode: soft-light;
+          opacity: 0.55;
+        }
+        .led-briefing .led-ink-streak {
+          background: repeating-linear-gradient(
+            92deg,
+            transparent 0 14px,
+            rgba(0,0,0,0.08) 14px 15px,
+            transparent 15px 31px,
+            rgba(255,255,255,0.03) 31px 32px
+          );
           mix-blend-mode: overlay;
-          opacity: 0.45;
+          opacity: 0.55;
         }
         .led-briefing .led-ink {
-          text-shadow: 1px 0 0 rgba(0,170,255,0.35), -1px 0 0 rgba(223,10,20,0.4);
-        }
-        .led-briefing .led-slash {
-          background: repeating-linear-gradient(-18deg, transparent, transparent 10px, rgba(223,10,20,0.12) 10px, rgba(223,10,20,0.12) 12px);
+          text-shadow: 1.5px 0 0 rgba(0,150,200,0.28), -1.5px 0 0 rgba(223,10,20,0.32);
         }
         @media (prefers-reduced-motion: reduce) {
-          .led-briefing .led-print-img { filter: grayscale(0.7) contrast(1.15); }
+          .led-briefing .led-print-img,
+          .led-briefing .led-collage-soft { filter: saturate(0.65) contrast(1.1) brightness(0.9); }
         }
       `}</style>
 
@@ -1686,50 +1760,48 @@ function CarsonLedBriefing({
         </nav>
       </div>
 
-      <header className="relative isolate min-h-[110svh] overflow-hidden bg-[#0A0A0A] text-white">
-        <PrintPlate
-          src={lead?.imageSrc}
-          priority
-          className="absolute inset-0"
-          tone="crimson"
-          sizes="100vw"
-        />
-        <div className="led-slash pointer-events-none absolute inset-0 opacity-70" aria-hidden />
-        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/70 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black via-black/80 to-transparent" />
+      <header className="relative isolate min-h-[110svh] overflow-hidden bg-[#120e0c] text-white">
+        <PressHeroCollage stories={stories} />
 
-        <div className="relative z-10 flex min-h-[110svh] flex-col justify-end px-4 pb-12 pt-28 sm:px-8 lg:px-14">
-          <p className="led-ink text-[12px] font-bold tracking-[0.34em] text-[#DF0A14] uppercase" style={uiBold}>
+        <div className="relative z-20 flex min-h-[110svh] flex-col justify-end px-4 pb-12 pt-28 sm:px-8 lg:px-14">
+          <p className="text-[12px] font-bold tracking-[0.34em] text-[#E8E0D4]/80 uppercase" style={uiBold}>
             Press proof · design-led edition
           </p>
 
-          <div className="relative mt-3 select-none">
+          <div className="relative mt-4 select-none">
+            {/* Cropped / overprinted mark like Fragile logo treatment */}
             <p
-              className="pointer-events-none absolute -top-8 left-[-8%] text-[clamp(5rem,22vw,16rem)] leading-[0.72] tracking-[-0.07em] text-white/[0.12] sm:-top-14"
+              className="pointer-events-none absolute top-[-0.35em] right-[4%] z-[1] overflow-hidden text-[clamp(2rem,6vw,4.5rem)] leading-none tracking-[0.12em] text-white"
+              style={romanBold}
+              aria-hidden
+            >
+              <span className="relative inline-block bg-black px-2 py-1 outline outline-[3px] outline-black">
+                THE
+                <span className="absolute inset-x-0 bottom-0 h-[42%] bg-[#8a1018]" />
+              </span>
+            </p>
+            <p
+              className="pointer-events-none absolute -top-10 left-[-6%] text-[clamp(5rem,22vw,16rem)] leading-[0.72] tracking-[-0.07em] text-white/[0.1] sm:-top-14"
               style={romanBold}
               aria-hidden
             >
               EDITION
             </p>
-            <p
-              className="led-ink pointer-events-none absolute top-[18%] left-[12%] rotate-[-12deg] text-[clamp(2.5rem,8vw,6rem)] leading-none tracking-[0.2em] text-[#DF0A14]/50"
-              style={uiBold}
-              aria-hidden
-            >
-              INK
-            </p>
             <h1 className="led-ink relative max-w-[13ch] text-[clamp(3.4rem,10vw,8rem)] leading-[0.82] tracking-[-0.045em] text-white" style={roman}>
               {words.length > 1 ? (
                 <>
                   <span className="block -ml-1">{words[0]}</span>
-                  <span className="ml-[10%] block -rotate-1 text-[#DF0A14]">{words.slice(1).join(" ")}</span>
+                  <span className="relative ml-[8%] block">
+                    <span className="text-[#FF6A2A]">{words.slice(1).join(" ")}</span>
+                    <span className="pointer-events-none absolute inset-x-[-4%] top-[48%] h-[38%] bg-[#6b0a10]/75" aria-hidden />
+                  </span>
                 </>
               ) : (
                 briefing
               )}
             </h1>
             <p
-              className="pointer-events-none absolute right-[-8%] bottom-[-22%] rotate-[-11deg] text-[clamp(3.5rem,14vw,10rem)] leading-none tracking-[-0.09em] text-[#DF0A14]/40"
+              className="pointer-events-none absolute right-[-4%] bottom-[-18%] text-[clamp(3.2rem,12vw,8.5rem)] leading-none tracking-[-0.08em] text-white/20"
               style={romanBold}
               aria-hidden
             >
@@ -1737,14 +1809,14 @@ function CarsonLedBriefing({
             </p>
           </div>
 
-          <div className="mt-10 grid max-w-[52rem] gap-6 border-l-[7px] border-[#DF0A14] bg-black/35 p-5 backdrop-blur-[2px] sm:mt-12 sm:p-7">
-            <p className="text-[11px] font-bold tracking-[0.18em] text-white/65 uppercase" style={uiBold}>
+          <div className="mt-10 max-w-[40rem] border-l-[6px] border-[#E8E0D4]/70 bg-black/45 p-5 sm:mt-12 sm:p-7">
+            <p className="text-[11px] font-bold tracking-[0.18em] text-[#E8E0D4]/70 uppercase" style={uiBold}>
               Plate 01 · Today’s main story
             </p>
-            <p className="led-ink text-[clamp(1.75rem,3.5vw,2.85rem)] leading-[1.05] text-white" style={roman}>
+            <p className="mt-3 text-[clamp(1.7rem,3.2vw,2.6rem)] leading-[1.08] text-white" style={roman}>
               {lead?.dek || lead?.displayTitle}
             </p>
-            <a href={`#led-${lead?.id ?? "top"}`} className={weekCta} style={uiBold}>
+            <a href={`#led-${lead?.id ?? "top"}`} className={`mt-6 ${weekCta}`} style={uiBold}>
               Read the full briefing
               <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-4 w-4" />
             </a>
@@ -1779,7 +1851,6 @@ function CarsonLedBriefing({
         <div className="relative mx-auto mt-14 max-w-[1320px] space-y-20 lg:space-y-28">
           {stories.map((story, storyIndex) => {
             const offset = storyIndex % 2 === 1;
-            const tilt = storyIndex % 3 === 0 ? "-rotate-1" : storyIndex % 3 === 1 ? "rotate-1" : "rotate-0";
             const tone = storyIndex % 3 === 0 ? "crimson" : storyIndex % 3 === 1 ? "ink" : "midnight";
             const gated = locked && storyIndex > 0;
             return (
@@ -1799,13 +1870,13 @@ function CarsonLedBriefing({
                   {number(storyIndex)}
                 </p>
 
-                <div className={`relative z-10 grid items-start gap-6 lg:grid-cols-12 lg:gap-8`}>
+                <div className="relative z-10 grid items-start gap-6 lg:grid-cols-12 lg:gap-8">
                   <div className={`lg:col-span-5 ${offset ? "lg:col-start-8 lg:order-2" : "lg:col-start-1"}`}>
                     <PrintPlate
                       src={story.imageSrc}
                       locked={gated}
                       tone={tone}
-                      className={`aspect-[4/5] ${tilt}`}
+                      className="aspect-[4/5]"
                       sizes="(min-width: 1024px) 40vw, 100vw"
                     />
                     {story.imageCaption ? (
@@ -1816,12 +1887,7 @@ function CarsonLedBriefing({
                   </div>
 
                   <div className={`min-w-0 lg:col-span-7 ${offset ? "lg:col-start-1 lg:order-1 lg:pr-6" : "lg:col-start-6"}`}>
-                    <p
-                      className={`inline-block -rotate-1 bg-[#DF0A14] px-2 py-1 text-[11px] font-bold tracking-[0.16em] text-white uppercase ${
-                        offset ? "lg:rotate-1" : ""
-                      }`}
-                      style={uiBold}
-                    >
+                    <p className="inline-block bg-[#DF0A14] px-2 py-1 text-[11px] font-bold tracking-[0.16em] text-white uppercase" style={uiBold}>
                       {story.chip}
                     </p>
                     <h3
