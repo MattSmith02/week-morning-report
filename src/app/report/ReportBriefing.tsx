@@ -131,7 +131,7 @@ const WEEK_SUBSCRIBE =
   "https://subscribe.theweek.com/pubs/W0/TWE/self1023_3formats_Dlink.jsp?cds_mag_code=TWE&cds_page_id=275740";
 const WEEK_NAV = ["Home", "The Explainer", "Talking Points", "The Week Recommends", "Podcasts", "Newsletters", "From the Magazine", "More", "The Week Junior"];
 
-type ReportLayout = "classic" | "digest";
+type ReportLayout = "classic" | "digest" | "led";
 
 function WeekSiteHeader() {
   return (
@@ -1562,10 +1562,253 @@ function HeroSplitComposition({
 function layoutHref(layout: ReportLayout, locked: boolean, ads: boolean) {
   const params = new URLSearchParams();
   if (layout === "classic") params.set("layout", "classic");
+  if (layout === "led") params.set("layout", "led");
   if (locked) params.set("locked", "1");
   if (ads) params.set("ads", "1");
   const query = params.toString();
   return query ? `/report?${query}` : "/report";
+}
+
+/** Design-led briefing — expressive type, broken grid, Week red/cream. */
+function CarsonLedBriefing({
+  stories,
+  briefing,
+  locked = false,
+}: {
+  stories: WeekStory[];
+  briefing: string;
+  locked?: boolean;
+}) {
+  const lead = stories[0];
+  const rest = stories.slice(1, 8);
+
+  return (
+    <div className="min-h-screen overflow-x-hidden bg-[#F4F0EA] text-[#0A0A0A]">
+      <div className="sticky top-0 z-40 flex h-12 items-center justify-between gap-3 border-b border-black/10 bg-[#F4F0EA] px-4 sm:px-6">
+        <p className="truncate text-sm text-black" style={romanBold}>
+          The Week · {briefing} · Led
+        </p>
+        <nav className="flex items-center gap-3 text-[11px] font-bold tracking-[0.1em] uppercase" style={uiBold}>
+          <Link href={layoutHref("digest", locked, false)} className="text-[var(--brand-text-secondary,#45556c)] hover:text-[#DF0A14]">
+            Digest
+          </Link>
+          <Link href={layoutHref("classic", locked, false)} className="text-[var(--brand-text-secondary,#45556c)] hover:text-[#DF0A14]">
+            Classic
+          </Link>
+          <span className="text-[#DF0A14]">Led</span>
+        </nav>
+      </div>
+
+      <header className="relative isolate min-h-[100svh] overflow-hidden bg-black text-white">
+        {lead?.imageSrc ? (
+          <Image
+            src={lead.imageSrc}
+            alt=""
+            fill
+            priority
+            unoptimized={lead.imageSrc.startsWith("/") || lead.imageSrc.startsWith("http")}
+            className="object-cover object-center opacity-55 saturate-50 contrast-125"
+            sizes="100vw"
+          />
+        ) : null}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black" />
+
+        <div className="relative z-10 flex min-h-[100svh] flex-col justify-end px-4 pb-10 pt-24 sm:px-8 lg:px-12">
+          <p className="text-[12px] font-bold tracking-[0.28em] text-[#DF0A14] uppercase" style={uiBold}>
+            The Week · design-led edition
+          </p>
+
+          <div className="relative mt-4 select-none">
+            <p
+              className="pointer-events-none absolute -top-6 left-[-4%] text-[clamp(4.5rem,18vw,14rem)] leading-[0.78] tracking-[-0.06em] text-white/15 sm:-top-10"
+              style={romanBold}
+              aria-hidden
+            >
+              MORNING
+            </p>
+            <h1 className="relative max-w-[14ch] text-[clamp(3.2rem,9vw,7.5rem)] leading-[0.88] tracking-[-0.04em] text-white" style={roman}>
+              {briefing.includes(" ") ? (
+                <>
+                  <span className="block">{briefing.split(" ")[0]}</span>
+                  <span className="ml-[8%] block text-[#DF0A14]">{briefing.split(" ").slice(1).join(" ")}</span>
+                </>
+              ) : (
+                briefing
+              )}
+            </h1>
+            <p
+              className="pointer-events-none absolute right-[-6%] bottom-[-18%] rotate-[-8deg] text-[clamp(3rem,12vw,9rem)] leading-none tracking-[-0.08em] text-[#DF0A14]/35"
+              style={romanBold}
+              aria-hidden
+            >
+              NOW
+            </p>
+          </div>
+
+          <div className="mt-8 flex max-w-[40rem] flex-col gap-5 border-l-[6px] border-[#DF0A14] pl-5 sm:mt-10">
+            <p className="text-[11px] font-bold tracking-[0.16em] text-white/70 uppercase" style={uiBold}>
+              Today’s main story
+            </p>
+            <p className="text-[clamp(1.6rem,3.2vw,2.6rem)] leading-[1.08] text-white" style={roman}>
+              {lead?.dek || lead?.displayTitle}
+            </p>
+            {lead?.whatHappened ? (
+              <p className="max-w-[36ch] text-[16px] leading-7 text-white/80" style={roman}>
+                {lead.whatHappened.slice(0, 160)}
+                {lead.whatHappened.length > 160 ? "…" : ""}
+              </p>
+            ) : null}
+            <a href={`#led-${lead?.id ?? "top"}`} className={weekCta} style={uiBold}>
+              Enter the briefing
+              <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-4 w-4" />
+            </a>
+          </div>
+        </div>
+      </header>
+
+      <section id="led-top" className="relative bg-[#F4F0EA] px-4 py-14 sm:px-8 lg:px-12">
+        <p
+          className="pointer-events-none absolute top-6 right-4 text-[clamp(5rem,20vw,16rem)] leading-none tracking-[-0.08em] text-black/[0.05] sm:right-8"
+          style={romanBold}
+          aria-hidden
+        >
+          {String(stories.length).padStart(2, "0")}
+        </p>
+        <div className="relative mx-auto max-w-[1280px]">
+          <p className="text-[11px] font-bold tracking-[0.18em] text-[#DF0A14] uppercase" style={uiBold}>
+            Inside · type as structure
+          </p>
+          <h2 className="mt-3 max-w-[18ch] text-[clamp(2.4rem,6vw,4.5rem)] leading-[0.95] tracking-[-0.03em] text-[#011535]" style={roman}>
+            Stories that collide.
+          </h2>
+          <div className="mt-4 h-[4px] w-24 bg-[#DF0A14]" aria-hidden />
+        </div>
+
+        <div className="relative mx-auto mt-12 max-w-[1280px] space-y-10 lg:space-y-16">
+          {stories.map((story, storyIndex) => {
+            const offset = storyIndex % 2 === 1;
+            const tilt = storyIndex % 3 === 0 ? "-rotate-1" : storyIndex % 3 === 1 ? "rotate-1" : "rotate-0";
+            return (
+              <article
+                key={story.id}
+                id={`led-${story.id}`}
+                data-story-article={story.id}
+                className={`relative grid items-end gap-4 lg:grid-cols-12 lg:gap-6 ${offset ? "lg:pt-8" : ""}`}
+              >
+                <p
+                  className={`pointer-events-none absolute z-0 text-[clamp(4rem,14vw,11rem)] leading-none tracking-[-0.08em] text-[#DF0A14]/15 ${
+                    offset ? "top-[-1.5rem] right-0 lg:right-8" : "top-[-1rem] left-0 lg:left-4"
+                  }`}
+                  style={romanBold}
+                  aria-hidden
+                >
+                  {number(storyIndex)}
+                </p>
+
+                <div className={`relative z-10 lg:col-span-5 ${offset ? "lg:col-start-7 lg:order-2" : "lg:col-start-1"}`}>
+                  <div className={`relative aspect-[4/5] overflow-hidden bg-[#111] ${tilt}`}>
+                    {story.imageSrc ? (
+                      <Image
+                        src={story.imageSrc}
+                        alt=""
+                        fill
+                        unoptimized={story.imageSrc.startsWith("/") || story.imageSrc.startsWith("http")}
+                        className={`object-cover ${locked && storyIndex > 0 ? "scale-105 blur-[10px]" : ""}`}
+                        sizes="(min-width: 1024px) 40vw, 100vw"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-[#1C2A38]" />
+                    )}
+                    {locked && storyIndex > 0 ? (
+                      <span className="absolute top-1/2 left-1/2 z-10 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#DF0A14] text-white">
+                        <Lock size={22} strokeWidth={2.4} aria-hidden />
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+
+                <div className={`relative z-10 flex flex-col justify-end lg:col-span-6 ${offset ? "lg:col-start-1 lg:order-1 lg:pr-8" : "lg:col-start-6 lg:pl-4"}`}>
+                  <p className="text-[11px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
+                    {story.chip}
+                  </p>
+                  <h3
+                    className={`mt-3 max-w-[16ch] text-[#011535] ${
+                      storyIndex === 0
+                        ? "text-[clamp(2.2rem,5vw,4rem)] leading-[0.95]"
+                        : "text-[clamp(1.8rem,3.6vw,3rem)] leading-[1.02]"
+                    }`}
+                    style={roman}
+                  >
+                    {story.displayTitle}
+                  </h3>
+                  <p className="mt-4 max-w-[38ch] text-[17px] leading-7 text-black/75" style={roman}>
+                    {story.dek}
+                  </p>
+                  {story.whatHappened && !(locked && storyIndex > 0) ? (
+                    <p className="mt-4 max-w-[42ch] text-[15px] leading-6 text-black/60" style={roman}>
+                      {story.whatHappened.slice(0, 180)}
+                      {story.whatHappened.length > 180 ? "…" : ""}
+                    </p>
+                  ) : null}
+                  {locked && storyIndex > 0 ? (
+                    <a href={WEEK_SUBSCRIBE} target="_blank" rel="noreferrer" className={`mt-5 ${weekCta}`} style={uiBold}>
+                      <Lock size={12} strokeWidth={2.4} aria-hidden />
+                      Sign up to unlock
+                    </a>
+                  ) : (
+                    <a
+                      href={`#led-${story.id}`}
+                      className="mt-5 inline-flex items-center gap-1 text-[12px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase"
+                      style={uiBold}
+                    >
+                      Stay with this story
+                      <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-4 w-4" />
+                    </a>
+                  )}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+
+        {rest.length === 0 ? null : (
+          <div className="relative mx-auto mt-20 max-w-[1280px] border-t border-black/15 pt-10">
+            <p className="text-[11px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
+              Also colliding today
+            </p>
+            <ul className="mt-6 grid gap-x-8 gap-y-4 sm:grid-cols-2">
+              {stories.slice(0, 6).map((story, storyIndex) => (
+                <li key={`rail-${story.id}`} className="flex items-baseline gap-3 border-b border-black/10 pb-3">
+                  <span className="text-[13px] font-bold tracking-[0.1em] text-[#DF0A14]" style={uiBold}>
+                    {number(storyIndex)}
+                  </span>
+                  <a href={`#led-${story.id}`} className="min-w-0 text-[18px] leading-6 text-[#011535] hover:text-[#DF0A14]" style={roman}>
+                    {story.dek}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </section>
+
+      <section className="bg-black px-4 py-20 text-white sm:px-8">
+        <div className="mx-auto max-w-[900px]">
+          <p className="text-[11px] font-bold tracking-[0.18em] text-[#DF0A14] uppercase" style={uiBold}>
+            {briefing}
+          </p>
+          <h2 className="mt-4 text-[clamp(2.5rem,7vw,5rem)] leading-[0.95] tracking-[-0.03em]" style={roman}>
+            You’re all
+            <span className="text-[#DF0A14]"> caught </span>
+            up.
+          </h2>
+          <Link href="/report" className={`mt-8 ${weekCta}`} style={uiBold}>
+            Back to digest
+          </Link>
+        </div>
+      </section>
+    </div>
+  );
 }
 
 type ArchiveCard = {
@@ -1938,6 +2181,7 @@ export function ReportBriefing({
   layout?: ReportLayout;
 }) {
   const digest = layout === "digest";
+  const led = layout === "led";
   const [index, setIndex] = useState(0);
   const [open, setOpen] = useState(false);
   const [down, setDown] = useState(false);
@@ -1946,6 +2190,7 @@ export function ReportBriefing({
   const total = number(Math.max(stories.length - 1, 0));
 
   useEffect(() => {
+    if (led) return;
     const onScroll = () => {
       if (!digest && window.matchMedia("(max-width: 767px)").matches) return;
       const line = window.innerHeight * 0.28;
@@ -1963,9 +2208,10 @@ export function ReportBriefing({
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [digest, stories]);
+  }, [digest, led, stories]);
 
   useEffect(() => {
+    if (led) return;
     const rail = railRef.current;
     if (!rail) return;
     const slides = [...rail.querySelectorAll<HTMLElement>("[data-slide]")];
@@ -2119,6 +2365,7 @@ export function ReportBriefing({
     </nav>
   );
 
+  if (led) return <CarsonLedBriefing stories={stories} briefing={briefing} locked={locked} />;
   if (sourcesView) return <SourcesChart periods={periods} />;
 
   return (
@@ -2416,9 +2663,15 @@ export function ReportBriefing({
             </Link>
             <Link
               href={layoutHref("classic", locked, ads)}
-              className={!digest ? "text-[#DF0A14]" : "text-[var(--brand-text-secondary,#45556c)] hover:text-[#DF0A14]"}
+              className={layout === "classic" ? "text-[#DF0A14]" : "text-[var(--brand-text-secondary,#45556c)] hover:text-[#DF0A14]"}
             >
               Classic
+            </Link>
+            <Link
+              href={layoutHref("led", locked, ads)}
+              className="text-[var(--brand-text-secondary,#45556c)] hover:text-[#DF0A14]"
+            >
+              Led
             </Link>
             <span className="text-black/20" aria-hidden>
               |
