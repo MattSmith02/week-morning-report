@@ -1675,7 +1675,140 @@ function PressHeroCollage({ stories }: { stories: WeekStory[] }) {
   );
 }
 
-/** Design-led briefing — expressive type, print plates, full stories. */
+function StoryFactfile({
+  story,
+  index,
+  locked,
+  onClose,
+}: {
+  story: WeekStory;
+  index: number;
+  locked: boolean;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [onClose]);
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center sm:p-6" role="dialog" aria-modal="true" aria-label={`${story.displayTitle} factfile`}>
+      <button type="button" className="absolute inset-0 bg-black/60" aria-label="Close factfile" onClick={onClose} />
+      <div className="relative z-10 flex max-h-[88svh] w-full max-w-[560px] flex-col overflow-hidden border border-black/10 bg-[#EDE7DE] shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
+        <div className="relative aspect-square w-full shrink-0 bg-[#1a1412]">
+          {story.imageSrc ? (
+            <PrintPlate src={story.imageSrc} tone={index % 3 === 0 ? "crimson" : index % 3 === 1 ? "ink" : "midnight"} className="absolute inset-0" sizes="560px" />
+          ) : (
+            <div className="absolute inset-0 bg-[#1C2A38]" />
+          )}
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute top-3 right-3 z-20 inline-flex h-10 w-10 items-center justify-center bg-black/70 text-white transition-opacity hover:opacity-80"
+            aria-label="Close"
+          >
+            <X size={18} strokeWidth={2.2} aria-hidden />
+          </button>
+          <span className="absolute bottom-3 left-3 z-20 bg-[#DF0A14] px-2 py-1 text-[11px] font-bold tracking-[0.14em] text-white uppercase" style={uiBold}>
+            {number(index)} · Factfile
+          </span>
+        </div>
+
+        <div className={`min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6 ${brandScrollbar}`}>
+          <p className="text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
+            {story.chip}
+          </p>
+          <h2 className="mt-2 text-[clamp(1.75rem,4vw,2.35rem)] leading-[1.05] text-[#011535]" style={roman}>
+            {story.displayTitle}
+          </h2>
+          <p className="mt-3 text-[17px] leading-7 text-black/80" style={roman}>
+            {story.dek}
+          </p>
+          <div className="mt-4 h-[3px] w-14 bg-[#DF0A14]" aria-hidden />
+
+          {locked && index > 0 ? (
+            <div className="mt-6">
+              <p className="text-[15px] leading-6 text-black/65" style={roman}>
+                The rest of this factfile is locked.
+              </p>
+              <a href={WEEK_SUBSCRIBE} target="_blank" rel="noreferrer" className={`mt-4 ${weekCta}`} style={uiBold}>
+                <Lock size={12} strokeWidth={2.4} aria-hidden />
+                Sign up to unlock
+              </a>
+            </div>
+          ) : (
+            <div className="mt-6 flex flex-col gap-5 text-[16px] leading-7 text-[#1B1B1B]" style={roman}>
+              {story.whatHappened ? (
+                <section>
+                  <p className="text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
+                    What happened
+                  </p>
+                  <p className="mt-2">{story.whatHappened}</p>
+                </section>
+              ) : null}
+              {story.quote ? (
+                <section>
+                  <p className="text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
+                    Quote
+                  </p>
+                  <p className="mt-2 italic">“{story.quote}”</p>
+                  {story.quoteAttribution ? (
+                    <p className="mt-2 text-[13px] text-black/55" style={ui}>
+                      {story.quoteAttribution}
+                    </p>
+                  ) : null}
+                </section>
+              ) : null}
+              {story.whoSaidWhat ? (
+                <section>
+                  <p className="text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
+                    Who said what
+                  </p>
+                  <p className="mt-2">{story.whoSaidWhat}</p>
+                </section>
+              ) : null}
+              {story.whatsNext ? (
+                <section>
+                  <p className="text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
+                    What’s next
+                  </p>
+                  <p className="mt-2">{story.whatsNext}</p>
+                </section>
+              ) : null}
+              {story.stats?.length ? (
+                <section>
+                  <p className="text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase" style={uiBold}>
+                    {story.statsHeading || "Figures"}
+                  </p>
+                  <ul className="mt-2 space-y-2">
+                    {story.stats.map((stat) => (
+                      <li key={stat.label} className="flex items-baseline justify-between gap-4 border-b border-black/10 pb-2">
+                        <span className="text-[14px] text-black/60">{stat.label}</span>
+                        <span className="text-[18px]" style={romanBold}>
+                          {stat.value}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Design-led briefing — stacked press plates open factfiles. */
 function CarsonLedBriefing({
   stories,
   briefing,
@@ -1687,6 +1820,11 @@ function CarsonLedBriefing({
 }) {
   const lead = stories[0];
   const words = briefing.split(" ");
+  const [factId, setFactId] = useState<string | null>(null);
+  const activeIndex = Math.max(0, stories.findIndex((story) => story.id === factId));
+  const activeStory = factId ? stories[activeIndex] : null;
+  const withArt = stories.filter((story) => story.imageSrc);
+  const stack = withArt.length ? withArt : stories;
 
   return (
     <div className="led-briefing min-h-screen overflow-x-hidden bg-[#EDE7DE] text-[#0A0A0A]">
@@ -1816,111 +1954,71 @@ function CarsonLedBriefing({
             <p className="mt-3 text-[clamp(1.7rem,3.2vw,2.6rem)] leading-[1.08] text-white" style={roman}>
               {lead?.dek || lead?.displayTitle}
             </p>
-            <a href={`#led-${lead?.id ?? "top"}`} className={`mt-6 ${weekCta}`} style={uiBold}>
-              Read the full briefing
+            <a href="#led-stack" className={`mt-6 ${weekCta}`} style={uiBold}>
+              Open the stack
               <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-4 w-4" />
             </a>
           </div>
         </div>
       </header>
 
-      <section id="led-top" className="relative px-4 py-16 sm:px-8 lg:px-12">
-        <p
-          className="led-ink pointer-events-none absolute top-4 right-2 text-[clamp(6rem,24vw,18rem)] leading-none tracking-[-0.09em] text-black/[0.06] sm:right-6"
-          style={romanBold}
-          aria-hidden
-        >
-          {String(stories.length).padStart(2, "0")}
-        </p>
-
-        <div className="relative mx-auto max-w-[1320px]">
+      <section id="led-stack" className="relative scroll-mt-12 px-4 py-16 sm:px-8 lg:px-12">
+        <div className="relative mx-auto max-w-[720px]">
           <p className="text-[11px] font-bold tracking-[0.2em] text-[#DF0A14] uppercase" style={uiBold}>
-            Full plates · type as structure
+            Story order · press stack
           </p>
-          <h2 className="led-ink mt-3 max-w-[16ch] text-[clamp(2.6rem,7vw,5.2rem)] leading-[0.9] tracking-[-0.035em] text-[#011535]" style={roman}>
-            Collide. Overprint. Read.
+          <h2 className="led-ink mt-3 max-w-[14ch] text-[clamp(2.4rem,6vw,4.2rem)] leading-[0.92] tracking-[-0.035em] text-[#011535]" style={roman}>
+            Click a plate. Open the factfile.
           </h2>
-          <div className="mt-5 flex items-center gap-3">
-            <div className="h-[5px] w-28 bg-[#DF0A14]" aria-hidden />
-            <p className="text-[13px] tracking-[0.08em] text-black/50 uppercase" style={uiBold}>
-              Uncropped stories
-            </p>
-          </div>
+          <div className="mt-4 h-[4px] w-24 bg-[#DF0A14]" aria-hidden />
+          <p className="mt-4 max-w-[36ch] text-[16px] leading-7 text-black/60" style={roman}>
+            Straight squares, stacked in edition order. Each one opens a factfile for that story.
+          </p>
         </div>
 
-        <div className="relative mx-auto mt-14 max-w-[1320px] space-y-20 lg:space-y-28">
-          {stories.map((story, storyIndex) => {
-            const offset = storyIndex % 2 === 1;
-            const tone = storyIndex % 3 === 0 ? "crimson" : storyIndex % 3 === 1 ? "ink" : "midnight";
-            const gated = locked && storyIndex > 0;
-            return (
-              <article
-                key={story.id}
-                id={`led-${story.id}`}
-                data-story-article={story.id}
-                className={`relative ${offset ? "lg:pt-10" : ""}`}
-              >
-                <p
-                  className={`led-ink pointer-events-none absolute z-0 text-[clamp(5rem,16vw,13rem)] leading-none tracking-[-0.09em] text-[#DF0A14]/18 ${
-                    offset ? "-top-8 right-0 lg:right-4" : "-top-6 left-0 lg:left-2"
-                  }`}
-                  style={romanBold}
-                  aria-hidden
-                >
-                  {number(storyIndex)}
-                </p>
-
-                <div className="relative z-10 grid items-start gap-6 lg:grid-cols-12 lg:gap-8">
-                  <div className={`lg:col-span-5 ${offset ? "lg:col-start-8 lg:order-2" : "lg:col-start-1"}`}>
+        <div className="relative mx-auto mt-12 max-w-[560px]">
+          <ol className="relative flex flex-col">
+            {stack.map((story, storyIndex) => {
+              const tone = storyIndex % 3 === 0 ? "crimson" : storyIndex % 3 === 1 ? "ink" : "midnight";
+              const gated = locked && storyIndex > 0;
+              const overlap = storyIndex === 0 ? "mt-0" : "-mt-10 sm:-mt-14";
+              return (
+                <li key={story.id} className={`relative ${overlap}`} style={{ zIndex: storyIndex + 1 }}>
+                  <button
+                    type="button"
+                    onClick={() => setFactId(story.id)}
+                    className="group relative block w-full text-left outline-none transition-transform duration-300 hover:-translate-y-1 focus-visible:ring-2 focus-visible:ring-[#DF0A14] focus-visible:ring-offset-4 focus-visible:ring-offset-[#EDE7DE]"
+                    aria-label={`Open factfile: ${story.displayTitle}`}
+                  >
+                    <span className="pointer-events-none absolute -top-3 left-3 z-20 bg-black px-2 py-1 text-[11px] font-bold tracking-[0.14em] text-white uppercase shadow-[2px_2px_0_#DF0A14]" style={uiBold}>
+                      {number(storyIndex)}
+                    </span>
                     <PrintPlate
                       src={story.imageSrc}
                       locked={gated}
                       tone={tone}
-                      className="aspect-[4/5]"
-                      sizes="(min-width: 1024px) 40vw, 100vw"
+                      className="aspect-square w-full shadow-[0_18px_40px_rgba(0,0,0,0.28)]"
+                      sizes="560px"
                     />
-                    {story.imageCaption ? (
-                      <p className="mt-2 text-[12px] leading-4 text-black/45" style={ui}>
-                        {story.imageCaption}
-                      </p>
-                    ) : null}
-                  </div>
-
-                  <div className={`min-w-0 lg:col-span-7 ${offset ? "lg:col-start-1 lg:order-1 lg:pr-6" : "lg:col-start-6"}`}>
-                    <p className="inline-block bg-[#DF0A14] px-2 py-1 text-[11px] font-bold tracking-[0.16em] text-white uppercase" style={uiBold}>
-                      {story.chip}
-                    </p>
-                    <h3
-                      className={`led-ink mt-4 max-w-[15ch] text-[#011535] ${
-                        storyIndex === 0
-                          ? "text-[clamp(2.4rem,5.5vw,4.4rem)] leading-[0.92]"
-                          : "text-[clamp(2rem,4vw,3.3rem)] leading-[0.98]"
-                      }`}
-                      style={roman}
-                    >
-                      {story.displayTitle}
-                    </h3>
-                    <p className="mt-4 max-w-[40ch] text-[19px] leading-8 text-black/80" style={roman}>
-                      {story.dek}
-                    </p>
-
-                    {gated ? (
-                      <div className="mt-8">
-                        <a href={WEEK_SUBSCRIBE} target="_blank" rel="noreferrer" className={weekCta} style={uiBold}>
-                          <Lock size={12} strokeWidth={2.4} aria-hidden />
-                          Sign up to unlock
-                        </a>
-                      </div>
-                    ) : (
-                      <div className="mt-8 max-w-[42rem] border-t border-black/15 pt-6">
-                        <StoryReading story={story} layout="digest" />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </article>
-            );
-          })}
+                    <span className="absolute inset-x-0 bottom-0 z-20 flex items-end justify-between gap-3 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-4 pt-16">
+                      <span className="min-w-0">
+                        <span className="block text-[10px] font-bold tracking-[0.14em] text-[#FF6A2A] uppercase" style={uiBold}>
+                          {story.chip}
+                        </span>
+                        <span className="mt-1 block line-clamp-2 text-[18px] leading-6 text-white sm:text-[20px]" style={roman}>
+                          {story.dek}
+                        </span>
+                      </span>
+                      <span className="inline-flex shrink-0 items-center gap-1 text-[11px] font-bold tracking-[0.12em] text-white uppercase opacity-90 group-hover:opacity-100" style={uiBold}>
+                        Factfile
+                        <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-3.5 w-3.5" />
+                      </span>
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
         </div>
       </section>
 
@@ -1946,6 +2044,15 @@ function CarsonLedBriefing({
           </Link>
         </div>
       </section>
+
+      {activeStory ? (
+        <StoryFactfile
+          story={activeStory}
+          index={activeIndex}
+          locked={locked}
+          onClose={() => setFactId(null)}
+        />
+      ) : null}
     </div>
   );
 }
