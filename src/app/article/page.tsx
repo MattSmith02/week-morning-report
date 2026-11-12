@@ -1,6 +1,12 @@
+"use client";
+
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import type { CSSProperties, ReactNode } from "react";
+import { BrandScrollArrow } from "@/components/atoms/BrandScrollArrow/BrandScrollArrow";
+import { BrandIcon } from "@/components/atoms/icons/BrandIcon";
+import { ChevronRight, Lock } from "lucide-react";
+import { EDITIONS } from "../the-week/stories";
 
 const ROMAN = "Palatino, 'Palatino Linotype', 'Book Antiqua', Georgia, serif";
 const UI = "Arial, Helvetica, sans-serif";
@@ -8,6 +14,11 @@ const roman: CSSProperties = { fontFamily: ROMAN, fontWeight: 400 };
 const romanBold: CSSProperties = { fontFamily: ROMAN, fontWeight: 700 };
 const ui: CSSProperties = { fontFamily: UI, fontWeight: 400 };
 const uiBold: CSSProperties = { fontFamily: UI, fontWeight: 700 };
+
+const CREAM = "#F4F0EA";
+const SOFT = "#F0EAE1";
+const weekCta =
+  "inline-flex w-fit items-center justify-center gap-2 rounded-lg bg-[#DF0A14] px-4 py-3 text-xs font-bold tracking-[0.05em] text-[#FAFAFA] uppercase transition-colors duration-200 hover:bg-[#B20810] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#DF0A14]";
 
 const WEEK_SUBSCRIBE =
   "https://subscribe.theweek.com/pubs/W0/TWE/self1023_3formats_Dlink.jsp?cds_mag_code=TWE&cds_page_id=275740";
@@ -216,22 +227,134 @@ function NewsletterForm() {
           type="email"
           name="email"
           placeholder="Your Email Address"
-          className="h-[46px] w-full border border-[#CCCCCC] px-2.5 text-[16px] leading-[18px] text-black placeholder:text-black/50 sm:max-w-[354px]"
+          className="h-[46px] w-full border border-black/15 bg-white px-2.5 text-[16px] leading-[18px] text-black placeholder:text-black/50 sm:max-w-[354px]"
           style={ui}
         />
-        <button type="submit" className="h-[46px] w-full bg-[#DF0A14] px-4 text-[14px] font-bold tracking-[0.06em] text-white uppercase sm:w-[196px]" style={uiBold}>
+        <button type="submit" className={`${weekCta} h-[46px] w-full sm:w-auto`} style={uiBold}>
           Sign up
         </button>
       </div>
       <label className="mt-4 flex items-start gap-2 text-[14px] leading-[14px] text-black" style={ui}>
-        <input type="checkbox" className="mt-0.5 h-[13px] w-[13px] shrink-0 rounded-[2px] border border-[#767676]" />
+        <input type="checkbox" className="mt-0.5 h-[13px] w-[13px] shrink-0 rounded-[2px] border border-[#767676] bg-white" />
         Contact me with news and offers from other Future brands
       </label>
       <label className="mt-3 flex items-start gap-2 text-[14px] leading-[14px] text-black" style={ui}>
-        <input type="checkbox" className="mt-0.5 h-[13px] w-[13px] shrink-0 rounded-[2px] border border-[#767676]" />
+        <input type="checkbox" className="mt-0.5 h-[13px] w-[13px] shrink-0 rounded-[2px] border border-[#767676] bg-white" />
         Receive email from us on behalf of our trusted partners
       </label>
     </form>
+  );
+}
+
+function MiniLatestBriefing() {
+  const edition = EDITIONS.find((item) => item.id === "morning") ?? EDITIONS[0];
+  const stories = edition.stories.filter((story) => story.imageSrc).slice(0, 6);
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const [atStart, setAtStart] = useState(true);
+  const [atEnd, setAtEnd] = useState(false);
+
+  const syncEdges = () => {
+    const root = scrollerRef.current;
+    if (!root) return;
+    setAtStart(root.scrollLeft < 8);
+    setAtEnd(root.scrollLeft + root.clientWidth >= root.scrollWidth - 8);
+  };
+
+  useEffect(() => {
+    syncEdges();
+  }, [stories.length]);
+
+  const go = (direction: -1 | 1) => {
+    const root = scrollerRef.current;
+    const card = root?.querySelector<HTMLElement>("[data-feed-card]");
+    if (!root || !card) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    root.scrollBy({ left: direction * (card.offsetWidth + 12), behavior: reduce ? "auto" : "smooth" });
+  };
+
+  if (!stories.length) return null;
+
+  return (
+    <section className="mt-10 border border-black/10" style={{ background: CREAM }} aria-label="Latest briefing">
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-black/10 px-4 py-5 sm:px-5">
+        <div>
+          <p className="text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
+            From today’s edition
+          </p>
+          <h2 className="mt-2 text-[28px] leading-none text-[#011535] sm:text-[32px]" style={roman}>
+            {edition.briefing}
+          </h2>
+          <div className="mt-3 h-[3px] w-14 bg-[#DF0A14]" aria-hidden />
+        </div>
+        <Link href="/report" className={weekCta} style={uiBold}>
+          Open full briefing
+          <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-4 w-4" />
+        </Link>
+      </div>
+
+      <div className="relative px-2 py-5 sm:px-4">
+        <div
+          ref={scrollerRef}
+          onScroll={syncEdges}
+          className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {stories.map((story, index) => (
+            <article
+              key={story.id}
+              data-feed-card
+              className="flex w-[min(78%,240px)] shrink-0 snap-start flex-col border border-black/10 bg-white sm:w-[220px]"
+            >
+              <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#111]">
+                <Image
+                  src={story.imageSrc!}
+                  alt=""
+                  fill
+                  sizes="240px"
+                  className={`object-cover object-[center_20%] ${story.imageFit === "contain" ? "object-contain" : ""}`}
+                />
+                {index > 0 ? (
+                  <span className="absolute top-2.5 right-2.5 inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#DF0A14] text-white shadow-[0_6px_16px_rgba(0,0,0,0.28)]">
+                    <Lock size={12} strokeWidth={2.4} aria-hidden />
+                    <span className="sr-only">Subscriber story</span>
+                  </span>
+                ) : null}
+              </div>
+              <div className="flex flex-1 flex-col px-3 py-3" style={{ background: SOFT }}>
+                <p className="text-[10px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
+                  {story.chip}
+                </p>
+                <p className="mt-1.5 line-clamp-3 text-[16px] leading-5 text-[#1B1B1B]" style={roman}>
+                  {story.dek}
+                </p>
+                <Link
+                  href={`/report#${story.id}`}
+                  className="mt-3 inline-flex items-center gap-1 text-[11px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase"
+                  style={uiBold}
+                >
+                  Read
+                  <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <BrandScrollArrow
+          direction="left"
+          label="Previous stories"
+          disabled={atStart}
+          onClick={() => go(-1)}
+          className="absolute top-[42%] left-1 z-10 -translate-y-1/2"
+        />
+        <BrandScrollArrow
+          direction="right"
+          label="Next stories"
+          disabled={atEnd}
+          onClick={() => go(1)}
+          className="absolute top-[42%] right-1 z-10 -translate-y-1/2"
+        />
+      </div>
+    </section>
   );
 }
 
@@ -304,7 +427,7 @@ export default function ArticlePage() {
             When a private company sells shares to the public for the first time
           </p>
 
-          <div className="mt-[26px] flex items-center gap-2">
+          <div className="mt-[26px] flex flex-wrap items-center justify-center gap-3">
             <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-[#E5E7EB]">
               <Image src={AUTHOR} alt="" fill unoptimized sizes="40px" className="object-cover" />
             </span>
@@ -313,6 +436,10 @@ export default function ArticlePage() {
               <span className="hidden h-3 w-px bg-[#D1D5DC] sm:block" aria-hidden />
               <span className="text-[14px] leading-5">Published 14 hours ago</span>
             </p>
+            <span className="inline-flex items-center gap-1.5 rounded-[5px] bg-[#DF0A14] px-2.5 py-1.5 text-[11px] font-bold tracking-[0.12em] text-white uppercase" style={uiBold}>
+              <Lock size={11} strokeWidth={2.4} aria-hidden />
+              Exclusive
+            </span>
           </div>
         </header>
 
@@ -400,11 +527,15 @@ export default function ArticlePage() {
                   </p>
                 </div>
 
-                <section id="newsletter" className="mt-5 bg-[#E7E2DF] p-5" aria-label="Newsletter">
-                  <h2 className="text-center text-[32px] leading-9 text-[#1B1B1B] sm:text-[36px] sm:leading-9" style={roman}>
+                <section id="newsletter" className="mt-5 border-l-2 border-dashed border-[#DF0A14] p-5" style={{ background: CREAM }} aria-label="Newsletter">
+                  <p className="text-center text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
+                    Daily editions
+                  </p>
+                  <h2 className="mt-2 text-center text-[32px] leading-9 text-[#1B1B1B] sm:text-[36px] sm:leading-9" style={roman}>
                     Sign up to get Today’s Best Articles in your inbox
                   </h2>
-                  <p className="mt-2.5 text-[16px] leading-[30px] text-[#1B1B1B]" style={roman}>
+                  <div className="mx-auto mt-3 h-[3px] w-14 bg-[#DF0A14]" aria-hidden />
+                  <p className="mt-3 text-[16px] leading-[30px] text-[#1B1B1B]" style={roman}>
                     A free daily email with the day’s biggest news and the stories worth reading first.
                   </p>
                   <div className="mt-5">
@@ -500,8 +631,10 @@ export default function ArticlePage() {
             </p>
           </div>
 
-          <div className="mt-[45px]">
-            <AdSlot height={427} />
+          <MiniLatestBriefing />
+
+          <div className="mt-10">
+            <AdSlot height={280} />
           </div>
 
           <section className="mt-5" aria-label="Read more">
