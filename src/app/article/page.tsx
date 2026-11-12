@@ -562,8 +562,8 @@ export default function ArticlePage() {
                 </div>
 
                 <PullQuote
-                  quote="And that’s what I love so much about quotes, it’s what is a really great quote for quoting."
-                  attribution="Quote of the day"
+                  quote="An IPO is less a finish line than a new kind of scrutiny — the moment a private story has to survive a public price."
+                  attribution="The Explainer"
                 />
 
                 <h2 className="mt-5 text-[32px] leading-[42px] tracking-[-0.096px] text-[#333333]" style={roman}>
