@@ -121,6 +121,37 @@ function GoogleMark() {
   );
 }
 
+function QuoteMark({ className = "mt-1 h-8 w-11 shrink-0" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 130 52 40" fill="none" aria-hidden>
+      <path
+        d="M51.3797 134.046C46.9979 136.135 43.5661 138.566 41.0844 141.339C38.6027 144.112 37.1679 147.474 36.7802 151.425L40.0374 151.425C42.4416 151.425 44.3998 151.69 45.9121 152.222C47.4245 152.754 48.6459 153.495 49.5766 154.444C50.4685 155.356 51.1083 156.363 51.496 157.464C51.845 158.566 52.0195 159.706 52.0195 160.883C52.0195 163.314 51.0307 165.442 49.0531 167.265C47.0367 169.088 44.6713 170 41.9569 170C37.6914 170 34.4148 168.613 32.1269 165.84C29.8391 163.067 28.6951 159.231 28.6951 154.33C28.6951 149.772 30.6728 145.176 34.628 140.541C38.5445 135.907 43.2753 132.393 48.8204 130L51.3797 134.046ZM22.7041 134.046C18.3223 136.135 14.8905 138.566 12.4088 141.339C9.92706 144.112 8.49231 147.474 8.10454 151.424L11.3618 151.424C13.766 151.424 15.7242 151.69 17.2365 152.222C18.7488 152.754 19.9703 153.495 20.901 154.444C21.7928 155.356 22.4327 156.363 22.8204 157.464C23.1694 158.566 23.3439 159.706 23.3439 160.883C23.3439 163.314 22.3551 165.442 20.3775 167.265C18.3611 169.088 15.9957 170 13.2813 170C9.0158 170 5.73914 168.613 3.45129 165.84C1.16345 163.067 0.019527 159.231 0.0195274 154.33C0.0195278 149.772 1.99716 145.176 5.95242 140.541C9.8689 135.907 14.5997 132.393 20.1448 130L22.7041 134.046Z"
+        fill="#DF0A14"
+      />
+    </svg>
+  );
+}
+
+function PullQuote({ quote, attribution }: { quote: string; attribution?: string }) {
+  return (
+    <figure className="my-8 px-5 py-7 sm:px-7 sm:py-8" style={{ background: CREAM }}>
+      <div className="flex items-start gap-4">
+        <QuoteMark />
+        <div className="min-w-0">
+          <blockquote className="text-[1.5rem] leading-8 text-[#1B1B1B] italic sm:text-[1.75rem] sm:leading-9" style={roman}>
+            “{quote}”
+          </blockquote>
+          {attribution ? (
+            <figcaption className="mt-4 text-[13px] font-bold tracking-[0.1em] text-[#666666] uppercase" style={uiBold}>
+              {attribution}
+            </figcaption>
+          ) : null}
+        </div>
+      </div>
+    </figure>
+  );
+}
+
 function PromoBar() {
   return (
     <div className="flex w-full items-center justify-center bg-[#FFD500] px-[30px] py-[7px]">
@@ -529,6 +560,11 @@ export default function ArticlePage() {
                     For an IPO to happen, a company does not just flip a switch. It files a prospectus, meets exchange rules, and often spends months preparing financials and a roadshow for institutional buyers.
                   </p>
                 </div>
+
+                <PullQuote
+                  quote="And that’s what I love so much about quotes, it’s what is a really great quote for quoting."
+                  attribution="Quote of the day"
+                />
 
                 <h2 className="mt-5 text-[32px] leading-[42px] tracking-[-0.096px] text-[#333333]" style={roman}>
                   Why do companies go public?
