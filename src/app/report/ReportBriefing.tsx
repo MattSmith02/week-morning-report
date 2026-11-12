@@ -1569,7 +1569,62 @@ function layoutHref(layout: ReportLayout, locked: boolean, ads: boolean) {
   return query ? `/report?${query}` : "/report";
 }
 
-/** Design-led briefing — expressive type, broken grid, Week red/cream. */
+/** Print-press plate — grain, halftone, ink misregistration. */
+function PrintPlate({
+  src,
+  alt = "",
+  priority = false,
+  locked = false,
+  className = "",
+  sizes = "100vw",
+  tone = "ink",
+}: {
+  src?: string;
+  alt?: string;
+  priority?: boolean;
+  locked?: boolean;
+  className?: string;
+  sizes?: string;
+  tone?: "ink" | "crimson" | "midnight";
+}) {
+  const wash =
+    tone === "crimson"
+      ? "from-[#DF0A14]/45 via-transparent to-black/70"
+      : tone === "midnight"
+        ? "from-[#011535]/55 via-transparent to-black/75"
+        : "from-black/30 via-transparent to-black/65";
+
+  return (
+    <div className={`led-print relative overflow-hidden bg-[#111] ${className}`}>
+      {src ? (
+        <>
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            priority={priority}
+            unoptimized={src.startsWith("/") || src.startsWith("http")}
+            className={`led-print-img object-cover ${locked ? "scale-105 blur-[10px]" : ""}`}
+            sizes={sizes}
+          />
+          <div className="led-print-misreg pointer-events-none absolute inset-0" aria-hidden />
+          <div className={`pointer-events-none absolute inset-0 bg-gradient-to-b ${wash}`} aria-hidden />
+          <div className="led-print-halftone pointer-events-none absolute inset-0" aria-hidden />
+          <div className="led-print-grain pointer-events-none absolute inset-0" aria-hidden />
+        </>
+      ) : (
+        <div className="absolute inset-0 bg-[#1C2A38]" />
+      )}
+      {locked ? (
+        <span className="absolute top-1/2 left-1/2 z-10 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#DF0A14] text-white">
+          <Lock size={22} strokeWidth={2.4} aria-hidden />
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+/** Design-led briefing — expressive type, print plates, full stories. */
 function CarsonLedBriefing({
   stories,
   briefing,
@@ -1580,11 +1635,43 @@ function CarsonLedBriefing({
   locked?: boolean;
 }) {
   const lead = stories[0];
-  const rest = stories.slice(1, 8);
+  const words = briefing.split(" ");
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#F4F0EA] text-[#0A0A0A]">
-      <div className="sticky top-0 z-40 flex h-12 items-center justify-between gap-3 border-b border-black/10 bg-[#F4F0EA] px-4 sm:px-6">
+    <div className="led-briefing min-h-screen overflow-x-hidden bg-[#EDE7DE] text-[#0A0A0A]">
+      <style>{`
+        .led-briefing .led-print-img {
+          filter: grayscale(1) contrast(1.35) brightness(0.92);
+        }
+        .led-briefing .led-print-misreg {
+          background-image: inherit;
+          box-shadow: inset 2px 0 0 rgba(0, 180, 255, 0.22), inset -2px 0 0 rgba(255, 40, 80, 0.2);
+          mix-blend-mode: screen;
+          opacity: 0.55;
+        }
+        .led-briefing .led-print-halftone {
+          background-image: radial-gradient(circle, rgba(0,0,0,0.55) 1.1px, transparent 1.35px);
+          background-size: 5px 5px;
+          mix-blend-mode: multiply;
+          opacity: 0.38;
+        }
+        .led-briefing .led-print-grain {
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+          mix-blend-mode: overlay;
+          opacity: 0.45;
+        }
+        .led-briefing .led-ink {
+          text-shadow: 1px 0 0 rgba(0,170,255,0.35), -1px 0 0 rgba(223,10,20,0.4);
+        }
+        .led-briefing .led-slash {
+          background: repeating-linear-gradient(-18deg, transparent, transparent 10px, rgba(223,10,20,0.12) 10px, rgba(223,10,20,0.12) 12px);
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .led-briefing .led-print-img { filter: grayscale(0.7) contrast(1.15); }
+        }
+      `}</style>
+
+      <div className="sticky top-0 z-40 flex h-12 items-center justify-between gap-3 border-b border-black/20 bg-[#EDE7DE]/95 px-4 backdrop-blur-sm sm:px-6">
         <p className="truncate text-sm text-black" style={romanBold}>
           The Week · {briefing} · Led
         </p>
@@ -1599,45 +1686,50 @@ function CarsonLedBriefing({
         </nav>
       </div>
 
-      <header className="relative isolate min-h-[100svh] overflow-hidden bg-black text-white">
-        {lead?.imageSrc ? (
-          <Image
-            src={lead.imageSrc}
-            alt=""
-            fill
-            priority
-            unoptimized={lead.imageSrc.startsWith("/") || lead.imageSrc.startsWith("http")}
-            className="object-cover object-center opacity-55 saturate-50 contrast-125"
-            sizes="100vw"
-          />
-        ) : null}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black" />
+      <header className="relative isolate min-h-[110svh] overflow-hidden bg-[#0A0A0A] text-white">
+        <PrintPlate
+          src={lead?.imageSrc}
+          priority
+          className="absolute inset-0"
+          tone="crimson"
+          sizes="100vw"
+        />
+        <div className="led-slash pointer-events-none absolute inset-0 opacity-70" aria-hidden />
+        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/70 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black via-black/80 to-transparent" />
 
-        <div className="relative z-10 flex min-h-[100svh] flex-col justify-end px-4 pb-10 pt-24 sm:px-8 lg:px-12">
-          <p className="text-[12px] font-bold tracking-[0.28em] text-[#DF0A14] uppercase" style={uiBold}>
-            The Week · design-led edition
+        <div className="relative z-10 flex min-h-[110svh] flex-col justify-end px-4 pb-12 pt-28 sm:px-8 lg:px-14">
+          <p className="led-ink text-[12px] font-bold tracking-[0.34em] text-[#DF0A14] uppercase" style={uiBold}>
+            Press proof · design-led edition
           </p>
 
-          <div className="relative mt-4 select-none">
+          <div className="relative mt-3 select-none">
             <p
-              className="pointer-events-none absolute -top-6 left-[-4%] text-[clamp(4.5rem,18vw,14rem)] leading-[0.78] tracking-[-0.06em] text-white/15 sm:-top-10"
+              className="pointer-events-none absolute -top-8 left-[-8%] text-[clamp(5rem,22vw,16rem)] leading-[0.72] tracking-[-0.07em] text-white/[0.12] sm:-top-14"
               style={romanBold}
               aria-hidden
             >
-              MORNING
+              EDITION
             </p>
-            <h1 className="relative max-w-[14ch] text-[clamp(3.2rem,9vw,7.5rem)] leading-[0.88] tracking-[-0.04em] text-white" style={roman}>
-              {briefing.includes(" ") ? (
+            <p
+              className="led-ink pointer-events-none absolute top-[18%] left-[12%] rotate-[-12deg] text-[clamp(2.5rem,8vw,6rem)] leading-none tracking-[0.2em] text-[#DF0A14]/50"
+              style={uiBold}
+              aria-hidden
+            >
+              INK
+            </p>
+            <h1 className="led-ink relative max-w-[13ch] text-[clamp(3.4rem,10vw,8rem)] leading-[0.82] tracking-[-0.045em] text-white" style={roman}>
+              {words.length > 1 ? (
                 <>
-                  <span className="block">{briefing.split(" ")[0]}</span>
-                  <span className="ml-[8%] block text-[#DF0A14]">{briefing.split(" ").slice(1).join(" ")}</span>
+                  <span className="block -ml-1">{words[0]}</span>
+                  <span className="ml-[10%] block -rotate-1 text-[#DF0A14]">{words.slice(1).join(" ")}</span>
                 </>
               ) : (
                 briefing
               )}
             </h1>
             <p
-              className="pointer-events-none absolute right-[-6%] bottom-[-18%] rotate-[-8deg] text-[clamp(3rem,12vw,9rem)] leading-none tracking-[-0.08em] text-[#DF0A14]/35"
+              className="pointer-events-none absolute right-[-8%] bottom-[-22%] rotate-[-11deg] text-[clamp(3.5rem,14vw,10rem)] leading-none tracking-[-0.09em] text-[#DF0A14]/40"
               style={romanBold}
               aria-hidden
             >
@@ -1645,59 +1737,61 @@ function CarsonLedBriefing({
             </p>
           </div>
 
-          <div className="mt-8 flex max-w-[40rem] flex-col gap-5 border-l-[6px] border-[#DF0A14] pl-5 sm:mt-10">
-            <p className="text-[11px] font-bold tracking-[0.16em] text-white/70 uppercase" style={uiBold}>
-              Today’s main story
+          <div className="mt-10 grid max-w-[52rem] gap-6 border-l-[7px] border-[#DF0A14] bg-black/35 p-5 backdrop-blur-[2px] sm:mt-12 sm:p-7">
+            <p className="text-[11px] font-bold tracking-[0.18em] text-white/65 uppercase" style={uiBold}>
+              Plate 01 · Today’s main story
             </p>
-            <p className="text-[clamp(1.6rem,3.2vw,2.6rem)] leading-[1.08] text-white" style={roman}>
+            <p className="led-ink text-[clamp(1.75rem,3.5vw,2.85rem)] leading-[1.05] text-white" style={roman}>
               {lead?.dek || lead?.displayTitle}
             </p>
-            {lead?.whatHappened ? (
-              <p className="max-w-[36ch] text-[16px] leading-7 text-white/80" style={roman}>
-                {lead.whatHappened.slice(0, 160)}
-                {lead.whatHappened.length > 160 ? "…" : ""}
-              </p>
-            ) : null}
             <a href={`#led-${lead?.id ?? "top"}`} className={weekCta} style={uiBold}>
-              Enter the briefing
+              Read the full briefing
               <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-4 w-4" />
             </a>
           </div>
         </div>
       </header>
 
-      <section id="led-top" className="relative bg-[#F4F0EA] px-4 py-14 sm:px-8 lg:px-12">
+      <section id="led-top" className="relative px-4 py-16 sm:px-8 lg:px-12">
         <p
-          className="pointer-events-none absolute top-6 right-4 text-[clamp(5rem,20vw,16rem)] leading-none tracking-[-0.08em] text-black/[0.05] sm:right-8"
+          className="led-ink pointer-events-none absolute top-4 right-2 text-[clamp(6rem,24vw,18rem)] leading-none tracking-[-0.09em] text-black/[0.06] sm:right-6"
           style={romanBold}
           aria-hidden
         >
           {String(stories.length).padStart(2, "0")}
         </p>
-        <div className="relative mx-auto max-w-[1280px]">
-          <p className="text-[11px] font-bold tracking-[0.18em] text-[#DF0A14] uppercase" style={uiBold}>
-            Inside · type as structure
+
+        <div className="relative mx-auto max-w-[1320px]">
+          <p className="text-[11px] font-bold tracking-[0.2em] text-[#DF0A14] uppercase" style={uiBold}>
+            Full plates · type as structure
           </p>
-          <h2 className="mt-3 max-w-[18ch] text-[clamp(2.4rem,6vw,4.5rem)] leading-[0.95] tracking-[-0.03em] text-[#011535]" style={roman}>
-            Stories that collide.
+          <h2 className="led-ink mt-3 max-w-[16ch] text-[clamp(2.6rem,7vw,5.2rem)] leading-[0.9] tracking-[-0.035em] text-[#011535]" style={roman}>
+            Collide. Overprint. Read.
           </h2>
-          <div className="mt-4 h-[4px] w-24 bg-[#DF0A14]" aria-hidden />
+          <div className="mt-5 flex items-center gap-3">
+            <div className="h-[5px] w-28 bg-[#DF0A14]" aria-hidden />
+            <p className="text-[13px] tracking-[0.08em] text-black/50 uppercase" style={uiBold}>
+              Uncropped stories
+            </p>
+          </div>
         </div>
 
-        <div className="relative mx-auto mt-12 max-w-[1280px] space-y-10 lg:space-y-16">
+        <div className="relative mx-auto mt-14 max-w-[1320px] space-y-20 lg:space-y-28">
           {stories.map((story, storyIndex) => {
             const offset = storyIndex % 2 === 1;
             const tilt = storyIndex % 3 === 0 ? "-rotate-1" : storyIndex % 3 === 1 ? "rotate-1" : "rotate-0";
+            const tone = storyIndex % 3 === 0 ? "crimson" : storyIndex % 3 === 1 ? "ink" : "midnight";
+            const gated = locked && storyIndex > 0;
             return (
               <article
                 key={story.id}
                 id={`led-${story.id}`}
                 data-story-article={story.id}
-                className={`relative grid items-end gap-4 lg:grid-cols-12 lg:gap-6 ${offset ? "lg:pt-8" : ""}`}
+                className={`relative ${offset ? "lg:pt-10" : ""}`}
               >
                 <p
-                  className={`pointer-events-none absolute z-0 text-[clamp(4rem,14vw,11rem)] leading-none tracking-[-0.08em] text-[#DF0A14]/15 ${
-                    offset ? "top-[-1.5rem] right-0 lg:right-8" : "top-[-1rem] left-0 lg:left-4"
+                  className={`led-ink pointer-events-none absolute z-0 text-[clamp(5rem,16vw,13rem)] leading-none tracking-[-0.09em] text-[#DF0A14]/18 ${
+                    offset ? "-top-8 right-0 lg:right-4" : "-top-6 left-0 lg:left-2"
                   }`}
                   style={romanBold}
                   aria-hidden
@@ -1705,104 +1799,83 @@ function CarsonLedBriefing({
                   {number(storyIndex)}
                 </p>
 
-                <div className={`relative z-10 lg:col-span-5 ${offset ? "lg:col-start-7 lg:order-2" : "lg:col-start-1"}`}>
-                  <div className={`relative aspect-[4/5] overflow-hidden bg-[#111] ${tilt}`}>
-                    {story.imageSrc ? (
-                      <Image
-                        src={story.imageSrc}
-                        alt=""
-                        fill
-                        unoptimized={story.imageSrc.startsWith("/") || story.imageSrc.startsWith("http")}
-                        className={`object-cover ${locked && storyIndex > 0 ? "scale-105 blur-[10px]" : ""}`}
-                        sizes="(min-width: 1024px) 40vw, 100vw"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 bg-[#1C2A38]" />
-                    )}
-                    {locked && storyIndex > 0 ? (
-                      <span className="absolute top-1/2 left-1/2 z-10 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#DF0A14] text-white">
-                        <Lock size={22} strokeWidth={2.4} aria-hidden />
-                      </span>
+                <div className={`relative z-10 grid items-start gap-6 lg:grid-cols-12 lg:gap-8`}>
+                  <div className={`lg:col-span-5 ${offset ? "lg:col-start-8 lg:order-2" : "lg:col-start-1"}`}>
+                    <PrintPlate
+                      src={story.imageSrc}
+                      locked={gated}
+                      tone={tone}
+                      className={`aspect-[4/5] ${tilt}`}
+                      sizes="(min-width: 1024px) 40vw, 100vw"
+                    />
+                    {story.imageCaption ? (
+                      <p className="mt-2 text-[12px] leading-4 text-black/45" style={ui}>
+                        {story.imageCaption}
+                      </p>
                     ) : null}
                   </div>
-                </div>
 
-                <div className={`relative z-10 flex flex-col justify-end lg:col-span-6 ${offset ? "lg:col-start-1 lg:order-1 lg:pr-8" : "lg:col-start-6 lg:pl-4"}`}>
-                  <p className="text-[11px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
-                    {story.chip}
-                  </p>
-                  <h3
-                    className={`mt-3 max-w-[16ch] text-[#011535] ${
-                      storyIndex === 0
-                        ? "text-[clamp(2.2rem,5vw,4rem)] leading-[0.95]"
-                        : "text-[clamp(1.8rem,3.6vw,3rem)] leading-[1.02]"
-                    }`}
-                    style={roman}
-                  >
-                    {story.displayTitle}
-                  </h3>
-                  <p className="mt-4 max-w-[38ch] text-[17px] leading-7 text-black/75" style={roman}>
-                    {story.dek}
-                  </p>
-                  {story.whatHappened && !(locked && storyIndex > 0) ? (
-                    <p className="mt-4 max-w-[42ch] text-[15px] leading-6 text-black/60" style={roman}>
-                      {story.whatHappened.slice(0, 180)}
-                      {story.whatHappened.length > 180 ? "…" : ""}
-                    </p>
-                  ) : null}
-                  {locked && storyIndex > 0 ? (
-                    <a href={WEEK_SUBSCRIBE} target="_blank" rel="noreferrer" className={`mt-5 ${weekCta}`} style={uiBold}>
-                      <Lock size={12} strokeWidth={2.4} aria-hidden />
-                      Sign up to unlock
-                    </a>
-                  ) : (
-                    <a
-                      href={`#led-${story.id}`}
-                      className="mt-5 inline-flex items-center gap-1 text-[12px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase"
+                  <div className={`min-w-0 lg:col-span-7 ${offset ? "lg:col-start-1 lg:order-1 lg:pr-6" : "lg:col-start-6"}`}>
+                    <p
+                      className={`inline-block -rotate-1 bg-[#DF0A14] px-2 py-1 text-[11px] font-bold tracking-[0.16em] text-white uppercase ${
+                        offset ? "lg:rotate-1" : ""
+                      }`}
                       style={uiBold}
                     >
-                      Stay with this story
-                      <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-4 w-4" />
-                    </a>
-                  )}
+                      {story.chip}
+                    </p>
+                    <h3
+                      className={`led-ink mt-4 max-w-[15ch] text-[#011535] ${
+                        storyIndex === 0
+                          ? "text-[clamp(2.4rem,5.5vw,4.4rem)] leading-[0.92]"
+                          : "text-[clamp(2rem,4vw,3.3rem)] leading-[0.98]"
+                      }`}
+                      style={roman}
+                    >
+                      {story.displayTitle}
+                    </h3>
+                    <p className="mt-4 max-w-[40ch] text-[19px] leading-8 text-black/80" style={roman}>
+                      {story.dek}
+                    </p>
+
+                    {gated ? (
+                      <div className="mt-8">
+                        <a href={WEEK_SUBSCRIBE} target="_blank" rel="noreferrer" className={weekCta} style={uiBold}>
+                          <Lock size={12} strokeWidth={2.4} aria-hidden />
+                          Sign up to unlock
+                        </a>
+                      </div>
+                    ) : (
+                      <div className="mt-8 max-w-[42rem] border-t border-black/15 pt-6">
+                        <StoryReading story={story} layout="digest" />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </article>
             );
           })}
         </div>
-
-        {rest.length === 0 ? null : (
-          <div className="relative mx-auto mt-20 max-w-[1280px] border-t border-black/15 pt-10">
-            <p className="text-[11px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
-              Also colliding today
-            </p>
-            <ul className="mt-6 grid gap-x-8 gap-y-4 sm:grid-cols-2">
-              {stories.slice(0, 6).map((story, storyIndex) => (
-                <li key={`rail-${story.id}`} className="flex items-baseline gap-3 border-b border-black/10 pb-3">
-                  <span className="text-[13px] font-bold tracking-[0.1em] text-[#DF0A14]" style={uiBold}>
-                    {number(storyIndex)}
-                  </span>
-                  <a href={`#led-${story.id}`} className="min-w-0 text-[18px] leading-6 text-[#011535] hover:text-[#DF0A14]" style={roman}>
-                    {story.dek}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
       </section>
 
-      <section className="bg-black px-4 py-20 text-white sm:px-8">
-        <div className="mx-auto max-w-[900px]">
-          <p className="text-[11px] font-bold tracking-[0.18em] text-[#DF0A14] uppercase" style={uiBold}>
+      <section className="relative overflow-hidden bg-black px-4 py-24 text-white sm:px-8">
+        <p
+          className="pointer-events-none absolute -bottom-10 left-[-4%] text-[clamp(5rem,18vw,14rem)] leading-none tracking-[-0.08em] text-white/[0.06]"
+          style={romanBold}
+          aria-hidden
+        >
+          PROOF
+        </p>
+        <div className="relative mx-auto max-w-[900px]">
+          <p className="text-[11px] font-bold tracking-[0.2em] text-[#DF0A14] uppercase" style={uiBold}>
             {briefing}
           </p>
-          <h2 className="mt-4 text-[clamp(2.5rem,7vw,5rem)] leading-[0.95] tracking-[-0.03em]" style={roman}>
+          <h2 className="led-ink mt-4 text-[clamp(2.8rem,8vw,5.5rem)] leading-[0.92] tracking-[-0.035em]" style={roman}>
             You’re all
             <span className="text-[#DF0A14]"> caught </span>
             up.
           </h2>
-          <Link href="/report" className={`mt-8 ${weekCta}`} style={uiBold}>
+          <Link href="/report" className={`mt-10 ${weekCta}`} style={uiBold}>
             Back to digest
           </Link>
         </div>
