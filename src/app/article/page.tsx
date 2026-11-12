@@ -343,20 +343,22 @@ function MiniLatestBriefing() {
           ))}
         </div>
 
-        <BrandScrollArrow
-          direction="left"
-          label="Previous stories"
-          disabled={atStart}
-          onClick={() => go(-1)}
-          className="absolute top-[42%] left-1 z-10 -translate-y-1/2 lg:hidden"
-        />
-        <BrandScrollArrow
-          direction="right"
-          label="Next stories"
-          disabled={atEnd}
-          onClick={() => go(1)}
-          className="absolute top-[42%] right-1 z-10 -translate-y-1/2 lg:hidden"
-        />
+        <div className="pointer-events-none absolute inset-y-0 left-0 right-0 z-10 flex items-center justify-between px-2 lg:hidden">
+          <BrandScrollArrow
+            direction="left"
+            label="Previous stories"
+            disabled={atStart}
+            onClick={() => go(-1)}
+            className="pointer-events-auto"
+          />
+          <BrandScrollArrow
+            direction="right"
+            label="Next stories"
+            disabled={atEnd}
+            onClick={() => go(1)}
+            className="pointer-events-auto"
+          />
+        </div>
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3 px-4 pb-6 sm:px-6 lg:px-8">
