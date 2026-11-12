@@ -241,7 +241,7 @@ function NewsletterForm() {
         </label>
         <label className="flex items-start gap-2.5 text-[14px] leading-5 text-black" style={ui}>
           <input type="checkbox" className="mt-0.5 h-[13px] w-[13px] shrink-0 rounded-[2px] border border-[#767676] bg-white" />
-          Receive email from us on behalf of our trusted partners
+          Receive email from us on behalf of our trusted partners or sponsors
         </label>
       </div>
     </form>
@@ -531,32 +531,18 @@ export default function ArticlePage() {
 
                 <section id="newsletter" className="mt-8 px-5 py-10 sm:px-8 sm:py-12" style={{ background: CREAM }} aria-label="Newsletter">
                   <div className="mx-auto flex max-w-[34rem] flex-col items-center text-center">
-                    <p className="text-[11px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
-                      Daily editions
-                    </p>
-                    <h2 className="mt-4 text-[30px] leading-[1.15] text-[#1B1B1B] sm:text-[36px]" style={roman}>
+                    <h2 className="text-[30px] leading-[1.15] text-[#1B1B1B] sm:text-[36px]" style={roman}>
                       Sign up to get Today’s Best Articles in your inbox
                     </h2>
                     <div className="mt-5 h-[3px] w-16 bg-[#DF0A14]" aria-hidden />
-                    <p className="mt-5 text-[16px] leading-7 text-[#1B1B1B]" style={roman}>
-                      A free daily email with the day’s biggest news and the stories worth reading first.
+                    <p className="mt-5 text-[16px] leading-7 text-[#666666]" style={roman}>
+                      A free daily email with the day’s biggest news and analysis – and the best features from TheWeek.com
                     </p>
-                    <ul className="mt-6 flex flex-wrap items-center justify-center gap-2" aria-label="Edition cadence">
-                      {["Morning", "Evening", "Weekend"].map((label) => (
-                        <li
-                          key={label}
-                          className="inline-flex items-center border border-black/10 bg-white px-3 py-1.5 text-[11px] font-bold tracking-[0.12em] text-[#011535] uppercase"
-                          style={uiBold}
-                        >
-                          {label}
-                        </li>
-                      ))}
-                    </ul>
                   </div>
                   <div className="mx-auto mt-8 max-w-[34rem] border border-black/10 bg-white p-5 sm:p-6">
                     <NewsletterForm />
                     <p className="mt-5 text-[13px] leading-5 text-[#666666]" style={ui}>
-                      By submitting your information you agree to the Terms &amp; Conditions and Privacy Policy.
+                      By submitting your information you agree to the Terms &amp; Conditions and Privacy Policy and are aged 16 or over.
                     </p>
                   </div>
                 </section>
