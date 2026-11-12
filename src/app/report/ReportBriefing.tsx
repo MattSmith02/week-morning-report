@@ -1820,6 +1820,7 @@ function CarsonLedBriefing({
 }) {
   const lead = stories[0];
   const words = briefing.split(" ");
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [factId, setFactId] = useState<string | null>(null);
   const activeIndex = Math.max(0, stories.findIndex((story) => story.id === factId));
   const activeStory = factId ? stories[activeIndex] : null;
@@ -1962,64 +1963,100 @@ function CarsonLedBriefing({
         </div>
       </header>
 
-      <section id="led-stack" className="relative scroll-mt-12 px-4 py-16 sm:px-8 lg:px-12">
-        <div className="relative mx-auto max-w-[720px]">
-          <p className="text-[11px] font-bold tracking-[0.2em] text-[#DF0A14] uppercase" style={uiBold}>
+      <section id="led-stack" className="relative scroll-mt-12 bg-[#120e0c]">
+        <div className="relative z-20 px-4 pt-14 pb-8 sm:px-8 lg:px-12">
+          <p className="text-[11px] font-bold tracking-[0.2em] text-[#FF6A2A] uppercase" style={uiBold}>
             Story order · press stack
           </p>
-          <h2 className="led-ink mt-3 max-w-[14ch] text-[clamp(2.4rem,6vw,4.2rem)] leading-[0.92] tracking-[-0.035em] text-[#011535]" style={roman}>
-            Click a plate. Open the factfile.
+          <h2 className="led-ink mt-3 max-w-[16ch] text-[clamp(2.2rem,5.5vw,3.8rem)] leading-[0.92] tracking-[-0.035em] text-[#E8E0D4]" style={roman}>
+            Peel a plate. Open the factfile.
           </h2>
           <div className="mt-4 h-[4px] w-24 bg-[#DF0A14]" aria-hidden />
-          <p className="mt-4 max-w-[36ch] text-[16px] leading-7 text-black/60" style={roman}>
-            Straight squares, stacked in edition order. Each one opens a factfile for that story.
-          </p>
         </div>
 
-        <div className="relative mx-auto mt-12 max-w-[560px]">
-          <ol className="relative flex flex-col">
-            {stack.map((story, storyIndex) => {
-              const tone = storyIndex % 3 === 0 ? "crimson" : storyIndex % 3 === 1 ? "ink" : "midnight";
-              const gated = locked && storyIndex > 0;
-              const overlap = storyIndex === 0 ? "mt-0" : "-mt-10 sm:-mt-14";
-              return (
-                <li key={story.id} className={`relative ${overlap}`} style={{ zIndex: storyIndex + 1 }}>
+        <ol className="relative m-0 list-none p-0">
+          {stack.map((story, storyIndex) => {
+            const tone = storyIndex % 3 === 0 ? "crimson" : storyIndex % 3 === 1 ? "ink" : "midnight";
+            const gated = locked && storyIndex > 0;
+            const isOpen = expandedId === story.id;
+            const peek = storyIndex === 0 ? "mt-0" : "-mt-16 sm:-mt-24";
+            const height = isOpen ? "min-h-[72svh] sm:min-h-[78svh]" : "h-[38svh] sm:h-[44svh]";
+            return (
+              <li
+                key={story.id}
+                className={`relative ${peek}`}
+                style={{ zIndex: isOpen ? stack.length + 2 : storyIndex + 1 }}
+              >
+                <div
+                  className={`relative w-full overflow-hidden transition-[min-height,height,transform] duration-500 ease-out ${height} ${
+                    isOpen ? "shadow-[0_-40px_90px_rgba(0,0,0,0.65)]" : "shadow-[0_-24px_60px_rgba(0,0,0,0.55)]"
+                  }`}
+                >
+                  <PrintPlate
+                    src={story.imageSrc}
+                    locked={gated && !isOpen}
+                    tone={tone}
+                    className="absolute inset-0 h-full w-full"
+                    sizes="100vw"
+                  />
+                  {/* Depth lip — tucked sheet above */}
+                  <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-20 bg-gradient-to-b from-black/75 via-black/30 to-transparent" aria-hidden />
+                  <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-[3px] bg-black/45" aria-hidden />
+
                   <button
                     type="button"
-                    onClick={() => setFactId(story.id)}
-                    className="group relative block w-full text-left outline-none transition-transform duration-300 hover:-translate-y-1 focus-visible:ring-2 focus-visible:ring-[#DF0A14] focus-visible:ring-offset-4 focus-visible:ring-offset-[#EDE7DE]"
-                    aria-label={`Open factfile: ${story.displayTitle}`}
-                  >
-                    <span className="pointer-events-none absolute -top-3 left-3 z-20 bg-black px-2 py-1 text-[11px] font-bold tracking-[0.14em] text-white uppercase shadow-[2px_2px_0_#DF0A14]" style={uiBold}>
-                      {number(storyIndex)}
-                    </span>
-                    <PrintPlate
-                      src={story.imageSrc}
-                      locked={gated}
-                      tone={tone}
-                      className="aspect-square w-full shadow-[0_18px_40px_rgba(0,0,0,0.28)]"
-                      sizes="560px"
-                    />
-                    <span className="absolute inset-x-0 bottom-0 z-20 flex items-end justify-between gap-3 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-4 pt-16">
-                      <span className="min-w-0">
-                        <span className="block text-[10px] font-bold tracking-[0.14em] text-[#FF6A2A] uppercase" style={uiBold}>
-                          {story.chip}
-                        </span>
-                        <span className="mt-1 block line-clamp-2 text-[18px] leading-6 text-white sm:text-[20px]" style={roman}>
-                          {story.dek}
-                        </span>
-                      </span>
-                      <span className="inline-flex shrink-0 items-center gap-1 text-[11px] font-bold tracking-[0.12em] text-white uppercase opacity-90 group-hover:opacity-100" style={uiBold}>
+                    onClick={() => setExpandedId(isOpen ? null : story.id)}
+                    aria-expanded={isOpen}
+                    aria-label={`${isOpen ? "Collapse" : "Expand"} ${story.displayTitle}`}
+                    className="absolute inset-0 z-20 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[#DF0A14] focus-visible:ring-inset"
+                  />
+
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 flex items-end justify-between gap-4 bg-gradient-to-t from-black/92 via-black/50 to-transparent px-4 pb-5 pt-24 sm:px-8 sm:pb-7 lg:px-12">
+                    <div className="min-w-0 max-w-[48rem]">
+                      <p className="inline-flex items-center gap-2 bg-black/70 px-2 py-1 text-[11px] font-bold tracking-[0.14em] text-white uppercase shadow-[2px_2px_0_#DF0A14]" style={uiBold}>
+                        {number(storyIndex)} · {story.chip}
+                      </p>
+                      <h3 className={`mt-3 text-white ${isOpen ? "text-[clamp(1.6rem,3.5vw,2.6rem)] leading-[1.05]" : "line-clamp-2 text-[clamp(1.35rem,2.8vw,2.1rem)] leading-[1.1]"}`} style={roman}>
+                        {story.dek}
+                      </h3>
+                      {isOpen && !gated ? (
+                        <p className="mt-4 max-w-[42ch] text-[15px] leading-6 text-white/80 sm:text-[16px] sm:leading-7" style={roman}>
+                          {story.whatHappened?.slice(0, 220)}
+                          {(story.whatHappened?.length ?? 0) > 220 ? "…" : ""}
+                        </p>
+                      ) : null}
+                    </div>
+                    <div className="pointer-events-auto relative z-40 flex shrink-0 flex-col items-end gap-2">
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setExpandedId(story.id);
+                          setFactId(story.id);
+                        }}
+                        className="inline-flex items-center gap-1 bg-[#DF0A14] px-3 py-2 text-[11px] font-bold tracking-[0.12em] text-white uppercase transition-colors hover:bg-[#B20810]"
+                        style={uiBold}
+                      >
                         Factfile
                         <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-3.5 w-3.5" />
-                      </span>
-                    </span>
-                  </button>
-                </li>
-              );
-            })}
-          </ol>
-        </div>
+                      </button>
+                      {gated ? (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold tracking-[0.1em] text-white/70 uppercase" style={uiBold}>
+                          <Lock size={11} strokeWidth={2.4} aria-hidden />
+                          Locked
+                        </span>
+                      ) : (
+                        <span className="text-[11px] font-bold tracking-[0.1em] text-white/65 uppercase" style={uiBold}>
+                          {isOpen ? "Tap to fold" : "Tap to peel"}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
       </section>
 
       <section className="relative overflow-hidden bg-black px-4 py-24 text-white sm:px-8">
