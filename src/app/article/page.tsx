@@ -218,7 +218,7 @@ function SiteHeader() {
 function NewsletterForm() {
   return (
     <form className="relative" action="#">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
         <label className="sr-only" htmlFor="ipo-email">
           Your Email Address
         </label>
@@ -227,21 +227,23 @@ function NewsletterForm() {
           type="email"
           name="email"
           placeholder="Your Email Address"
-          className="h-[46px] w-full border border-black/15 bg-white px-2.5 text-[16px] leading-[18px] text-black placeholder:text-black/50 sm:max-w-[354px]"
+          className="h-12 w-full flex-1 border border-black/15 bg-white px-3.5 text-[16px] leading-[18px] text-black placeholder:text-black/45"
           style={ui}
         />
-        <button type="submit" className={`${weekCta} h-[46px] w-full sm:w-auto`} style={uiBold}>
+        <button type="submit" className={`${weekCta} h-12 w-full shrink-0 sm:w-auto sm:min-w-[148px]`} style={uiBold}>
           Sign up
         </button>
       </div>
-      <label className="mt-4 flex items-start gap-2 text-[14px] leading-[14px] text-black" style={ui}>
-        <input type="checkbox" className="mt-0.5 h-[13px] w-[13px] shrink-0 rounded-[2px] border border-[#767676] bg-white" />
-        Contact me with news and offers from other Future brands
-      </label>
-      <label className="mt-3 flex items-start gap-2 text-[14px] leading-[14px] text-black" style={ui}>
-        <input type="checkbox" className="mt-0.5 h-[13px] w-[13px] shrink-0 rounded-[2px] border border-[#767676] bg-white" />
-        Receive email from us on behalf of our trusted partners
-      </label>
+      <div className="mt-6 flex flex-col gap-3.5">
+        <label className="flex items-start gap-2.5 text-[14px] leading-5 text-black" style={ui}>
+          <input type="checkbox" className="mt-0.5 h-[13px] w-[13px] shrink-0 rounded-[2px] border border-[#767676] bg-white" />
+          Contact me with news and offers from other Future brands
+        </label>
+        <label className="flex items-start gap-2.5 text-[14px] leading-5 text-black" style={ui}>
+          <input type="checkbox" className="mt-0.5 h-[13px] w-[13px] shrink-0 rounded-[2px] border border-[#767676] bg-white" />
+          Receive email from us on behalf of our trusted partners
+        </label>
+      </div>
     </form>
   );
 }
@@ -527,23 +529,36 @@ export default function ArticlePage() {
                   </p>
                 </div>
 
-                <section id="newsletter" className="mt-5 border-l-2 border-dashed border-[#DF0A14] p-5" style={{ background: CREAM }} aria-label="Newsletter">
-                  <p className="text-center text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
-                    Daily editions
-                  </p>
-                  <h2 className="mt-2 text-center text-[32px] leading-9 text-[#1B1B1B] sm:text-[36px] sm:leading-9" style={roman}>
-                    Sign up to get Today’s Best Articles in your inbox
-                  </h2>
-                  <div className="mx-auto mt-3 h-[3px] w-14 bg-[#DF0A14]" aria-hidden />
-                  <p className="mt-3 text-[16px] leading-[30px] text-[#1B1B1B]" style={roman}>
-                    A free daily email with the day’s biggest news and the stories worth reading first.
-                  </p>
-                  <div className="mt-5">
-                    <NewsletterForm />
+                <section id="newsletter" className="mt-8 px-5 py-10 sm:px-8 sm:py-12" style={{ background: CREAM }} aria-label="Newsletter">
+                  <div className="mx-auto flex max-w-[34rem] flex-col items-center text-center">
+                    <p className="text-[11px] font-bold tracking-[0.16em] text-[#DF0A14] uppercase" style={uiBold}>
+                      Daily editions
+                    </p>
+                    <h2 className="mt-4 text-[30px] leading-[1.15] text-[#1B1B1B] sm:text-[36px]" style={roman}>
+                      Sign up to get Today’s Best Articles in your inbox
+                    </h2>
+                    <div className="mt-5 h-[3px] w-16 bg-[#DF0A14]" aria-hidden />
+                    <p className="mt-5 text-[16px] leading-7 text-[#1B1B1B]" style={roman}>
+                      A free daily email with the day’s biggest news and the stories worth reading first.
+                    </p>
+                    <ul className="mt-6 flex flex-wrap items-center justify-center gap-2" aria-label="Edition cadence">
+                      {["Morning", "Evening", "Weekend"].map((label) => (
+                        <li
+                          key={label}
+                          className="inline-flex items-center border border-black/10 bg-white px-3 py-1.5 text-[11px] font-bold tracking-[0.12em] text-[#011535] uppercase"
+                          style={uiBold}
+                        >
+                          {label}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <p className="mt-2.5 text-[14px] leading-[15px] text-[#666666]" style={ui}>
-                    By submitting your information you agree to the Terms &amp; Conditions and Privacy Policy.
-                  </p>
+                  <div className="mx-auto mt-8 max-w-[34rem] border border-black/10 bg-white p-5 sm:p-6">
+                    <NewsletterForm />
+                    <p className="mt-5 text-[13px] leading-5 text-[#666666]" style={ui}>
+                      By submitting your information you agree to the Terms &amp; Conditions and Privacy Policy.
+                    </p>
+                  </div>
                 </section>
 
                 <p className="mt-12 text-[18px] leading-[30px] text-[#1B1B1B]" style={roman}>
