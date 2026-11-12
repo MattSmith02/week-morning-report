@@ -637,32 +637,34 @@ export default function ArticlePage() {
             </aside>
           </div>
 
-          <section className="mt-10 py-8" aria-label="About the author">
-            <p className="text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
-              About the author
-            </p>
-            <div className="mt-2 h-[3px] w-14 bg-[#DF0A14]" aria-hidden />
-            <div className="mt-6 flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-6">
-              <span className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-[#E5E7EB] sm:h-24 sm:w-24">
-                <Image src={AUTHOR} alt="" fill unoptimized sizes="96px" className="object-cover" />
+          <section className="mt-8 border-y border-black/15 py-6" aria-label="About the author">
+            <div className="flex items-center gap-3">
+              <p className="shrink-0 text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
+                About the author
+              </p>
+              <div className="h-px min-w-0 flex-1 bg-black/15" aria-hidden />
+            </div>
+            <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-5">
+              <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-[#E5E7EB] sm:h-20 sm:w-20">
+                <Image src={AUTHOR} alt="" fill unoptimized sizes="80px" className="object-cover" />
               </span>
               <div className="min-w-0 flex-1">
-                <a href="https://theweek.com/" className="text-[22px] leading-7 text-[#1B1B1B] sm:text-[24px]" style={romanBold}>
+                <a href="https://theweek.com/" className="text-[20px] leading-6 text-[#1B1B1B] sm:text-[22px]" style={romanBold}>
                   Becca Stanek
                 </a>
-                <p className="mt-1 text-[13px] font-bold tracking-[0.08em] text-[#666666] uppercase" style={uiBold}>
+                <p className="mt-1 text-[12px] font-bold tracking-[0.08em] text-[#666666] uppercase" style={uiBold}>
                   The Week US
                 </p>
-                <p className="mt-4 max-w-[52ch] text-[17px] leading-7 text-[#1B1B1B]" style={roman}>
+                <p className="mt-3 max-w-[65ch] text-[16px] leading-6 text-[#1B1B1B]" style={roman}>
                   Becca Stanek has worked as an editor and writer in personal finance and consumer journalism, covering the stories that help readers make sense of money.
                 </p>
                 <a
                   href="#newsletter"
-                  className="mt-5 inline-flex items-center gap-2 text-[12px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase transition-opacity hover:opacity-80"
+                  className="mt-4 inline-flex items-center gap-2 text-[12px] font-bold tracking-[0.12em] text-[#DF0A14] uppercase transition-opacity hover:opacity-80"
                   style={uiBold}
                 >
-                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#DF0A14] text-white">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#DF0A14] text-white">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden>
                       <rect x="3" y="5" width="18" height="14" rx="1.5" stroke="white" strokeWidth="1.6" />
                       <path d="m4 7 8 6 8-6" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
