@@ -637,7 +637,7 @@ export default function ArticlePage() {
             </aside>
           </div>
 
-          <section className="mt-8 border-y border-black/15 py-6" aria-label="About the author">
+          <section className="mt-8 border-b border-black/15 pb-6" aria-label="About the author">
             <div className="flex items-center gap-3">
               <p className="shrink-0 text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
                 About the author
