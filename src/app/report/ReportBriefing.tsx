@@ -1621,56 +1621,32 @@ function PrintPlate({
   );
 }
 
-/** Fragile-style header collage — misaligned bands, ink flood, soft focus. */
+/** Single main-plate hero — no peeking slates above. */
 function PressHeroCollage({ stories }: { stories: WeekStory[] }) {
-  const plates = stories.filter((story) => story.imageSrc).slice(0, 4);
+  const plates = stories.filter((story) => story.imageSrc);
   const a = plates[0]?.imageSrc;
-  const b = plates[1]?.imageSrc ?? a;
-  const c = plates[2]?.imageSrc ?? a;
-  const d = plates[3]?.imageSrc ?? b;
+  const inset = plates[3]?.imageSrc ?? plates[1]?.imageSrc ?? a;
 
   return (
     <div className="led-collage absolute inset-0 overflow-hidden bg-[#120e0c]" aria-hidden>
-      {/* Top cream registration strip */}
-      <div className="absolute inset-x-0 top-0 z-20 h-[7%] bg-[#E8E0D4] opacity-90" />
-      <div className="absolute top-[5%] left-[-2%] z-10 h-[18%] w-[104%] overflow-hidden bg-[#2a2420]">
-        {b ? (
-          <Image src={b} alt="" fill unoptimized={b.startsWith("/") || b.startsWith("http")} className="led-collage-soft object-cover object-[center_30%] opacity-70" sizes="100vw" />
-        ) : null}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1a1512]/80 via-transparent to-[#1a1512]/90" />
-        <div className="led-print-grain absolute inset-0 opacity-60" />
-      </div>
-
-      {/* Mid charcoal smear band — slightly offset */}
-      <div className="absolute top-[16%] left-[-4%] z-[11] h-[28%] w-[108%] overflow-hidden bg-[#1c1816] shadow-[0_18px_40px_rgba(0,0,0,0.45)]">
-        {c ? (
-          <Image src={c} alt="" fill unoptimized={c.startsWith("/") || c.startsWith("http")} className="led-collage-soft object-cover object-[center_45%] opacity-55" sizes="100vw" />
-        ) : null}
-        <div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(20,16,14,0.85),transparent_45%,rgba(20,16,14,0.7))]" />
-        <div className="led-ink-streak absolute inset-0" />
-        <div className="led-print-grain absolute inset-0" />
-      </div>
-
-      {/* Dominant crimson flood plate */}
-      <div className="absolute top-[28%] left-[-1%] z-[12] h-[78%] w-[103%] overflow-hidden bg-[#6b0a10] shadow-[0_-30px_80px_rgba(0,0,0,0.55)]">
+      <div className="absolute inset-0 overflow-hidden bg-[#6b0a10]">
         {a ? (
-          <Image src={a} alt="" fill priority unoptimized={a.startsWith("/") || a.startsWith("http")} className="led-collage-soft object-cover object-center opacity-80" sizes="100vw" />
+          <Image src={a} alt="" fill priority unoptimized={a.startsWith("/") || a.startsWith("http")} className="led-collage-soft object-cover object-center opacity-85" sizes="100vw" />
         ) : null}
-        <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_78%_42%,rgba(255,120,40,0.55),transparent_55%),linear-gradient(180deg,rgba(90,8,12,0.35),rgba(40,4,6,0.82))]" />
+        <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_78%_42%,rgba(255,120,40,0.55),transparent_55%),linear-gradient(180deg,rgba(90,8,12,0.2),rgba(40,4,6,0.78))]" />
         <div className="led-print-grain absolute inset-0 opacity-70" />
       </div>
 
-      {/* Extra clipped fragment top-right */}
-      <div className="absolute top-[34%] right-[-6%] z-[13] h-[22%] w-[38%] overflow-hidden bg-[#3a0a0e] opacity-90 shadow-[-12px_8px_30px_rgba(0,0,0,0.4)]">
-        {d ? (
-          <Image src={d} alt="" fill unoptimized={d.startsWith("/") || d.startsWith("http")} className="led-collage-soft object-cover object-[70%_40%] opacity-65" sizes="40vw" />
-        ) : null}
-        <div className="absolute inset-0 bg-[#DF0A14]/35 mix-blend-multiply" />
-        <div className="led-print-grain absolute inset-0" />
-      </div>
+      {inset ? (
+        <div className="absolute top-[34%] right-[-6%] z-[13] hidden h-[22%] w-[38%] overflow-hidden bg-[#3a0a0e] opacity-90 shadow-[-12px_8px_30px_rgba(0,0,0,0.4)] sm:block">
+          <Image src={inset} alt="" fill unoptimized={inset.startsWith("/") || inset.startsWith("http")} className="led-collage-soft object-cover object-[70%_40%] opacity-65" sizes="40vw" />
+          <div className="absolute inset-0 bg-[#DF0A14]/35 mix-blend-multiply" />
+          <div className="led-print-grain absolute inset-0" />
+        </div>
+      ) : null}
 
       <div className="led-print-grain pointer-events-none absolute inset-0 z-30 opacity-50" />
-      <div className="pointer-events-none absolute inset-0 z-30 bg-gradient-to-t from-black via-transparent to-black/30" />
+      <div className="pointer-events-none absolute inset-0 z-30 bg-gradient-to-t from-black via-transparent to-black/25" />
     </div>
   );
 }
@@ -1689,7 +1665,9 @@ function CarsonLedBriefing({
   const words = briefing.split(" ");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const withArt = stories.filter((story) => story.imageSrc);
-  const stack = withArt.length ? withArt : stories;
+  // Peeking slates moved under the hero as article previews (skip lead — it's the main plate).
+  const previews = (withArt.length ? withArt : stories).slice(1);
+  const stack = previews.length ? previews : withArt.length ? withArt : stories;
 
   return (
     <div className="led-briefing min-h-screen overflow-x-hidden bg-[#EDE7DE] text-[#0A0A0A]">
@@ -1820,7 +1798,7 @@ function CarsonLedBriefing({
               {lead?.dek || lead?.displayTitle}
             </p>
             <a href="#led-stack" className={`mt-6 ${weekCta}`} style={uiBold}>
-              Browse the stack
+              More stories
               <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-4 w-4" />
             </a>
           </div>
@@ -1828,22 +1806,26 @@ function CarsonLedBriefing({
       </header>
 
       <section id="led-stack" className="relative scroll-mt-12 bg-[#120e0c]">
-        <div className="relative z-20 px-4 pt-14 pb-6 sm:px-8 lg:px-12">
-          <p className="text-[11px] font-bold tracking-[0.2em] text-[#FF6A2A] uppercase" style={uiBold}>
-            Story order · press stack
+        <div className="relative z-20 border-t border-white/10 bg-[#EDE7DE] px-4 pt-12 pb-8 sm:px-8 lg:px-12">
+          <p className="text-[11px] font-bold tracking-[0.2em] text-[#DF0A14] uppercase" style={uiBold}>
+            Article previews · press stack
           </p>
-          <h2 className="led-ink mt-3 max-w-[16ch] text-[clamp(2.2rem,5.5vw,3.8rem)] leading-[0.92] tracking-[-0.035em] text-[#E8E0D4]" style={roman}>
-            Tap an image. Read underneath.
+          <h2 className="led-ink mt-3 max-w-[16ch] text-[clamp(2.2rem,5.5vw,3.8rem)] leading-[0.92] tracking-[-0.035em] text-[#011535]" style={roman}>
+            More from this edition
           </h2>
-          <div className="mt-4 h-[4px] w-24 bg-[#DF0A14]" aria-hidden />
+          <p className="mt-3 max-w-[40ch] text-[16px] leading-7 text-black/60" style={roman}>
+            The peeking plates live here — tap one to read the story underneath.
+          </p>
+          <div className="mt-5 h-[4px] w-24 bg-[#DF0A14]" aria-hidden />
         </div>
 
         <ol className="relative m-0 list-none p-0">
           {stack.map((story, storyIndex) => {
+            const plateNo = lead && stack[0]?.id !== lead.id ? storyIndex + 1 : storyIndex;
             const tone = storyIndex % 3 === 0 ? "crimson" : storyIndex % 3 === 1 ? "ink" : "midnight";
-            const gated = locked && storyIndex > 0;
+            const gated = locked && plateNo > 0;
             const isOpen = expandedId === story.id;
-            const peek = storyIndex === 0 ? "mt-0" : isOpen ? "mt-0" : "-mt-16 sm:-mt-24";
+            const peek = storyIndex === 0 ? "mt-0" : isOpen ? "mt-0" : "-mt-8 sm:-mt-10";
             return (
               <li
                 key={story.id}
@@ -1856,8 +1838,8 @@ function CarsonLedBriefing({
                   onClick={() => setExpandedId(isOpen ? null : story.id)}
                   aria-expanded={isOpen}
                   aria-controls={`led-story-${story.id}`}
-                  className={`group relative block h-[42svh] w-full overflow-hidden text-left outline-none transition-transform duration-500 sm:h-[48svh] ${
-                    isOpen ? "shadow-[0_24px_50px_rgba(0,0,0,0.35)]" : "shadow-[0_-24px_60px_rgba(0,0,0,0.55)] hover:-translate-y-0.5"
+                  className={`group relative block w-full overflow-hidden text-left outline-none transition-[height,transform] duration-500 ${
+                    isOpen ? "h-[46svh] sm:h-[52svh] shadow-[0_24px_50px_rgba(0,0,0,0.35)]" : "h-[16svh] sm:h-[18svh] shadow-[0_-18px_40px_rgba(0,0,0,0.5)] hover:-translate-y-0.5"
                   } focus-visible:ring-2 focus-visible:ring-[#DF0A14] focus-visible:ring-inset`}
                 >
                   <PrintPlate
@@ -1872,7 +1854,7 @@ function CarsonLedBriefing({
                   <span className="absolute inset-x-0 bottom-0 z-20 flex items-end justify-between gap-4 bg-gradient-to-t from-black/90 via-black/45 to-transparent px-4 pb-5 pt-20 sm:px-8 sm:pb-7 lg:px-12">
                     <span className="min-w-0 max-w-[48rem]">
                       <span className="inline-flex items-center gap-2 bg-black/70 px-2 py-1 text-[11px] font-bold tracking-[0.14em] text-white uppercase shadow-[2px_2px_0_#DF0A14]" style={uiBold}>
-                        {number(storyIndex)} · {story.chip}
+                        {number(plateNo)} · {story.chip}
                       </span>
                       <span className="mt-3 block line-clamp-2 text-[clamp(1.35rem,2.8vw,2.1rem)] leading-[1.1] text-white" style={roman}>
                         {story.dek}
@@ -1895,7 +1877,7 @@ function CarsonLedBriefing({
                     <div className="border-b border-black/15 px-4 py-10 sm:px-8 sm:py-12 lg:px-12">
                       <div className="mx-auto max-w-[720px]">
                         <p className="text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
-                          {number(storyIndex)} · {story.chip}
+                          {number(plateNo)} · {story.chip}
                         </p>
                         <h3 className="mt-3 text-[clamp(1.85rem,4vw,2.75rem)] leading-[1.05] text-[#011535]" style={roman}>
                           {story.displayTitle}
