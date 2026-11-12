@@ -251,7 +251,7 @@ function NewsletterForm() {
 function MiniLatestBriefing() {
   const edition = EDITIONS.find((item) => item.id === "morning") ?? EDITIONS[0];
   const withImages = edition.stories.filter((story) => story.imageSrc);
-  const preview = withImages.slice(0, 5);
+  const preview = withImages.slice(0, 3);
   const moreCount = Math.max(0, edition.stories.length - preview.length);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [atStart, setAtStart] = useState(true);
@@ -290,23 +290,13 @@ function MiniLatestBriefing() {
           </h2>
           <div className="mt-3 h-[3px] w-14 bg-[#DF0A14]" aria-hidden />
           <p className="mt-4 text-[15px] leading-6 text-[#666666]" style={roman}>
-            A short look at today’s stories. Keep going in the mini briefing, or open the full report.
+            A short look at today’s top stories — then open the full briefing to keep reading.
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <Link
-            href="/report"
-            className="inline-flex items-center gap-2 border border-[#0A0A0A] bg-white px-4 py-3 text-xs font-bold tracking-[0.05em] text-[#0A0A0A] uppercase transition-opacity hover:opacity-80"
-            style={uiBold}
-          >
-            Mini briefing
-            <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-4 w-4" />
-          </Link>
-          <Link href="/report?layout=classic" className={weekCta} style={uiBold}>
-            Full briefing
-            <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-4 w-4" />
-          </Link>
-        </div>
+        <Link href="/report" className={weekCta} style={uiBold}>
+          Open briefing
+          <BrandIcon name="chevronRight" defaultIcon={ChevronRight} className="h-4 w-4" />
+        </Link>
       </div>
 
       <div className="relative px-2 py-5 sm:px-4">
