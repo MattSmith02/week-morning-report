@@ -1633,7 +1633,7 @@ function PressHeroCollage({ stories }: { stories: WeekStory[] }) {
         {a ? (
           <Image src={a} alt="" fill priority unoptimized={a.startsWith("/") || a.startsWith("http")} className="led-collage-soft object-cover object-center opacity-85" sizes="100vw" />
         ) : null}
-        <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_78%_42%,rgba(255,120,40,0.55),transparent_55%),linear-gradient(180deg,rgba(90,8,12,0.2),rgba(40,4,6,0.78))]" />
+        <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_78%_42%,rgba(223,10,20,0.55),transparent_55%),linear-gradient(180deg,rgba(90,8,12,0.2),rgba(40,4,6,0.78))]" />
         <div className="led-print-grain absolute inset-0 opacity-70" />
       </div>
 
@@ -1682,13 +1682,13 @@ function CarsonLedBriefing({
         }
         .led-briefing .led-print-wash--ink {
           background:
-            radial-gradient(110% 80% at 70% 40%, rgba(255,120,40,0.28), transparent 55%),
+            radial-gradient(110% 80% at 70% 40%, rgba(223,10,20,0.28), transparent 55%),
             linear-gradient(180deg, rgba(18,14,12,0.2), rgba(18,14,12,0.72));
           mix-blend-mode: multiply;
         }
         .led-briefing .led-print-wash--crimson {
           background:
-            radial-gradient(120% 80% at 78% 42%, rgba(255,120,40,0.55), transparent 55%),
+            radial-gradient(120% 80% at 78% 42%, rgba(223,10,20,0.55), transparent 55%),
             linear-gradient(180deg, rgba(90,8,12,0.2), rgba(40,4,6,0.78));
           mix-blend-mode: multiply;
         }
@@ -1773,7 +1773,7 @@ function CarsonLedBriefing({
                 <>
                   <span className="block -ml-1">{words[0]}</span>
                   <span className="relative ml-[8%] block">
-                    <span className="text-[#FF6A2A]">{words.slice(1).join(" ")}</span>
+                    <span className="text-[#DF0A14]">{words.slice(1).join(" ")}</span>
                     <span className="pointer-events-none absolute inset-x-[-4%] top-[48%] h-[38%] bg-[#6b0a10]/75" aria-hidden />
                   </span>
                 </>
@@ -1871,7 +1871,7 @@ function CarsonLedBriefing({
                           {story.displayTitle}
                         </h3>
                         <div className="relative mt-3 max-w-[40ch]">
-                          <p className="text-[clamp(1.25rem,2.4vw,1.65rem)] leading-[1.2] text-[#FF6A2A]" style={roman}>
+                          <p className="text-[clamp(1.25rem,2.4vw,1.65rem)] leading-[1.2] text-[#DF0A14]" style={roman}>
                             {story.dek}
                           </p>
                           <span className="pointer-events-none absolute inset-x-[-2%] top-[48%] h-[36%] bg-[#6b0a10]/7" aria-hidden />
@@ -1892,7 +1892,7 @@ function CarsonLedBriefing({
                           <div className="mt-10 space-y-8 text-[17px] leading-7 text-[#E8E0D4]/88 sm:text-[18px] sm:leading-8" style={roman}>
                             {story.whatHappened ? (
                               <section>
-                                <p className="text-[11px] font-bold tracking-[0.18em] text-[#FF6A2A] uppercase" style={uiBold}>
+                                <p className="text-[11px] font-bold tracking-[0.18em] text-[#DF0A14] uppercase" style={uiBold}>
                                   What happened
                                 </p>
                                 <p className="mt-3">{story.whatHappened}</p>
@@ -1900,7 +1900,7 @@ function CarsonLedBriefing({
                             ) : null}
                             {story.quote ? (
                               <section>
-                                <p className="text-[11px] font-bold tracking-[0.18em] text-[#FF6A2A] uppercase" style={uiBold}>
+                                <p className="text-[11px] font-bold tracking-[0.18em] text-[#DF0A14] uppercase" style={uiBold}>
                                   Quote
                                 </p>
                                 <p className="mt-3 border-l-[5px] border-[#DF0A14] pl-4 text-[clamp(1.35rem,2.5vw,1.75rem)] leading-[1.25] text-white italic">
@@ -1915,7 +1915,7 @@ function CarsonLedBriefing({
                             ) : null}
                             {story.whoSaidWhat ? (
                               <section>
-                                <p className="text-[11px] font-bold tracking-[0.18em] text-[#FF6A2A] uppercase" style={uiBold}>
+                                <p className="text-[11px] font-bold tracking-[0.18em] text-[#DF0A14] uppercase" style={uiBold}>
                                   Who said what
                                 </p>
                                 <p className="mt-3">{story.whoSaidWhat}</p>
@@ -1923,7 +1923,7 @@ function CarsonLedBriefing({
                             ) : null}
                             {story.whatsNext ? (
                               <section>
-                                <p className="text-[11px] font-bold tracking-[0.18em] text-[#FF6A2A] uppercase" style={uiBold}>
+                                <p className="text-[11px] font-bold tracking-[0.18em] text-[#DF0A14] uppercase" style={uiBold}>
                                   What’s next
                                 </p>
                                 <p className="mt-3">{story.whatsNext}</p>
@@ -1931,7 +1931,7 @@ function CarsonLedBriefing({
                             ) : null}
                             {story.stats?.length ? (
                               <section>
-                                <p className="text-[11px] font-bold tracking-[0.18em] text-[#FF6A2A] uppercase" style={uiBold}>
+                                <p className="text-[11px] font-bold tracking-[0.18em] text-[#DF0A14] uppercase" style={uiBold}>
                                   {story.statsHeading || "Figures"}
                                 </p>
                                 <ul className="mt-4 space-y-3">
@@ -1948,13 +1948,13 @@ function CarsonLedBriefing({
                             ) : null}
                             {story.items?.length ? (
                               <section>
-                                <p className="text-[11px] font-bold tracking-[0.18em] text-[#FF6A2A] uppercase" style={uiBold}>
+                                <p className="text-[11px] font-bold tracking-[0.18em] text-[#DF0A14] uppercase" style={uiBold}>
                                   Notes
                                 </p>
                                 <ul className="mt-4 space-y-4">
                                   {story.items.map((item) => (
                                     <li key={item.label} className="border-b border-white/15 pb-4">
-                                      <p className="text-[11px] font-bold tracking-[0.14em] text-[#FF6A2A] uppercase" style={uiBold}>
+                                      <p className="text-[11px] font-bold tracking-[0.14em] text-[#DF0A14] uppercase" style={uiBold}>
                                         {item.label}
                                       </p>
                                       <p className="mt-2 text-white">{item.text}</p>
@@ -1969,7 +1969,7 @@ function CarsonLedBriefing({
                         <button
                           type="button"
                           onClick={() => setExpandedId(null)}
-                          className="mt-10 text-[12px] font-bold tracking-[0.18em] text-[#E8E0D4]/55 uppercase hover:text-[#FF6A2A]"
+                          className="mt-10 text-[12px] font-bold tracking-[0.18em] text-[#E8E0D4]/55 uppercase hover:text-[#DF0A14]"
                           style={uiBold}
                         >
                           Fold plate
